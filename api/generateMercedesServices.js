@@ -4,12 +4,14 @@ const OpenApi = require("openapi-typescript-codegen");
 
 const spec = path.resolve(__dirname, "spec");
 const temp = path.resolve(__dirname, "__temp__");
-const mercedesServices = path.resolve(__dirname, "services/mercedes");
+const mercedesServices = path.resolve(
+  __dirname,
+  "mercedes-services/__generated__"
+);
 
 /** @type {import('openapi-typescript-codegen').Options} */
 const options = {
   indent: "2",
-  useOptions: true,
   useUnionTypes: true,
   output: temp,
   httpClient: "node",

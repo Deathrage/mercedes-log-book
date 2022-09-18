@@ -1,13 +1,16 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from "typeorm";
+import entity from "../decorators/entity";
+import Entity from "./Entity";
+import PropulsionType from "./PropulsionType";
 
-@Entity()
-export default class Car {
-  @ObjectIdColumn()
-  id: ObjectID;
-  @Column()
+@entity("Vehicles")
+export default class Vehicle implements Entity {
+  id: string;
   vin: string;
-  @Column()
   license: string;
-  @Column()
   model: string;
+  propulsion: PropulsionType;
+
+  constructor(entity?: Vehicle) {
+    if (entity) Object.assign(this, entity);
+  }
 }
