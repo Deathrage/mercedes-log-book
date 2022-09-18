@@ -6,10 +6,11 @@ import {
   parseDoorLockStatus,
   parseNumber,
 } from "./helpers";
+import { MercedesService } from "./MercedesService";
 import { ContainerVehicleLockStatusService } from "./__generated__/services/ContainerVehicleLockStatusService";
 
 @injectable()
-export default class VehicleLockStatusService {
+export default class VehicleLockStatusService extends MercedesService {
   async get(vehicleId: string): Promise<VehicleLockStatus> {
     const responses =
       await ContainerVehicleLockStatusService.getResourcesForContainerIdUsingGet(

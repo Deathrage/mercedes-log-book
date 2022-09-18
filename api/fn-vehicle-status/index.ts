@@ -1,7 +1,4 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import { tryBootstrap } from "../bootstrap";
-
-tryBootstrap();
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
