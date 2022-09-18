@@ -2,7 +2,8 @@
   "compilerOptions": {
     "module": "commonjs",
     "outDir": "dist",
-    "rootDir": "."
+    "rootDir": ".",
+    "strictPropertyInitialization": false
   },
   "extends": "../tsconfig.json"
 }
