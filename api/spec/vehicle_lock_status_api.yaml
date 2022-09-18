@@ -1,0 +1,423 @@
+openapi: 3.0.0
+info:
+  contact:
+    name: The open API platform by Mercedes-Benz
+  description: "This API allows access to vehicle lock status data of Mercedes-Benz vehicles remotely.\nData is categorized into resources and containers for the polling interface. They are defined as follows:\n* *Resource*: A resource is a single information about a vehicle. It's a measurement that consists of a name (also referred to as resource ID), a value, and an associated timestamp. See below for a list and description of all resources that this API provides.\n* *Container*: A container is a set of resources that are defined to group data for a certain use case.\n\nThe interface is a ISO 20078-compliant REST endpoint to query the latest data for a vehicle. If the vehicle did not send an update for a resource within 12 hours, the response will be empty.\n## Resources\nThis is an alphabetical list of all resources that the API provides.\nName | Description | Unit/Range\n---- | ----------- | ----------\ndoorlockstatusdecklid | \tLock status of the deck lid | false: locked<br>true: unlocked\ndoorlockstatusvehicle | Vehicle lock status | 0: vehicle unlocked<br>1: vehicle internal locked<br>2: vehicle external locked<br>3: vehicle selective unlocked\ndoorlockstatusgas | Status of gas tank door lock | false: locked<br>true: unlocked\npositionHeading | Vehicle heading position | 0..359.9 degrees\n"
+  title: Vehicle Lock Status API
+  version: '2.0'
+servers:
+  - url: 'https://api.mercedes-benz.com/vehicledata/v2'
+paths:
+  '/vehicles/{vehicleId}/containers/vehiclelockstatus':
+    get:
+      parameters:
+        - description: Vehicle identification number
+          in: path
+          name: vehicleId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                items:
+                  $ref: '#/components/schemas/VehicleLockStatus'
+                type: array
+          description: OK
+        '204':
+          description: No data available
+        '400':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Forbidden
+        '404':
+          description: Resource not Found
+        '429':
+          description: The service received too many requests in a given amount of time.
+        '500':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Internal Server Error
+        '503':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Service Unavailable
+      tags:
+        - Container Vehicle Lock Status
+      deprecated: false
+      operationId: getResourcesForContainerIdUsingGET
+      summary: >-
+        Returns all resources for the container 'vehiclelockstatus', data can be
+        filtered for a certain time range.
+  '/vehicles/{vehicleId}/resources':
+    get:
+      parameters:
+        - description: Vehicle identification number
+          in: path
+          name: vehicleId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ResourceMetaInfo'
+                type: array
+          description: OK
+        '204':
+          description: No data available
+        '400':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Forbidden
+        '404':
+          description: Resource not Found
+        '429':
+          description: The service received too many requests in a given amount of time.
+        '500':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Internal Server Error
+        '503':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Service Unavailable
+      tags:
+        - Resources
+      deprecated: false
+      operationId: getAllResourcesForVinUsingGET
+      summary: >-
+        Returns all available resources for the provided vehicle identification
+        number.
+  '/vehicles/{vehicleId}/resources/doorlockstatusdecklid':
+    get:
+      parameters:
+        - description: Vehicle identification number
+          in: path
+          name: vehicleId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                properties:
+                  doorlockstatusdecklid:
+                    $ref: '#/components/schemas/Resource'
+                type: object
+          description: OK
+        '204':
+          description: No data available
+        '400':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Forbidden
+        '404':
+          description: Resource not Found
+        '429':
+          description: The service received too many requests in a given amount of time.
+        '500':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Internal Server Error
+        '503':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Service Unavailable
+      tags:
+        - Door Lock Deck Lid Status Resource
+      deprecated: false
+      operationId: getLatestDoorLockStatusdeckLidUsingGET
+      summary: >-
+        Returns the latest available door lock deck lid status resource for the
+        provided vehicle identification number.
+  '/vehicles/{vehicleId}/resources/doorlockstatusgas':
+    get:
+      parameters:
+        - description: Vehicle identification number
+          in: path
+          name: vehicleId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                properties:
+                  doorlockstatusgas:
+                    $ref: '#/components/schemas/Resource'
+                type: object
+          description: OK
+        '204':
+          description: No data available
+        '400':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Forbidden
+        '404':
+          description: Resource not Found
+        '429':
+          description: The service received too many requests in a given amount of time.
+        '500':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Internal Server Error
+        '503':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Service Unavailable
+      tags:
+        - Door Lock Gas Status Resource
+      deprecated: false
+      operationId: getLatestDoorLockStatusGasUsingGET
+      summary: >-
+        Returns the latest available door lock status gas resource for the
+        provided vehicle identification number.
+  '/vehicles/{vehicleId}/resources/doorlockstatusvehicle':
+    get:
+      parameters:
+        - description: Vehicle identification number
+          in: path
+          name: vehicleId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                properties:
+                  doorlockstatusvehicle:
+                    $ref: '#/components/schemas/Resource'
+                type: object
+          description: OK
+        '204':
+          description: No data available
+        '400':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Forbidden
+        '404':
+          description: Resource not Found
+        '429':
+          description: The service received too many requests in a given amount of time.
+        '500':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Internal Server Error
+        '503':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Service Unavailable
+      tags:
+        - Door Lock Status Resource
+      deprecated: false
+      operationId: getLatestDoorLockStatusUsingGET
+      summary: >-
+        Returns the latest available door lock status resource for the provided
+        vehicle identification number.
+  '/vehicles/{vehicleId}/resources/positionHeading':
+    get:
+      parameters:
+        - description: Vehicle identification number
+          in: path
+          name: vehicleId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                properties:
+                  positionHeading:
+                    $ref: '#/components/schemas/Resource'
+                type: object
+          description: OK
+        '204':
+          description: No data available
+        '400':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Forbidden
+        '404':
+          description: Resource not Found
+        '429':
+          description: The service received too many requests in a given amount of time.
+        '500':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Internal Server Error
+        '503':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Service Unavailable
+      tags:
+        - Position Heading Resource
+      deprecated: false
+      operationId: getLatestPositionHeadingUsingGET
+      summary: >-
+        Returns the latest available position heading resource for the provided
+        vehicle identification number.
+components:
+  schemas:
+    ExVeError:
+      properties:
+        exveErrorId:
+          type: string
+        exveErrorMsg:
+          type: string
+        exveErrorRef:
+          type: string
+      title: ExVeError
+      type: object
+    Resource:
+      properties:
+        timestamp:
+          type: integer
+        value:
+          type: string
+      title: Resource
+      type: object
+    ResourceMetaInfo:
+      properties:
+        href:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+      title: ResourceMetaInfo
+      type: object
+    VehicleLockStatus:
+      properties:
+        doorlockstatusdecklid:
+          $ref: '#/components/schemas/Resource'
+        doorlockstatusgas:
+          $ref: '#/components/schemas/Resource'
+        doorlockstatusvehicle:
+          $ref: '#/components/schemas/Resource'
+        positionHeading:
+          $ref: '#/components/schemas/Resource'
+      title: VehicleLockStatus
+      type: object
+  securitySchemes:
+    OAuth2:
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://id.mercedes-benz.com/as/authorization.oauth2'
+          scopes:
+            'mb:vehicle:mbdata:vehiclelock': Grant vehicle lock status access
+          tokenUrl: 'https://id.mercedes-benz.com/as/token.oauth2'
+      type: oauth2
+security:
+  - OAuth2:
+      - 'mb:vehicle:mbdata:vehiclelock'
+tags:
+  - description: Vehicle Status service for view all Vehicle Status vehicle data points
+    name: Container Vehicle Lock Status
+  - description: Vehicle Lock Status service for view all accessible resources
+    name: Resources
+  - description: Door lock status service for view door lock resource
+    name: Door Lock Status Resource
+  - description: Deck lid lock status service for view deck lid lock resource
+    name: Door Lock Deck Lid Status Resource
+  - description: Door gas lock status service for view door gas resource
+    name: Door Lock Gas Status Resource
+  - description: Position heading service for view position heading resource
+    name: Position Heading Resource

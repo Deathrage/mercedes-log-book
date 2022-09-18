@@ -1,0 +1,265 @@
+openapi: 3.0.0
+info:
+  contact:
+    name: The open API platform by Mercedes-Benz
+  description: >
+    This API allows access to odometer information data of Mercedes-Benz
+    vehicles to offer distance based insurance services.
+
+    Data is categorized into resources and containers for the polling interface.
+    They are defined as follows:
+
+    * *Resource*: A resource is a single information about a vehicle. It's a
+    measurement that consists of a name (also referred to as resource ID), a
+    value, and an associated timestamp. See below for a list and description of
+    all resources that this API provides.
+
+    * *Container*: A container is a set of resources that are defined to group
+    data for a certain use case.
+
+
+    The interface is a ISO 20078-compliant REST endpoint to query the latest
+    data for a vehicle. If the vehicle did not send an update for a resource
+    within 12 hours, the response will be empty.
+
+    ## Resources
+
+    This is an alphabetical list of all resources that the API provides.
+
+    Name | Description | Unit/Range
+
+    ---- | ----------- | ----------
+
+    odo | Odometer | 0..999999 km
+  title: Pay As You Drive Insurance API
+  version: '2.0'
+servers:
+  - url: 'https://api.mercedes-benz.com/vehicledata/v2'
+paths:
+  '/vehicles/{vehicleId}/containers/payasyoudrive':
+    get:
+      parameters:
+        - description: Vehicle identification number
+          in: path
+          name: vehicleId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                items:
+                  properties:
+                    odo:
+                      $ref: '#/components/schemas/Resource'
+                  type: object
+                type: array
+          description: OK
+        '204':
+          description: No data available
+        '400':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Forbidden
+        '404':
+          description: Resource not Found
+        '429':
+          description: The service received too many requests in a given amount of time.
+        '500':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Internal Server Error
+        '503':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Service Unavailable
+      tags:
+        - Container Pay As You Drive Insurance
+      deprecated: false
+      operationId: getResourcesForContainerIdUsingGET
+      summary: >-
+        Returns all resources for the container 'insurance', data can be
+        filtered for a certain time range.
+  '/vehicles/{vehicleId}/resources':
+    get:
+      parameters:
+        - description: Vehicle identification number
+          in: path
+          name: vehicleId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ResourceMetaInfo'
+                type: array
+          description: OK
+        '204':
+          description: No data available
+        '400':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Forbidden
+        '404':
+          description: Resource not Found
+        '429':
+          description: The service received too many requests in a given amount of time.
+        '500':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Internal Server Error
+        '503':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Service Unavailable
+      tags:
+        - Resources
+      deprecated: false
+      operationId: getAllResourcesForVinUsingGET
+      summary: >-
+        Returns all available resources for the provided vehicle identification
+        number.
+  '/vehicles/{vehicleId}/resources/odo':
+    get:
+      parameters:
+        - description: Vehicle identification number
+          in: path
+          name: vehicleId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                properties:
+                  odo:
+                    $ref: '#/components/schemas/Resource'
+                type: object
+          description: OK
+        '204':
+          description: No data available
+        '400':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Forbidden
+        '404':
+          description: Resource not Found
+        '429':
+          description: The service received too many requests in a given amount of time.
+        '500':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Internal Server Error
+        '503':
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/ExVeError'
+          description: Service Unavailable
+      tags:
+        - Odometer resource
+      deprecated: false
+      operationId: getLatestOdometerUsingGET
+      summary: >-
+        Returns the latest available odometer resource for the provided vehicle
+        identification number.
+components:
+  schemas:
+    ExVeError:
+      properties:
+        exveErrorId:
+          type: string
+        exveErrorMsg:
+          type: string
+        exveErrorRef:
+          type: string
+      title: ExVeError
+      type: object
+    Resource:
+      properties:
+        timestamp:
+          type: integer
+        value:
+          type: string
+      title: Resource
+      type: object
+    ResourceMetaInfo:
+      properties:
+        href:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+      title: ResourceMetaInfo
+      type: object
+  securitySchemes:
+    OAuth2:
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://id.mercedes-benz.com/as/authorization.oauth2'
+          scopes:
+            'mb:vehicle:mbdata:payasyoudrive': Grant odometer access
+          tokenUrl: 'https://id.mercedes-benz.com/as/token.oauth2'
+      type: oauth2
+security:
+  - OAuth2:
+      - 'mb:vehicle:mbdata:payasyoudrive'
+tags:
+  - description: >-
+      Pay As You Drive Insurance service for view all Pay As You Drive Insurance
+      vehicle data points
+    name: Container Pay As You Drive Insurance
+  - description: Pay As You Drive Insurance service for view all accessible resources
+    name: Resources
+  - description: Pay As You Drive Insurance service for view odometer resource
+    name: Odometer resource
+

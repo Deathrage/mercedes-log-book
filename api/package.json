@@ -1,0 +1,18 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "devDependencies": {
+    "@azure/functions": "^3.0.0",
+    "@openapitools/openapi-generator-cli": "^2.5.2",
+    "@types/node": "16.x",
+    "typescript": "^4.0.0"
+  }
+}
