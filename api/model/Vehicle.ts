@@ -9,6 +9,7 @@ export default class Vehicle implements Entity {
   license: string;
   model: string;
   propulsion: PropulsionType;
+  lastSeen: number;
 
   constructor(entity?: Vehicle) {
     if (entity) Object.assign(this, entity);

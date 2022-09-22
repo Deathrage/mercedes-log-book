@@ -5,7 +5,7 @@ const tryInitializeMercedesServices = () => {
   if (initialized) return;
   initialized = true;
 
-  OpenAPI.BASE = "https://api.mercedes-benz.com/vehicledata_tryout/v2";
+  OpenAPI.BASE = "https://api.mercedes-benz.com/vehicledata/v2";
 };
 
 export class MercedesService {

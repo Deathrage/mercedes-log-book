@@ -6,7 +6,7 @@
       "direction": "in",
       "name": "req",
       "methods": ["get"],
-      "route": "hello-world"
+      "route": ".mb-auth"
     },
     {
       "type": "http",
@@ -14,5 +14,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/fn-hello-world/index.js"
+  "scriptFile": "../dist/fn-authenticate-mb/index.js"
 }
