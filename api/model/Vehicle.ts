@@ -11,7 +11,7 @@ export default class Vehicle implements Entity {
   propulsion: PropulsionType;
   lastSeen: number;
 
-  constructor(entity?: Vehicle) {
+  constructor(entity?: Partial<Vehicle>) {
     if (entity) Object.assign(this, entity);
   }
 }

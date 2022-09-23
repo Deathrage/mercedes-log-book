@@ -1,6 +1,7 @@
 import { CosmosClient, SqlParameter } from "@azure/cosmos";
 import { injectable } from "inversify";
 import { getEntityContainer } from "../decorators/entity";
+import { isValidatable } from "../helpers/predicate";
 import Entity from "../model/Entity";
 
 @injectable()
@@ -11,6 +12,9 @@ export class DataSource {
 
   async upsert<TEntity extends Entity>(entity: TEntity): Promise<void> {
     const container = this.#getEntityContainer(entity);
+
+    if (isValidatable(entity)) entity.validate();
+
     const { resource } = await this.#cosmos
       .database(this.#database)
       .container(container)
