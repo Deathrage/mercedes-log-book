@@ -1,6 +1,14 @@
-import { Context, HttpRequest } from "@azure/functions";
-import createHandler from "../helpers/createHandler";
+import { HttpResponse } from "@azure/functions";
+import { injectable } from "inversify";
+import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
 
-export default createHandler((_: Context, req: HttpRequest) => ({
-  body: "Hello world!",
-}));
+@injectable()
+class HelloWorld implements HttpRequestHandler {
+  handle(): HttpResponse {
+    return {
+      body: "Hello world!",
+    };
+  }
+}
+
+export default createHttpRequestHandler(HelloWorld, true);

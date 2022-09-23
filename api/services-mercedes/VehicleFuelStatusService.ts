@@ -1,9 +1,8 @@
 import { injectable } from "inversify";
 import { VehicleFuelStatus } from "../model/VehicleFuelStatus";
 import { findResource, parseNumber } from "./helpers";
-import { MercedesService } from "./MercedesService";
+import MercedesService from "./MercedesService";
 import { MercedesBenzClient } from "./__generated__";
-import { ContainerFuelStatusService } from "./__generated__/services/ContainerFuelStatusService";
 
 @injectable()
 export default class VehicleFuelStatusService extends MercedesService<VehicleFuelStatus> {

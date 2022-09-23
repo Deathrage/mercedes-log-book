@@ -5,5 +5,5 @@
   "azureFunctions.projectRuntime": "~4",
   "debug.internalConsoleOptions": "neverOpen",
   "azureFunctions.preDeployTask": "npm prune (functions)",
-  "cSpell.words": ["Oidc", "upserted", "Validatable"]
+  "cSpell.words": ["Authed", "Oidc", "upserted", "Validatable"]
 }

@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 import VehicleOdometerStatus from "../model/VehicleOdometerStatus";
 import { findResource, parseNumber } from "./helpers";
-import { MercedesService } from "./MercedesService";
+import MercedesService from "./MercedesService";
 import { MercedesBenzClient } from "./__generated__";
 
 @injectable()

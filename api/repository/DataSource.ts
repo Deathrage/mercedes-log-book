@@ -29,14 +29,14 @@ export class DataSource {
     id: string
   ): Promise<TEntity | null> {
     const container = getEntityContainer(type);
-    const { resource } = await this.#cosmos
+    const res = await this.#cosmos
       .database(this.#database)
       .container(container)
-      .item(id)
+      .item(id, id)
       .read<TEntity>();
 
-    if (!resource) return null;
-    return new type(resource);
+    if (!res.resource) return null;
+    return new type(res.resource);
   }
 
   async query<TEntity extends Entity>(
@@ -77,7 +77,7 @@ export class DataSource {
     const { resource } = await this.#cosmos
       .database(this.#database)
       .container(container)
-      .item(id)
+      .item(id, id)
       .delete<Entity>();
 
     if (!resource) throw new Error(`Entity for id ${id} was not found!`);

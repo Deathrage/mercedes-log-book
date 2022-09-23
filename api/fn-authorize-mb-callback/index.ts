@@ -4,18 +4,18 @@ import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
 import MercedesOidc from "../services-mercedes/MercedesOidc";
 
 @injectable()
-class AuthorizeMercedesBenz implements HttpRequestHandler {
+class AuthorizeMercedesBenzCallback implements HttpRequestHandler {
   constructor(oidc: MercedesOidc) {
     this.#oidc = oidc;
   }
 
   async handle(req: HttpRequest): Promise<HttpResponse> {
-    const oidcUrl = await this.#oidc.beginAuthorization(req.user!.username);
+    await this.#oidc.finishAuthorization(req.user!.username, req.url);
 
     return {
       status: 302,
       headers: {
-        Location: oidcUrl,
+        Location: "/",
       },
       body: "Redirecting...",
     };
@@ -24,4 +24,4 @@ class AuthorizeMercedesBenz implements HttpRequestHandler {
   #oidc: MercedesOidc;
 }
 
-export default createHttpRequestHandler(AuthorizeMercedesBenz, false);
+export default createHttpRequestHandler(AuthorizeMercedesBenzCallback, false);

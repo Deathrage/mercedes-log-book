@@ -6,7 +6,7 @@ import {
   parseDoorLockStatus,
   parseNumber,
 } from "./helpers";
-import { MercedesService } from "./MercedesService";
+import MercedesService from "./MercedesService";
 import { MercedesBenzClient } from "./__generated__";
 
 @injectable()

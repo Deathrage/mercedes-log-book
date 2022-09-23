@@ -6,7 +6,7 @@
       "direction": "in",
       "name": "req",
       "methods": ["get"],
-      "route": "vehicle-status"
+      "route": ".mb-auth-callback"
     },
     {
       "type": "http",
@@ -14,5 +14,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/fn-vehicle-status/index.js"
+  "scriptFile": "../dist/fn-authorize-mb-callback/index.js"
 }
