@@ -10,9 +10,7 @@ export default class UserRepository {
 
   async get(id: string): Promise<User> {
     const user = await this.#dataSource.read(User, id);
-
     if (!user) throw new Error(`User ${id} does not exist!`);
-
     return user;
   }
 
@@ -21,7 +19,7 @@ export default class UserRepository {
   }
 
   async getOrCreate(id: string, fallback: User) {
-    let user = await this.get(id);
+    let user = await this.#dataSource.read(User, id);
     if (!user) {
       user = fallback;
       await this.#dataSource.upsert(user);
