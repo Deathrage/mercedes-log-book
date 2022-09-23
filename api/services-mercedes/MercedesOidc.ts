@@ -39,7 +39,7 @@ export default class MercedesOidc {
     user.mercedesBenzNonce = uuidv4();
     user.mercedesBenz = undefined;
 
-    await this.#repository.upsert(user);
+    await this.#repository.createOrUpdate(user);
 
     const url = client.authorizationUrl({
       scope: scopes.join(" "),
@@ -61,7 +61,7 @@ export default class MercedesOidc {
       );
     user.mercedesBenzNonce = undefined;
     // Immediately delete the nonce as if anything fails later on nonce wont be stored anymore and cannot be misused
-    await this.#repository.upsert(user);
+    await this.#repository.createOrUpdate(user);
 
     const params = client.callbackParams(callbackUrl);
     const tokens = await client.oauthCallback(
@@ -111,7 +111,7 @@ export default class MercedesOidc {
       refreshToken: tokens.refresh_token!,
     };
 
-    await this.#repository.upsert(user);
+    await this.#repository.createOrUpdate(user);
 
     return tokens;
   }

@@ -14,8 +14,8 @@ export default class UserRepository {
     return user;
   }
 
-  async upsert(user: User): Promise<void> {
-    await this.#dataSource.upsert(user);
+  createOrUpdate(user: User): Promise<void> {
+    return this.#dataSource.upsert(user);
   }
 
   async getOrCreate(id: string, fallback: User) {

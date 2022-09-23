@@ -1,9 +1,40 @@
+import { z } from "zod";
 import entity from "../decorators/entity";
 import Entity from "./Entity";
 import Validatable from "./Validatable";
+import extend from "just-extend";
+
+const schema = z
+  .object({
+    id: z.string(),
+    mercedesBenz: z
+      .object({
+        accessToken: z
+          .object({
+            value: z.string(),
+            expiresAt: z.preprocess(
+              (arg) =>
+                typeof arg === "string" || arg instanceof Date
+                  ? new Date(arg)
+                  : undefined,
+              z.date()
+            ),
+          })
+          .optional(),
+        refreshToken: z.string(),
+      })
+      .optional(),
+    mercedesBenzNonce: z.string().optional(),
+  })
+  .refine(
+    (data) => !(data.mercedesBenz && data.mercedesBenzNonce),
+    "Mercedes benz tokens and nonce cannot be set at the same time."
+  );
 
 @entity("Users")
-export default class User implements Entity, Validatable {
+export default class User
+  implements Entity, Validatable, z.infer<typeof schema>
+{
   id: string;
   mercedesBenz?: {
     accessToken?: {
@@ -14,14 +45,11 @@ export default class User implements Entity, Validatable {
   };
   mercedesBenzNonce?: string;
 
-  constructor(entity?: Partial<User>) {
-    if (entity) Object.assign(this, entity);
+  constructor(data?: z.infer<typeof schema>) {
+    if (data) extend(this, schema.parse(data));
   }
 
   validate(): void {
-    if (this.mercedesBenzNonce && this.mercedesBenz)
-      throw new Error(
-        "Mercedes benz tokens and nonce cannot be set at the same time."
-      );
+    schema.parse(this);
   }
 }

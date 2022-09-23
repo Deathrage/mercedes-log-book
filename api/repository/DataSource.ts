@@ -29,14 +29,27 @@ export class DataSource {
     id: string
   ): Promise<TEntity | null> {
     const container = getEntityContainer(type);
-    const res = await this.#cosmos
+    const { resource } = await this.#cosmos
       .database(this.#database)
       .container(container)
       .item(id, id)
       .read<TEntity>();
 
-    if (!res.resource) return null;
-    return new type(res.resource);
+    if (!resource) return null;
+    return new type(resource);
+  }
+
+  async readAll<TEntity extends Entity>(
+    type: new (entity: TEntity) => TEntity
+  ) {
+    const container = getEntityContainer(type);
+    const { resources } = await this.#cosmos
+      .database(this.#database)
+      .container(container)
+      .items.readAll<TEntity>()
+      .fetchAll();
+
+    return resources.map((resource) => new type(resource));
   }
 
   async query<TEntity extends Entity>(
