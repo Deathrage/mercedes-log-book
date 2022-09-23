@@ -1,7 +1,7 @@
 enum PropulsionType {
   COMBUSTION = "COMBUSTION",
   ELECTRICITY = "ELECTRICITY",
-  HYBRID = "HYBRID",
+  PLUGIN_HYBRID = "PLUGIN_HYBRID",
 }
 
 export default PropulsionType;
