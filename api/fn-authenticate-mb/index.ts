@@ -1,18 +1,10 @@
-import {
-  AzureFunction,
-  Context,
-  HttpRequest,
-  HttpResponse,
-} from "@azure/functions";
 import container from "../container";
+import createHandler from "../helpers/createHandler";
 import User from "../model/User";
 import UserRepository from "../repository/UserRepository";
 
-const httpTrigger: AzureFunction = async function (
-  context: Context,
-  req: HttpRequest
-): Promise<void> {
-  const { id, username } = context.req!.user!;
+export default createHandler(async (_, req) => {
+  const { id, username } = req.user!;
 
   const user = await container
     .get(UserRepository)
@@ -21,14 +13,10 @@ const httpTrigger: AzureFunction = async function (
   const nonce = req.query["nonce"];
   if (!nonce) throw new Error("Nonce was not specified!");
 
-  const response: HttpResponse = {
+  return {
     status: 302,
     headers: {
       location: `${process.env.MERCEDES_BENZ_AUTH_URL}&state=${nonce}`,
     },
   };
-
-  context.res = response;
-};
-
-export default httpTrigger;
+});

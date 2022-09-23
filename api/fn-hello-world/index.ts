@@ -1,16 +1,11 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { Context, HttpRequest } from "@azure/functions";
+import createHandler from "../helpers/createHandler";
 
-const httpTrigger: AzureFunction = async function (
-  context: Context,
-  req: HttpRequest
-): Promise<void> {
+export default createHandler((_: Context, req: HttpRequest) => {
   const userId = req.user?.id;
   if (!userId) throw new Error("UserId?");
 
-  context.res = {
-    // status: 200, /* Defaults to 200 */
+  return {
     body: `Hi, you are ${userId}.`,
   };
-};
-
-export default httpTrigger;
+});
