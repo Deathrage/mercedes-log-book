@@ -9,21 +9,21 @@ export class DataSource {
     this.#cosmos = new CosmosClient(process.env.COSMOS_DB_CONNECTION_STRING);
   }
 
-  async create<TEntity extends Entity>(entity: TEntity): Promise<void> {
+  async upsert<TEntity extends Entity>(entity: TEntity): Promise<void> {
     const container = this.#getEntityContainer(entity);
     const { resource } = await this.#cosmos
       .database(this.#database)
       .container(container)
-      .items.create(entity);
+      .items.upsert(entity);
 
-    if (!resource) throw new Error("Entity was not successfully created!");
+    if (!resource) throw new Error("Entity was not successfully upserted!");
     if (!entity.id) entity.id = resource.id;
   }
 
   async read<TEntity extends Entity>(
     type: new (entity: TEntity) => TEntity,
     id: string
-  ): Promise<TEntity> {
+  ): Promise<TEntity | null> {
     const container = getEntityContainer(type);
     const { resource } = await this.#cosmos
       .database(this.#database)
@@ -31,7 +31,7 @@ export class DataSource {
       .item(id)
       .read<TEntity>();
 
-    if (!resource) throw new Error(`Entity for id ${id} was not found!`);
+    if (!resource) return null;
     return new type(resource);
   }
 

@@ -1,10 +1,6 @@
 {
   "routes": [
     {
-      "route": "*",
-      "allowedRoles": ["authenticated"]
-    },
-    {
       "route": "/.auth/login/facebook",
       "statusCode": 404
     },
@@ -15,6 +11,10 @@
     {
       "route": "/.auth/login/twitter",
       "statusCode": 404
+    },
+    {
+      "route": "*",
+      "allowedRoles": ["authenticated"]
     }
   ],
   "responseOverrides": {

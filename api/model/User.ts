@@ -2,7 +2,7 @@ import entity from "../decorators/entity";
 import Entity from "./Entity";
 
 @entity("Users")
-export class User implements Entity {
+export default class User implements Entity {
   id: string;
   userName: string;
   mercedesBenz: {
