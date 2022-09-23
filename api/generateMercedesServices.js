@@ -1,45 +1,52 @@
 const path = require("path");
 const fs = require("fs-extra");
 const OpenApi = require("openapi-typescript-codegen");
+const { merge, isErrorResult } = require("openapi-merge");
+const { load } = require("js-yaml");
 
 const spec = path.resolve(__dirname, "spec");
-const temp = path.resolve(__dirname, "__temp__");
 const mercedesServices = path.resolve(
   __dirname,
   "mercedes-services/__generated__"
 );
 
-/** @type {import('openapi-typescript-codegen').Options} */
-const options = {
-  indent: "2",
-  useUnionTypes: true,
-  output: temp,
-  httpClient: "node",
-  exportCore: true,
-  exportModels: true,
-  exportServices: true,
-  exportSchemas: false,
-  postfix: "Service",
-};
-
 const work = async () => {
-  if (await fs.pathExists(mercedesServices))
-    await fs.rm(mercedesServices, { recursive: true });
-
-  let yamls = await fs
+  // Process all openapi spec YAMLs to objects
+  const openIdSpecs = await fs
     .readdir(spec)
-    .then((yamls) => yamls.filter((file) => file.endsWith(".yaml")));
+    .then((yamls) => yamls.filter((file) => file.endsWith(".yaml")))
+    .then((yamls) =>
+      Promise.all(yamls.map((yaml) => fs.readFile(path.resolve(spec, yaml))))
+    )
+    .then((buffers) => buffers.map((buffer) => buffer.toString()))
+    .then((strings) => strings.map((string) => load(string)));
 
-  for (const yaml of yamls) {
-    await OpenApi.generate({
-      ...options,
-      input: path.resolve(spec, yaml),
-    });
+  // Produce single openapi spec
+  const result = merge(
+    openIdSpecs.map((spec, index) => ({
+      oas: spec,
+      operationSelection: {
+        // We take resources path only from the first document as it is in every one
+        excludeTags: index === 0 ? undefined : ["Resources"],
+      },
+    }))
+  );
+  if (isErrorResult(result)) throw new Error(result.message);
 
-    await fs.copy(temp, mercedesServices, { recursive: true, overwrite: true });
-  }
-
-  if (await fs.pathExists(temp)) await fs.rm(temp, { recursive: true });
+  await OpenApi.generate({
+    indent: "2",
+    useUnionTypes: true,
+    output: mercedesServices,
+    httpClient: "node",
+    exportCore: true,
+    exportModels: true,
+    exportServices: true,
+    exportSchemas: false,
+    postfix: "Service",
+    clientName: "MercedesBenzClient",
+    // Generate types form unified openapi spec
+    input: result.output,
+  });
 };
 
 work().then(

@@ -6,7 +6,7 @@
       "direction": "in",
       "name": "req",
       "methods": ["get"],
-      "route": "current-user"
+      "route": ".mb-auth"
     },
     {
       "type": "http",
@@ -14,5 +14,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/fn-current-user/index.js"
+  "scriptFile": "../dist/fn-authorize-mb/index.js"
 }

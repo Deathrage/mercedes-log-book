@@ -5,7 +5,6 @@ import Validatable from "./Validatable";
 @entity("Users")
 export default class User implements Entity, Validatable {
   id: string;
-  username: string;
   mercedesBenz?: {
     accessToken?: {
       value: string;
