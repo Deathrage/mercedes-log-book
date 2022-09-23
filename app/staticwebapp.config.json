@@ -1,0 +1,11 @@
+{
+  "routes": [
+    {
+      "route": "*",
+      "allowedRoles": ["authenticated"]
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/static/**/*"
+  }
+}
