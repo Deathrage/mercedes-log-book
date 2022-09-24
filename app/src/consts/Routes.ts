@@ -1,6 +1,7 @@
-export enum Routes {
-  INDEX = "/",
-  ADD_CAR = "cars/new",
-  RIDES = "rides",
-  RECORD_RIDE = "rides/record",
+enum Routes {
+  DASHBOARD = "/",
+  VEHICLE = "/vehicle",
+  RIDES = "/rides",
 }
+
+export default Routes;

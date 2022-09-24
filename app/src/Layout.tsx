@@ -1,24 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-// import { mainListItems, secondaryListItems } from "./listItems";
-// import Chart from "./Chart";
-// import Deposits from "./Deposits";
-// import Orders from "./Orders";
 import Copyright from "./components/Copyright";
 import Header from "./components/Header";
 import { Container } from "@mui/material";
 import Drawer from "./components/Drawer";
 import Dashboard from "./pages/Dashboard";
+import { BrowserRouter, Routes as Switch, Route } from "react-router-dom";
+import Routes from "./consts/Routes";
+import Rides from "./pages/Rides";
+import Vehicle from "./pages/Vehicle";
 
 const Layout = () => {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   return (
-    <>
+    <BrowserRouter>
       <Header open={open} onToggleDrawer={toggleDrawer} />
       <Drawer open={open} onToggleDrawer={toggleDrawer} />
       <Box
@@ -35,11 +35,15 @@ const Layout = () => {
       >
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Dashboard />
+          <Switch>
+            <Route path={Routes.VEHICLE} element={<Vehicle />} />
+            <Route path={Routes.RIDES} element={<Rides />} />
+            <Route path={Routes.DASHBOARD} element={<Dashboard />} />
+          </Switch>
           <Copyright sx={{ pt: 4 }} />
         </Container>
       </Box>
-    </>
+    </BrowserRouter>
   );
 };
 

@@ -4,8 +4,8 @@ import React, { FC } from "react";
 const Copyright: FC<TypographyProps> = (props) => (
   <Typography variant="body2" color="text.secondary" align="center" {...props}>
     {"Copyright © "}
-    <Link color="inherit" href="https://mui.com/">
-      Your Website
+    <Link color="inherit" href="https://www.lukasprochazka.net">
+      Lukáš Procházka
     </Link>{" "}
     {new Date().getFullYear()}
     {"."}

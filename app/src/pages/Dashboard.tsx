@@ -1,4 +1,4 @@
-import { Grid, Paper } from "@mui/material";
+import { Grid, Paper, Typography } from "@mui/material";
 import React from "react";
 
 const Dashboard = () => (
@@ -13,7 +13,7 @@ const Dashboard = () => (
           height: 240,
         }}
       >
-        asdadad
+        <Typography variant="h6">Vehicle status</Typography>
         {/* <Chart /> */}
       </Paper>
     </Grid>
@@ -27,14 +27,13 @@ const Dashboard = () => (
           height: 240,
         }}
       >
-        asdad
-        {/* <Deposits /> */}
+        {/* <Chart /> */}
       </Paper>
     </Grid>
     {/* Recent Orders */}
     <Grid item xs={12}>
       <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-        asda
+        <Typography variant="h6">Recent rides</Typography>
         {/* <Orders /> */}
       </Paper>
     </Grid>

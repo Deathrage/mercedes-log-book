@@ -9,6 +9,9 @@ import {
 import React, { FC } from "react";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import { drawerWidth } from "./Drawer";
+import CurrentUserCard from "./current-user/CurrentUserCard";
+import Routes from "../consts/Routes";
+import { useLocation } from "react-router-dom";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -33,41 +36,48 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const Header: FC<AppBarProps> = ({ open, onToggleDrawer }) => (
-  <AppBar position="absolute" open={open}>
-    <Toolbar
-      sx={{
-        pr: "24px",
-      }}
-    >
-      <IconButton
-        edge="start"
-        color="inherit"
-        aria-label="open drawer"
-        onClick={onToggleDrawer}
+const titles: Record<string, string> = {
+  [Routes.DASHBOARD]: "Dashboard",
+  [Routes.RIDES]: "Rides",
+  [Routes.VEHICLE]: "Vehicle",
+};
+
+const Header: FC<AppBarProps> = ({ open, onToggleDrawer }) => {
+  const { pathname } = useLocation();
+  const title = titles[pathname];
+
+  return (
+    <AppBar position="absolute" open={open}>
+      <Toolbar
         sx={{
-          marginRight: "36px",
-          ...(open && { display: "none" }),
+          pr: "24px",
         }}
       >
-        <MenuIcon />
-      </IconButton>
-      <Typography
-        component="h1"
-        variant="h6"
-        color="inherit"
-        noWrap
-        sx={{ flexGrow: 1 }}
-      >
-        Dashboard
-      </Typography>
-      {/* <IconButton color="inherit">
-        <Badge badgeContent={4} color="secondary">
-          <NotificationsIcon />
-        </Badge>
-      </IconButton> */}
-    </Toolbar>
-  </AppBar>
-);
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="open drawer"
+          onClick={onToggleDrawer}
+          sx={{
+            marginRight: "36px",
+            ...(open && { display: "none" }),
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Typography
+          component="h1"
+          variant="h5"
+          color="inherit"
+          noWrap
+          sx={{ flexGrow: 1 }}
+        >
+          {title}
+        </Typography>
+        <CurrentUserCard />
+      </Toolbar>
+    </AppBar>
+  );
+};
 
 export default Header;
