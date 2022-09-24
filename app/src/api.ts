@@ -1,20 +1,34 @@
 import { useCallback, useState } from "react";
 import fetchJson from "./helpers/fetchJson";
-import UserResponse from "../../api/model-contract/UserResponse";
-import VehiclesResponse from "../../api/model-contract/vehicle/VehiclesResponse";
-import PostVehicleRequest from "../../api/model-contract/vehicle/PostVehicleRequest";
-import VehicleResponse from "../../api/model-contract/vehicle/VehicleResponse";
 import api from "./consts/api";
+import {
+  PostVehicleRequest,
+  UserResponse,
+  VehicleResponse,
+  VehiclesResponse,
+} from "../../api/contracts";
 
 const endpoints = {
-  getCurrentUser: () => fetchJson<UserResponse>(api.currentUser),
-  getVehicles: () => Promise.reject<VehiclesResponse>(api.vehicle),
+  getCurrentUser: () =>
+    fetchJson<UserResponse.Type>(api.currentUser).then(
+      UserResponse.schema.parse
+    ),
+  getVehicles: () =>
+    fetchJson<VehiclesResponse.Type>(api.vehicles).then(
+      VehiclesResponse.schema.parse
+    ),
   getVehicle: (request: { vin: string }) =>
-    fetchJson<VehicleResponse>(api.vehicle(request.vin)),
-  postVehicle: (request: PostVehicleRequest) =>
-    fetchJson<VehicleResponse>(api.vehicle(), "POST", request),
+    fetchJson<VehicleResponse.Type>(api.vehicle(request.vin)).then(
+      VehicleResponse.schema.parse
+    ),
+  postVehicle: (request: PostVehicleRequest.Type) =>
+    fetchJson<VehicleResponse.Type>(api.vehicle(), "POST", request).then(
+      VehicleResponse.schema.parse
+    ),
   deleteVehicle: (request: { vin: string }) =>
-    fetchJson<VehicleResponse>(api.vehicle(request.vin)),
+    fetchJson<VehicleResponse.Type>(api.vehicle(request.vin), "DELETE").then(
+      VehicleResponse.schema.parse
+    ),
 };
 
 export const useApi = <Request, Response>(

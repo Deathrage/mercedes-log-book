@@ -102,7 +102,9 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
           <ListItemText primary="Rides" />
         </ListItemButton>
         <Divider sx={{ my: 1 }} />
-        <ListSubheader component="div" inset />
+        <ListSubheader component="div" inset>
+          Ride tracking
+        </ListSubheader>
         <ListItemButton>
           <ListItemIcon>
             <FlagOutlinedIcon />

@@ -5,8 +5,8 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": ["get", "post", "delete"],
-      "route": "vehicle/{id?}"
+      "methods": ["get"],
+      "route": "vehicles"
     },
     {
       "type": "http",
@@ -14,5 +14,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/fn-vehicle/index.js"
+  "scriptFile": "../dist/fn-vehicles/index.js"
 }

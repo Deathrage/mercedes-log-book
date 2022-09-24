@@ -1,9 +1,9 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
-import UserResponse from "../model-contract/UserResponse";
 import User from "../model/User";
 import UserRepository from "../repository/UserRepository";
+import { UserResponse } from "../contracts";
 
 @injectable()
 class CurrentUser implements HttpRequestHandler {
@@ -22,7 +22,7 @@ class CurrentUser implements HttpRequestHandler {
       body: {
         username: user.id,
         mercedesBenzPaired: !!user.mercedesBenz,
-      } as UserResponse,
+      } as UserResponse.Type,
     };
   }
 

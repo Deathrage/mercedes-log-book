@@ -1,8 +1,7 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
+import { PostVehicleRequest, VehicleResponse } from "../contracts";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
-import PostVehicleRequest from "../model-contract/vehicle/PostVehicleRequest";
-import VehicleResponse from "../model-contract/vehicle/VehicleResponse";
 import Vehicle from "../model/Vehicle";
 import VehicleRepository from "../repository/VehicleRepository";
 
@@ -15,36 +14,42 @@ class VehicleHandler implements HttpRequestHandler {
   async handle(req: HttpRequest): Promise<HttpResponse> {
     const vehicleId = req.params.id;
     const body = req.body;
-    if (!vehicleId && req.method === "GET")
+    if (!vehicleId && req.method && ["GET", "DELETE"].includes(req.method))
       throw new Error("Parameter id is required if method is GET!");
     if (!body && req.method === "POST")
       throw new Error("Body is required when method is POST!");
 
+    if (req.method === "POST")
+      return {
+        body: await this.#post(
+          PostVehicleRequest.schema.parse(body),
+          req.user!.username
+        ),
+      };
+    if (req.method === "DELETE")
+      return {
+        body: await this.#delete(vehicleId),
+      };
+
     return {
-      body:
-        req.method === "GET"
-          ? await this.#get(vehicleId)
-          : await this.#createOrUpdate(
-              body as PostVehicleRequest,
-              req.user!.username
-            ),
+      body: await this.#get(vehicleId),
     };
   }
 
-  async #get(vehicleId: string): Promise<VehicleResponse> {
+  async #get(vehicleId: string): Promise<VehicleResponse.Type> {
     const vehicle = await this.#repository.getRequired(vehicleId);
-    return {
-      vin: vehicle.id,
-      license: vehicle.license,
-      model: vehicle.model,
-      propulsion: vehicle.propulsion,
-    };
+    return this.#map(vehicle);
   }
 
-  async #createOrUpdate(
-    body: PostVehicleRequest,
+  async #delete(vehicleId: string): Promise<VehicleResponse.Type> {
+    const vehicle = await this.#repository.delete(vehicleId);
+    return this.#map(vehicle);
+  }
+
+  async #post(
+    body: PostVehicleRequest.Type,
     userId: string
-  ): Promise<VehicleResponse> {
+  ): Promise<VehicleResponse.Type> {
     let vehicle = await this.#repository.get(body.vin);
 
     if (!vehicle) vehicle = new Vehicle();
@@ -59,15 +64,21 @@ class VehicleHandler implements HttpRequestHandler {
 
     await this.#repository.createOrUpdate(vehicle);
 
+    return this.#map(vehicle);
+  }
+
+  #repository: VehicleRepository;
+
+  #map(vehicle: Vehicle): VehicleResponse.Type {
     return {
       vin: vehicle.id,
       license: vehicle.license,
       model: vehicle.model,
       propulsion: vehicle.propulsion,
+      gasCapacity: vehicle.capacity.gas,
+      batteryCapacity: vehicle.capacity.battery,
     };
   }
-
-  #repository: VehicleRepository;
 }
 
 export default createHttpRequestHandler(VehicleHandler, false);

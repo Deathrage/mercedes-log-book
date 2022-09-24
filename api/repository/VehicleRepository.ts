@@ -8,12 +8,16 @@ export default class VehicleRepository {
     this.#dataSource = dataSource;
   }
 
-  getAll(): Promise<Vehicle[]> {
+  getAll(userId: string): Promise<Vehicle[]> {
     return this.#dataSource.readAll(Vehicle);
   }
 
   get(id: string): Promise<Vehicle | null> {
     return this.#dataSource.read(Vehicle, id);
+  }
+
+  delete(id: string): Promise<Vehicle> {
+    return this.#dataSource.delete(Vehicle, id);
   }
 
   async getRequired(id: string): Promise<Vehicle> {
