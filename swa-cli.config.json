@@ -7,8 +7,10 @@
       "outputLocation": "dist",
       "appBuildCommand": "npm run build",
       "apiBuildCommand": "npm run build",
+      "port": 4280,
       "run": "npm start",
-      "appDevserverUrl": "http://localhost:3000"
+      "appDevserverUrl": "http://localhost:4281",
+      "devserverTimeout": 9000
     }
   }
 }

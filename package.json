@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "swa build",
+    "prestart": "pushd api && npm run build && popd",
     "start": "swa start"
   },
   "devDependencies": {

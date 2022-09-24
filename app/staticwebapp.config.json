@@ -20,7 +20,7 @@
       "statusCode": 404
     },
     {
-      "route": "*",
+      "route": "/*",
       "allowedRoles": ["registered_user"]
     }
   ],
@@ -31,6 +31,6 @@
     }
   },
   "navigationFallback": {
-    "rewrite": "/static/**/*"
+    "rewrite": "/"
   }
 }
