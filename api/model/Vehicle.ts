@@ -5,7 +5,7 @@ import Entity from "./Entity";
 import PropulsionType from "./PropulsionType";
 import Validatable from "./Validatable";
 
-export const schema = z
+const schema = z
   .object({
     id: z.string(),
     license: z.string(),
