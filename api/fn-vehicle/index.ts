@@ -1,7 +1,10 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
-import { PostVehicleRequest, VehicleResponse } from "../contracts";
+import extend from "just-extend";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
+import VehicleData, {
+  schema as VehicleDataSchema,
+} from "../model-shared/VehicleData";
 import Vehicle from "../model/Vehicle";
 import VehicleRepository from "../repository/VehicleRepository";
 
@@ -22,62 +25,55 @@ class VehicleHandler implements HttpRequestHandler {
     if (req.method === "POST")
       return {
         body: await this.#post(
-          PostVehicleRequest.schema.parse(body),
+          VehicleDataSchema.parse(body),
           req.user!.username
         ),
       };
     if (req.method === "DELETE")
       return {
-        body: await this.#delete(vehicleId),
+        body: await this.#delete(vehicleId, req.user!.username),
       };
 
     return {
-      body: await this.#get(vehicleId),
+      body: await this.#get(vehicleId, req.user!.username),
     };
-  }
-
-  async #get(vehicleId: string): Promise<VehicleResponse.Type> {
-    const vehicle = await this.#repository.getRequired(vehicleId);
-    return this.#map(vehicle);
-  }
-
-  async #delete(vehicleId: string): Promise<VehicleResponse.Type> {
-    const vehicle = await this.#repository.delete(vehicleId);
-    return this.#map(vehicle);
-  }
-
-  async #post(
-    body: PostVehicleRequest.Type,
-    userId: string
-  ): Promise<VehicleResponse.Type> {
-    let vehicle = await this.#repository.get(body.vin);
-
-    if (!vehicle) vehicle = new Vehicle();
-    else if (vehicle.userId !== userId)
-      throw new Error(`Vehicle ${body.vin} does not belong to user ${userId}!`);
-
-    vehicle.id = body.vin;
-    vehicle.license = body.license;
-    vehicle.model = body.model;
-    vehicle.propulsion = body.propulsion;
-    vehicle.userId = userId;
-
-    await this.#repository.createOrUpdate(vehicle);
-
-    return this.#map(vehicle);
   }
 
   #repository: VehicleRepository;
 
-  #map(vehicle: Vehicle): VehicleResponse.Type {
-    return {
-      vin: vehicle.id,
-      license: vehicle.license,
-      model: vehicle.model,
-      propulsion: vehicle.propulsion,
-      gasCapacity: vehicle.capacity.gas,
-      batteryCapacity: vehicle.capacity.battery,
-    };
+  async #get(vehicleId: string, userId: string): Promise<VehicleData> {
+    const vehicle = await this.#repository.getRequired(vehicleId);
+    this.#assertVehicleOwned(vehicle, userId);
+    return vehicle;
+  }
+
+  async #delete(vehicleId: string, userId: string): Promise<VehicleData> {
+    const vehicle = await this.#repository.getRequired(vehicleId);
+    this.#assertVehicleOwned(vehicle, userId);
+
+    const deletedVehicle = await this.#repository.delete(vehicleId);
+    return deletedVehicle;
+  }
+
+  async #post(body: VehicleData, userId: string): Promise<VehicleData> {
+    let vehicle = await this.#repository.get(body.id);
+
+    if (vehicle) this.#assertVehicleOwned(vehicle, userId);
+    if (!vehicle) vehicle = new Vehicle();
+
+    // Update vehicle from body
+    extend(vehicle, body);
+
+    await this.#repository.createOrUpdate(vehicle);
+
+    return vehicle;
+  }
+
+  async #assertVehicleOwned(vehicle: Vehicle, userId: string) {
+    if (vehicle.userId !== userId)
+      throw new Error(
+        `Vehicle ${vehicle.id} does not belong to user ${userId}!`
+      );
   }
 }
 

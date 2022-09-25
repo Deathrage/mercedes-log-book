@@ -15,7 +15,7 @@ const CurrentUserProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
     () =>
       data
         ? {
-            username: data.username,
+            id: data.id,
             mercedesBenzPaired: data.mercedesBenzPaired,
           }
         : null,

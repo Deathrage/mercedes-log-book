@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 export interface CurrentUserContext {
-  get username(): string;
+  get id(): string;
   get mercedesBenzPaired(): boolean;
 }
 

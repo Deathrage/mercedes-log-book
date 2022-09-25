@@ -5,11 +5,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 
 const CurrentUserCard: FC = () => {
-  const { username, mercedesBenzPaired } = useCurrentUserContext();
+  const { id, mercedesBenzPaired } = useCurrentUserContext();
 
   return (
     <Box>
-      <Typography>User: {username}</Typography>
+      <Typography>User: {id}</Typography>
       <Typography variant="body2" display="flex">
         Mercedes Benz connected:
         {mercedesBenzPaired ? <CheckIcon /> : <CloseIcon />}

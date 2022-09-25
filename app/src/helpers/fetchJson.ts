@@ -1,5 +1,6 @@
 const fetchJson = async <Response>(
   path: string,
+  parse: (obj: object) => Response,
   method = "GET",
   body?: object
 ) => {

@@ -31,10 +31,10 @@ const schema = z
     "Mercedes benz tokens and nonce cannot be set at the same time."
   );
 
+type UserData = z.infer<typeof schema>;
+
 @entity("Users")
-export default class User
-  implements Entity, Validatable, z.infer<typeof schema>
-{
+export default class User implements Entity, Validatable, UserData {
   id: string;
   mercedesBenz?: {
     accessToken?: {
@@ -45,7 +45,7 @@ export default class User
   };
   mercedesBenzNonce?: string;
 
-  constructor(data?: z.infer<typeof schema>) {
+  constructor(data?: UserData) {
     if (data) extend(this, schema.parse(data));
   }
 

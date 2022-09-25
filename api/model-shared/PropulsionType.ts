@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 enum PropulsionType {
   COMBUSTION = "COMBUSTION",
   ELECTRICITY = "ELECTRICITY",

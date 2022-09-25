@@ -1,33 +1,30 @@
 import { useCallback, useState } from "react";
 import fetchJson from "./helpers/fetchJson";
 import api from "./consts/api";
-import {
-  PostVehicleRequest,
-  UserResponse,
-  VehicleResponse,
-  VehiclesResponse,
-} from "../../api/contracts";
+import PublicUserData, {
+  schema as PublicUser,
+} from "../../api/model-shared/PublicUserData";
+import VehicleData, {
+  schema as VehicleSchema,
+} from "../../api/model-shared/VehicleData";
+import VehiclesData, {
+  schema as VehiclesSchema,
+} from "../../api/model-shared/VehiclesData";
 
 const endpoints = {
   getCurrentUser: () =>
-    fetchJson<UserResponse.Type>(api.currentUser).then(
-      UserResponse.schema.parse
-    ),
+    fetchJson<PublicUserData>(api.currentUser, PublicUser.parse),
   getVehicles: () =>
-    fetchJson<VehiclesResponse.Type>(api.vehicles).then(
-      VehiclesResponse.schema.parse
-    ),
+    fetchJson<VehiclesData>(api.vehicles, VehiclesSchema.parse),
   getVehicle: (request: { vin: string }) =>
-    fetchJson<VehicleResponse.Type>(api.vehicle(request.vin)).then(
-      VehicleResponse.schema.parse
-    ),
-  postVehicle: (request: PostVehicleRequest.Type) =>
-    fetchJson<VehicleResponse.Type>(api.vehicle(), "POST", request).then(
-      VehicleResponse.schema.parse
-    ),
+    fetchJson<VehicleData>(api.vehicle(request.vin), VehicleSchema.parse),
+  postVehicle: (request: VehicleData) =>
+    fetchJson<VehicleData>(api.vehicle(), VehicleSchema.parse, "POST", request),
   deleteVehicle: (request: { vin: string }) =>
-    fetchJson<VehicleResponse.Type>(api.vehicle(request.vin), "DELETE").then(
-      VehicleResponse.schema.parse
+    fetchJson<VehicleData>(
+      api.vehicle(request.vin),
+      VehicleSchema.parse,
+      "DELETE"
     ),
 };
 
