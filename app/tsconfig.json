@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "esnext",
+    "module": "ESNext",
     "noEmit": true,
-    "jsx": "react"
+    "baseUrl": ".",
+    "jsx": "react",
+    "paths": {
+      "zod": ["node_modules/zod"]
+    }
   },
   "include": ["src", "../api/mode-shared"],
   "extends": "../tsconfig.json"
