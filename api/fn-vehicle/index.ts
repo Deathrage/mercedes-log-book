@@ -1,6 +1,7 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import extend from "just-extend";
+import { assertValidRequest, assertVehicleOwner } from "../helpers/assert";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
 import VehicleData, {
   schema as VehicleDataSchema,
@@ -15,20 +16,20 @@ class VehicleHandler implements HttpRequestHandler {
   }
 
   async handle(req: HttpRequest): Promise<HttpResponse> {
-    const vehicleId = req.params.id;
-    const body = req.body;
-    if (!vehicleId && req.method && ["GET", "DELETE"].includes(req.method))
-      throw new Error("Parameter id is required if method is GET!");
-    if (!body && req.method === "POST")
-      throw new Error("Body is required when method is POST!");
+    assertValidRequest(req, ["GET", "POST", "DELETE"], {
+      GET: ["id"],
+      DELETE: ["id"],
+    });
 
     if (req.method === "POST")
       return {
         body: await this.#post(
-          VehicleDataSchema.parse(body),
+          VehicleDataSchema.parse(req.body),
           req.user!.username
         ),
       };
+
+    const vehicleId = req.params.id;
     if (req.method === "DELETE")
       return {
         body: await this.#delete(vehicleId, req.user!.username),
@@ -43,13 +44,16 @@ class VehicleHandler implements HttpRequestHandler {
 
   async #get(vehicleId: string, userId: string): Promise<VehicleData> {
     const vehicle = await this.#repository.getRequired(vehicleId);
-    this.#assertVehicleOwned(vehicle, userId);
+
+    assertVehicleOwner(vehicle, userId);
+
     return VehicleDataSchema.parse(vehicle);
   }
 
   async #delete(vehicleId: string, userId: string): Promise<VehicleData> {
     const vehicle = await this.#repository.getRequired(vehicleId);
-    this.#assertVehicleOwned(vehicle, userId);
+
+    assertVehicleOwner(vehicle, userId);
 
     const deletedVehicle = await this.#repository.delete(vehicleId);
     return VehicleDataSchema.parse(deletedVehicle);
@@ -58,7 +62,7 @@ class VehicleHandler implements HttpRequestHandler {
   async #post(body: VehicleData, userId: string): Promise<VehicleData> {
     let vehicle = await this.#repository.get(body.id);
 
-    if (vehicle) this.#assertVehicleOwned(vehicle, userId);
+    if (vehicle) assertVehicleOwner(vehicle, userId);
     if (!vehicle) {
       vehicle = new Vehicle();
       vehicle.userId = userId;
@@ -70,13 +74,6 @@ class VehicleHandler implements HttpRequestHandler {
     await this.#repository.createOrUpdate(vehicle);
 
     return VehicleDataSchema.parse(vehicle);
-  }
-
-  async #assertVehicleOwned(vehicle: Vehicle, userId: string) {
-    if (vehicle.userId !== userId)
-      throw new Error(
-        `Vehicle ${vehicle.id} does not belong to user ${userId}!`
-      );
   }
 }
 

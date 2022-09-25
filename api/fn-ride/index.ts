@@ -1,10 +1,10 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import extend from "just-extend";
+import { assertValidRequest, assertVehicleOwner } from "../helpers/assert";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
 import RideData, { schema as RideDataSchema } from "../model-shared/RideData";
 import Ride from "../model/Ride";
-import Vehicle from "../model/Vehicle";
 import RidesRepository from "../repository/RidesRepository";
 import VehicleRepository from "../repository/VehicleRepository";
 
@@ -19,17 +19,20 @@ class RideHandler implements HttpRequestHandler {
   }
 
   async handle(req: HttpRequest): Promise<HttpResponse> {
-    const rideId = req.params.id;
-    const body = req.body;
-    if (!rideId && req.method && ["GET", "DELETE"].includes(req.method))
-      throw new Error("Parameter id is required if method is GET!");
-    if (!body && req.method === "POST")
-      throw new Error("Body is required when method is POST!");
+    assertValidRequest(req, ["GET", "POST", "DELETE"], {
+      GET: ["id"],
+      DELETE: ["id"],
+    });
 
     if (req.method === "POST")
       return {
-        body: await this.#post(RideDataSchema.parse(body), req.user!.username),
+        body: await this.#post(
+          RideDataSchema.parse(req.body),
+          req.user!.username
+        ),
       };
+
+    const rideId = req.params.id;
     if (req.method === "DELETE")
       return {
         body: await this.#delete(rideId, req.user!.username),
@@ -45,31 +48,26 @@ class RideHandler implements HttpRequestHandler {
 
   async #get(rideId: string, userId: string): Promise<RideData> {
     const ride = await this.#repository.getRequired(rideId);
-    const vehicle = await this.#vehicleRepository.getRequired(ride.vehicleId);
-    this.#assertVehicleOwned(vehicle, userId);
 
-    return RideDataSchema.parse(vehicle);
+    this.#assertAuthorization(ride, userId);
+
+    return RideDataSchema.parse(ride);
   }
 
   async #delete(rideId: string, userId: string): Promise<RideData> {
     const ride = await this.#repository.getRequired(rideId);
-    const vehicle = await this.#vehicleRepository.getRequired(ride.vehicleId);
-    this.#assertVehicleOwned(vehicle, userId);
 
-    const deletedVehicle = await this.#repository.delete(rideId);
-    return RideDataSchema.parse(deletedVehicle);
+    this.#assertAuthorization(ride, userId);
+
+    const deletedRide = await this.#repository.delete(rideId);
+    return RideDataSchema.parse(deletedRide);
   }
 
   async #post(body: RideData, userId: string): Promise<RideData> {
     let ride = await this.#repository.get(body.id);
 
-    if (ride) {
-      const vehicle = await this.#vehicleRepository.getRequired(ride.vehicleId);
-      this.#assertVehicleOwned(vehicle, userId);
-    }
-    if (!ride) {
-      ride = new Ride();
-    }
+    if (ride) this.#assertAuthorization(ride, userId);
+    if (!ride) ride = new Ride();
 
     // Update vehicle from body
     extend(ride, body);
@@ -79,11 +77,9 @@ class RideHandler implements HttpRequestHandler {
     return RideDataSchema.parse(ride);
   }
 
-  async #assertVehicleOwned(vehicle: Vehicle, userId: string) {
-    if (vehicle.userId !== userId)
-      throw new Error(
-        `Vehicle ${vehicle.id} does not belong to user ${userId}!`
-      );
+  async #assertAuthorization(ride: Ride, userId: string) {
+    const vehicle = await this.#vehicleRepository.getRequired(ride.vehicleId);
+    assertVehicleOwner(vehicle, userId);
   }
 }
 
