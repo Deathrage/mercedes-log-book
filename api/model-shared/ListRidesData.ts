@@ -2,10 +2,9 @@ import { z } from "zod";
 import { schema as coordinates } from "./Coordinates";
 import { schema as date } from "./Date";
 
-const milestone = z.object({
+const location = z.object({
   address: z.string().optional(),
   coordinates: coordinates.optional(),
-  date: date,
 });
 
 const consumptionItem = z.object({
@@ -18,8 +17,10 @@ export const schema = z.object({
     z.object({
       id: z.string(),
       reason: z.string().optional(),
-      started: milestone,
-      ended: milestone.optional(),
+      departed: date,
+      startLocation: location,
+      arrived: date.optional(),
+      endLocation: location,
       distance: z.number().positive().optional(),
       consumption: z.object({
         gas: consumptionItem.optional(),

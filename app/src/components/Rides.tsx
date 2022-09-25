@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   IconButton,
   Table,
   TableBody,
@@ -9,7 +10,7 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import {
   formatDateTime,
   formatKilometers,
@@ -20,10 +21,28 @@ import {
 import { DoubleTableCell } from "./DoubleTableCell";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import RideDialog from "./RideDialog";
 
-const Rides: FC<{ onlyFirstPage?: true }> = ({ onlyFirstPage }) => {
+const CREATE = Symbol("Creating rides");
+
+const Rides: FC<{ onlyFirstPage?: true; allowCreate?: true }> = ({
+  onlyFirstPage,
+  allowCreate,
+}) => {
+  const [id, setId] = useState<string | typeof CREATE | null>(null);
+
   return (
     <TableContainer>
+      {allowCreate && (
+        <Button
+          autoFocus
+          color="inherit"
+          sx={{ ml: "auto", display: "block" }}
+          onClick={() => setId(CREATE)}
+        >
+          New
+        </Button>
+      )}
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -73,7 +92,7 @@ const Rides: FC<{ onlyFirstPage?: true }> = ({ onlyFirstPage }) => {
               </Box>
             </TableCell>
             <TableCell align="right">
-              <IconButton>
+              <IconButton onClick={() => setId("foo")}>
                 <EditIcon />
               </IconButton>
               <IconButton color="error">
@@ -93,6 +112,12 @@ const Rides: FC<{ onlyFirstPage?: true }> = ({ onlyFirstPage }) => {
           onPageChange={console.log}
         />
       )}
+      <RideDialog
+        open={!!id}
+        rideId={typeof id === "string" ? id : undefined}
+        onClose={() => setId(null)}
+        onSaved={() => setId(null)}
+      />
     </TableContainer>
   );
 };

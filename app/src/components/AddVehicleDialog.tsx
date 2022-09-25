@@ -57,7 +57,7 @@ const AddVehicleDialog: FC = () => {
                     <IconButton edge="start" onClick={() => setCreating(false)}>
                       <CloseIcon />
                     </IconButton>
-                    Creating vehicle
+                    Creating a vehicle
                     <Button
                       autoFocus
                       color="inherit"

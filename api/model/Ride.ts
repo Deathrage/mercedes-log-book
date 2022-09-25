@@ -8,8 +8,10 @@ import RideData, { RidePointData, schema } from "../model-shared/RideData";
 export default class Ride implements Entity, Validatable, RideData {
   id: string;
   vehicleId: string;
+  departed: Date;
+  arrived?: Date;
   start: RidePointData;
-  end?: RidePointData;
+  end: RidePointData;
   note?: string;
   reason?: string;
 

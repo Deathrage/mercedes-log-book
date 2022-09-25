@@ -76,18 +76,16 @@ class RidesHandler implements HttpRequestHandler {
         return {
           id: ride.id,
           reason: ride.reason,
-          started: {
+          departed: ride.departed,
+          startLocation: {
             address: ride.start.address,
             coordinates: ride.start.coordinates,
-            date: ride.start.date,
           },
-          ended: ride.end
-            ? {
-                address: ride.start.address,
-                coordinates: ride.start.coordinates,
-                date: ride.start.date,
-              }
-            : undefined,
+          arrived: ride.arrived,
+          endLocation: {
+            address: ride.end.address,
+            coordinates: ride.end.coordinates,
+          },
           distance:
             ride.start.odometer && ride.end?.odometer
               ? ride.end.odometer - ride.start.odometer

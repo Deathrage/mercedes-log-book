@@ -8,14 +8,14 @@ export const schema = z.object({
     .object({
       range: withDate(z.number().positive()).optional(),
       level: withDate(z.number().positive()).optional(),
-      absLevel: z.number().positive().int(),
+      absLevel: z.number().positive().optional(),
     })
     .optional(),
   battery: z
     .object({
       range: withDate(z.number().positive()).optional(),
       level: withDate(z.number().positive()).optional(),
-      absLevel: z.number().positive(),
+      absLevel: z.number().positive().optional(),
     })
     .optional(),
 });

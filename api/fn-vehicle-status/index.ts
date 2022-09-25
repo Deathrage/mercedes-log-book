@@ -72,7 +72,7 @@ class VehicleStatusHandler implements HttpRequestHandler {
                   date: new Date(fuel.tankLevel.timestamp!),
                 }
               : undefined,
-            capacity: vehicle.capacity.gas,
+            absLevel: vehicle.capacity.gas,
           }
         : undefined,
       battery: battery
@@ -89,7 +89,7 @@ class VehicleStatusHandler implements HttpRequestHandler {
                   date: new Date(battery.batteryLevel.timestamp!),
                 }
               : undefined,
-            capacity: vehicle.capacity.battery,
+            absLevel: vehicle.capacity.battery,
           }
         : undefined,
     });

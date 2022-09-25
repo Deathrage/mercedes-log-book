@@ -35,7 +35,7 @@ export default class RidesRepository {
         skip,
         take,
       },
-      orderby: "start.date DESC",
+      orderby: "start DESC",
     });
     return rides;
   }

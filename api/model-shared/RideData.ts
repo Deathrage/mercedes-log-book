@@ -3,7 +3,6 @@ import { schema as date } from "../model-shared/Date";
 
 export const pointSchema = z.object({
   odometer: z.number().positive().optional(),
-  date,
   gas: z.number().positive().optional(),
   battery: z.number().positive().optional(),
   address: z.string().optional(),
@@ -20,8 +19,10 @@ export const schema = z.object({
   reason: z.string().optional(),
   note: z.string().optional(),
   vehicleId: z.string(),
+  departed: date,
+  arrived: date.optional(),
   start: pointSchema,
-  end: pointSchema.optional(),
+  end: pointSchema,
 });
 
 type RideData = z.infer<typeof schema>;
