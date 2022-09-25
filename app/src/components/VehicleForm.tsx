@@ -7,7 +7,7 @@ import {
   TextField,
 } from "@mui/material";
 import deepEqual from "deep-equal";
-import React, { ReactNode, useCallback, useEffect, useRef } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import { FC } from "react";
 import { FormState, useForm } from "react-hook-form";
 import PropulsionType from "../../../api/model-shared/PropulsionType";
