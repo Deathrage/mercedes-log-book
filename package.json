@@ -7,7 +7,6 @@
     "start": "swa start"
   },
   "devDependencies": {
-    "@types/deep-equal": "^1.0.1",
     "react-scripts": "^5.0.1"
   }
 }
