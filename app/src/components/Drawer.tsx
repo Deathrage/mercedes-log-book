@@ -18,9 +18,11 @@ import {
   Route as RouteIcon,
   Flag as FlagIcon,
   FlagOutlined as FlagOutlinedIcon,
+  Assignment as AssignmentIcon,
 } from "@mui/icons-material";
 import Routes from "../consts/Routes";
 import { useLocation, useNavigate } from "react-router-dom";
+import VehicleSelect from "./VehicleSelect";
 
 export const drawerWidth: number = 240;
 
@@ -67,7 +69,7 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
           px: [1],
         }}
       >
-        Log Book
+        <VehicleSelect />
         <IconButton onClick={onToggleDrawer}>
           <ChevronLeftIcon />
         </IconButton>
@@ -116,6 +118,22 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
             <FlagIcon />
           </ListItemIcon>
           <ListItemText primary="Finish ride" />
+        </ListItemButton>
+        <Divider sx={{ my: 1 }} />
+        <ListSubheader component="div" inset>
+          Quick exports
+        </ListSubheader>
+        <ListItemButton>
+          <ListItemIcon>
+            <AssignmentIcon />
+          </ListItemIcon>
+          <ListItemText primary="Current month" />
+        </ListItemButton>
+        <ListItemButton>
+          <ListItemIcon>
+            <AssignmentIcon />
+          </ListItemIcon>
+          <ListItemText primary="Previous month" />
         </ListItemButton>
       </List>
     </StyledDrawer>

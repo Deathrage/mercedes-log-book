@@ -9,8 +9,12 @@
     "@mui/material": "^5.10.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.36.1",
     "react-router-dom": "^6.4.0",
-    "zod": "^3.19.1"
+    "zod": "^3.19.1",
+    "inversify": "^6.0.1",
+    "moment": "^2.29.4",
+    "deep-equal": "^2.0.5"
   },
   "scripts": {
     "start": "cross-env PORT=4281 react-app-rewired start --config-overrides configOverrides.js",

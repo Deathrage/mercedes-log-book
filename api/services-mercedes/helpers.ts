@@ -9,17 +9,17 @@ import { Resource } from "./__generated__";
 export const findResource = <Response extends object, Value>(
   responses: Response[],
   key: keyof Response,
-  parser: (value: Resource | undefined) => Timestamped<Value>
+  parser: (value: Resource) => Timestamped<Value> | undefined
 ) => {
   const response = responses.find((r) => Reflect.has(r, key));
-  return parser(response);
+  if (!response) return undefined;
+  return parser(Reflect.get(response, key));
 };
 
 export const parseBoolean = (
-  value: Resource | undefined
-): Timestamped<boolean> => {
-  if (value?.value === undefined)
-    return { value: undefined, timestamp: undefined };
+  value: Resource
+): Timestamped<boolean> | undefined => {
+  if (!value.timestamp || !value.value) return undefined;
   return {
     value: value === "true" ? true : false,
     timestamp: value.timestamp,
@@ -35,10 +35,9 @@ const lightSwitchPositionMap: Record<string, LightSwitchPosition> = {
 };
 
 export const parseLightSwitchPosition = (
-  value: Resource | undefined
-): Timestamped<LightSwitchPosition> => {
-  if (value?.value == undefined)
-    return { value: undefined, timestamp: undefined };
+  value: Resource
+): Timestamped<LightSwitchPosition> | undefined => {
+  if (!value.value || !value.timestamp) return undefined;
   return {
     value: lightSwitchPositionMap[value.value],
     timestamp: value.timestamp,
@@ -52,10 +51,9 @@ const rooftopStatusMap: Record<string, RooftopStatus> = {
 };
 
 export const parseRooftopStatus = (
-  value: Resource | undefined
-): Timestamped<RooftopStatus> => {
-  if (value?.value == undefined)
-    return { value: undefined, timestamp: undefined };
+  value: Resource
+): Timestamped<RooftopStatus> | undefined => {
+  if (!value.value || !value.timestamp) return undefined;
   return {
     value: rooftopStatusMap[value.value],
     timestamp: value?.timestamp,
@@ -73,13 +71,12 @@ const sunroofStatusMap: Record<string, SunroofStatus> = {
 };
 
 export const parseSunroofStatus = (
-  value: Resource | undefined
-): Timestamped<SunroofStatus> => {
-  if (value?.value == undefined)
-    return { value: undefined, timestamp: undefined };
+  value: Resource
+): Timestamped<SunroofStatus> | undefined => {
+  if (!value.timestamp || !value.value) return undefined;
   return {
     value: sunroofStatusMap[value.value],
-    timestamp: value?.timestamp,
+    timestamp: value.timestamp,
   };
 };
 
@@ -93,10 +90,9 @@ const windowsStatusMap: Record<string, WindowsStatus> = {
 };
 
 export const parseWindowsStatus = (
-  value: Resource | undefined
-): Timestamped<WindowsStatus> => {
-  if (value?.value == undefined)
-    return { value: undefined, timestamp: undefined };
+  value: Resource
+): Timestamped<WindowsStatus> | undefined => {
+  if (!value.timestamp || !value.value) return undefined;
   return {
     value: windowsStatusMap[value.value],
     timestamp: value?.timestamp,
@@ -111,10 +107,9 @@ const doorLockStatusMap: Record<string, DoorLockStatus> = {
 };
 
 export const parseDoorLockStatus = (
-  value: Resource | undefined
-): Timestamped<DoorLockStatus> => {
-  if (value?.value == undefined)
-    return { value: undefined, timestamp: undefined };
+  value: Resource
+): Timestamped<DoorLockStatus> | undefined => {
+  if (!value.timestamp || !value.value) return undefined;
   return {
     value: doorLockStatusMap[value.value],
     timestamp: value?.timestamp,
@@ -122,12 +117,17 @@ export const parseDoorLockStatus = (
 };
 
 export const parseNumber = (
-  value: Resource | undefined
-): Timestamped<number> => {
-  if (value?.value == undefined)
-    return { value: undefined, timestamp: undefined };
+  value: Resource
+): Timestamped<number> | undefined => {
+  if (!value.timestamp || !value.value) return undefined;
   return {
     value: Number(value.value),
     timestamp: value.timestamp,
   };
+};
+
+export const parsePercentNumber = (value: Resource) => {
+  const parsed = parseNumber(value);
+  if (parsed) parsed.value = parsed.value / 100;
+  return parsed;
 };

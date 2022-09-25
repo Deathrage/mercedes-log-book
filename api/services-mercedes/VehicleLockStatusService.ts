@@ -6,19 +6,26 @@ import {
   parseDoorLockStatus,
   parseNumber,
 } from "./helpers";
+import MercedesOidc from "./MercedesOidc";
 import MercedesService from "./MercedesService";
 import { MercedesBenzClient } from "./__generated__";
 
 @injectable()
 export default class VehicleLockStatusService extends MercedesService<VehicleLockStatus> {
+  constructor(oidc: MercedesOidc) {
+    super(oidc);
+  }
+
   async execute(
     vehicleId: string,
     client: MercedesBenzClient
-  ): Promise<VehicleLockStatus> {
+  ): Promise<VehicleLockStatus | null> {
     const responses =
       await client.containerVehicleLockStatus.getResourcesForContainerIdUsingGet3(
         vehicleId
       );
+
+    if (!responses) return null;
 
     return {
       deckLidUnlocked: findResource(

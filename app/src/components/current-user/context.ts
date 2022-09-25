@@ -8,7 +8,7 @@ export interface CurrentUserContext {
 export default createContext<CurrentUserContext>(
   new Proxy<CurrentUserContext>({} as CurrentUserContext, {
     get: () => {
-      throw new Error("Context was not initialized!");
+      throw new Error("Current user context was not initialized!");
     },
   })
 );

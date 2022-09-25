@@ -16,19 +16,6 @@ export const createHttpRequestHandler =
       let req = context.req;
       if (!req) throw new Error("Function was not bound as HttpTrigger!");
 
-      // Fill req. user for test user if set
-      if (!req.user && process.env.TEST_USERNAME)
-        req = {
-          ...req,
-          user: {
-            id: "test",
-            username: process.env.TEST_USERNAME,
-            type: "StaticWebApps",
-            identityProvider: "test",
-            claimsPrincipalData: {},
-          },
-        };
-
       if (!req.user && !allowAnonymous) {
         context.res = {
           status: 401,

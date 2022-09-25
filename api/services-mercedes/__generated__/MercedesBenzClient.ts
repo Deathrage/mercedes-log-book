@@ -3,7 +3,7 @@
 /* eslint-disable */
 import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
-import { NodeHttpRequest } from './core/NodeHttpRequest';
+import { AxiosHttpRequest } from './core/AxiosHttpRequest';
 
 import { ContainerElectricVehicleStatusService } from './services/ContainerElectricVehicleStatusService';
 import { ContainerFuelStatusService } from './services/ContainerFuelStatusService';
@@ -75,7 +75,7 @@ export class MercedesBenzClient {
 
   public readonly request: BaseHttpRequest;
 
-  constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = NodeHttpRequest) {
+  constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = AxiosHttpRequest) {
     this.request = new HttpRequest({
       BASE: config?.BASE ?? 'https://api.mercedes-benz.com/vehicledata/v2',
       VERSION: config?.VERSION ?? '2.0',

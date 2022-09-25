@@ -2,6 +2,7 @@ import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
 import VehiclesData from "../model-shared/VehiclesData";
+import { schema as VehicleDataSchema } from "../model-shared/VehicleData";
 import VehicleRepository from "../repository/VehicleRepository";
 
 @injectable()
@@ -19,7 +20,7 @@ class VehiclesHandler implements HttpRequestHandler {
 
   async #get(userId: string): Promise<VehiclesData> {
     const vehicles = await this.#repository.getAll(userId);
-    return vehicles;
+    return vehicles.map((vehicle) => VehicleDataSchema.parse(vehicle));
   }
 
   #repository: VehicleRepository;

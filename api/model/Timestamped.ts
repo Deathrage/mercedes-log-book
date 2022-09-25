@@ -1,4 +1,4 @@
 export default interface Timestamped<Value> {
-  value?: Value;
-  timestamp?: number;
+  value: Value;
+  timestamp: number;
 }

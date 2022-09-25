@@ -5,28 +5,28 @@ import Timestamped from "./Timestamped";
 import WindowsStatus from "./WindowsStatus";
 
 export default interface VehicleStatus {
-  deckLidOpen: Timestamped<boolean>;
+  deckLidOpen?: Timestamped<boolean>;
   doorsOpen: {
-    frontLeft: Timestamped<boolean>;
-    frontRight: Timestamped<boolean>;
-    rearLeft: Timestamped<boolean>;
-    rearRight: Timestamped<boolean>;
+    frontLeft?: Timestamped<boolean>;
+    frontRight?: Timestamped<boolean>;
+    rearLeft?: Timestamped<boolean>;
+    rearRight?: Timestamped<boolean>;
   };
   interiorLightsOn: {
-    front: Timestamped<boolean>;
-    rear: Timestamped<boolean>;
+    front?: Timestamped<boolean>;
+    rear?: Timestamped<boolean>;
   };
-  lightSwitchPosition: Timestamped<LightSwitchPosition>;
+  lightSwitchPosition?: Timestamped<LightSwitchPosition>;
   readingLampOn: {
-    left: Timestamped<boolean>;
-    right: Timestamped<boolean>;
+    left?: Timestamped<boolean>;
+    right?: Timestamped<boolean>;
   };
-  rooftop: Timestamped<RooftopStatus>;
-  sunroof: Timestamped<SunroofStatus>;
+  rooftop?: Timestamped<RooftopStatus>;
+  sunroof?: Timestamped<SunroofStatus>;
   windows: {
-    frontLeft: Timestamped<WindowsStatus>;
-    frontRight: Timestamped<WindowsStatus>;
-    rearLeft: Timestamped<WindowsStatus>;
-    rearRight: Timestamped<WindowsStatus>;
+    frontLeft?: Timestamped<WindowsStatus>;
+    frontRight?: Timestamped<WindowsStatus>;
+    rearLeft?: Timestamped<WindowsStatus>;
+    rearRight?: Timestamped<WindowsStatus>;
   };
 }

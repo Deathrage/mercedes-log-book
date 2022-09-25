@@ -7,7 +7,7 @@ const { load } = require("js-yaml");
 const spec = path.resolve(__dirname, "spec");
 const mercedesServices = path.resolve(
   __dirname,
-  "mercedes-services/__generated__"
+  "services-mercedes/__generated__"
 );
 
 const work = async () => {
@@ -37,7 +37,7 @@ const work = async () => {
     indent: "2",
     useUnionTypes: true,
     output: mercedesServices,
-    httpClient: "node",
+    httpClient: "axios",
     exportCore: true,
     exportModels: true,
     exportServices: true,

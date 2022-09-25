@@ -11,7 +11,12 @@ const fetchJson = async <Response>(
     },
     body: body ? JSON.stringify(body) : undefined,
   });
-  return (await res.json()) as Response;
+
+  const responseText: string = await res.text();
+
+  if (res.status !== 200) throw new Error(responseText);
+
+  return JSON.parse(responseText) as Response;
 };
 
 export default fetchJson;

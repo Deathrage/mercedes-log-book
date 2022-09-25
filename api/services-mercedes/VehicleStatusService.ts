@@ -8,19 +8,26 @@ import {
   parseSunroofStatus,
   parseWindowsStatus,
 } from "./helpers";
+import MercedesOidc from "./MercedesOidc";
 import MercedesService from "./MercedesService";
 import { MercedesBenzClient } from "./__generated__";
 
 @injectable()
 export default class VehicleStatusService extends MercedesService<VehicleStatus> {
+  constructor(oidc: MercedesOidc) {
+    super(oidc);
+  }
+
   async execute(
     vehicleId: string,
     client: MercedesBenzClient
-  ): Promise<VehicleStatus> {
+  ): Promise<VehicleStatus | null> {
     const responses =
       await client.containerVehicleStatus.getResourcesForContainerIdUsingGet4(
         vehicleId
       );
+
+    if (!responses) return null;
 
     return {
       deckLidOpen: findResource(responses, "decklidstatus", parseBoolean),

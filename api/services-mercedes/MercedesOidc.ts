@@ -85,7 +85,7 @@ export default class MercedesOidc {
 
     if (
       user.mercedesBenz.accessToken &&
-      user.mercedesBenz.accessToken.expiresAt.getTime() < new Date().getTime()
+      user.mercedesBenz.accessToken.expiresAt.getTime() > new Date().getTime()
     )
       return user.mercedesBenz.accessToken.value;
 

@@ -10,6 +10,10 @@ import VehicleData, {
 import VehiclesData, {
   schema as VehiclesSchema,
 } from "../../api/model-shared/VehiclesData";
+import VehicleStatusData, {
+  schema as VehicleStatusSchema,
+} from "../../api/model-shared/VehicleStatusData";
+import { useErrorsContext } from "./components/errors/hooks";
 
 const endpoints = {
   getCurrentUser: () =>
@@ -26,11 +30,18 @@ const endpoints = {
       VehicleSchema.parse,
       "DELETE"
     ),
+  getVehicleStatus: (request: { vin: string }) =>
+    fetchJson<VehicleStatusData>(
+      api.vehicleStatus(request.vin),
+      VehicleStatusSchema.parse
+    ),
 };
 
 export const useApi = <Request, Response>(
   pick: (list: typeof endpoints) => (request: Request) => Promise<Response>
 ) => {
+  const { show } = useErrorsContext();
+
   const endpoint = pick(endpoints);
 
   const [state, setState] = useState<{
@@ -52,10 +63,11 @@ export const useApi = <Request, Response>(
         return response;
       } catch (error) {
         setState({ running: false, data: null, error });
+        show(error);
         throw error;
       }
     },
-    [endpoint]
+    [endpoint, show]
   );
 
   return { ...state, invoke };

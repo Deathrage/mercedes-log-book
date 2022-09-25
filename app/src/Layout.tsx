@@ -10,12 +10,19 @@ import { BrowserRouter, Routes as Switch, Route } from "react-router-dom";
 import Routes from "./consts/Routes";
 import Rides from "./pages/Rides";
 import Vehicle from "./pages/Vehicle";
+import { useCurrentUserContext } from "./components/current-user/hooks";
+import ConnectToMercedesDialog from "./components/ConnectToMercedesDialog";
+import AddVehicleDialog from "./components/AddVehicleDialog";
+import { useVehiclesContext } from "./components/vehicles/hooks";
 
 const Layout = () => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  const { mercedesBenzPaired } = useCurrentUserContext();
+  const { activeVehicle } = useVehiclesContext();
 
   return (
     <BrowserRouter>
@@ -35,11 +42,15 @@ const Layout = () => {
       >
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Switch>
-            <Route path={Routes.VEHICLE} element={<Vehicle />} />
-            <Route path={Routes.RIDES} element={<Rides />} />
-            <Route path={Routes.DASHBOARD} element={<Dashboard />} />
-          </Switch>
+          {mercedesBenzPaired && activeVehicle && (
+            <Switch>
+              <Route path={Routes.VEHICLE} element={<Vehicle />} />
+              <Route path={Routes.RIDES} element={<Rides />} />
+              <Route path={Routes.DASHBOARD} element={<Dashboard />} />
+            </Switch>
+          )}
+          <ConnectToMercedesDialog />
+          <AddVehicleDialog />
           <Copyright sx={{ pt: 4 }} />
         </Container>
       </Box>
