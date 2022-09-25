@@ -57,24 +57,26 @@ export class DataSource {
     query: {
       where?: string;
       parameters?: SqlParameter[];
-      paging?: {
+      pagination?: {
         take: number;
         skip: number;
       };
+      orderby?: string;
     }
   ): Promise<TEntity[]> {
     const container = getEntityContainer(type);
 
     const whereClause = query.where ? ` WHERE ${query.where}` : "";
-    const pagingClause = query.paging
-      ? ` OFFSET ${query.paging.skip} LIMIT ${query.paging.take}`
+    const pagingClause = query.pagination
+      ? ` OFFSET ${query.pagination.skip} LIMIT ${query.pagination.take}`
       : "";
+    const orderByClause = query.orderby ? ` ORDER BY ${query.orderby}` : "";
 
     const { resources } = await this.#cosmos
       .database(this.#database)
       .container(container)
       .items.query<TEntity>({
-        query: `SELECT * FROM entity${whereClause}${pagingClause}`,
+        query: `SELECT * FROM entity${whereClause}${orderByClause}${pagingClause}`,
         parameters: query.parameters,
       })
       .fetchAll();

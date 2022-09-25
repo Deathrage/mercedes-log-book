@@ -1,6 +1,7 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
+import { hasCombustionEngine, hasElectricEngine } from "../helpers/propulsion";
 import PropulsionType from "../model-shared/PropulsionType";
 import VehicleStatusData, {
   schema as VehicleStatusDataSchema,
@@ -24,11 +25,11 @@ class VehicleStatusHandler implements HttpRequestHandler {
     this.#fuel = fuel;
   }
 
-  async handle(req: HttpRequest): Promise<HttpResponse> {
-    const userId = req.user!.username;
-    const vehicleId = req.params.id;
-    if (!vehicleId) throw new Error("Missing required parameter id!");
-
+  async handle({
+    params: { id: vehicleId },
+    user,
+  }: HttpRequest): Promise<HttpResponse> {
+    const userId = user!.username;
     return {
       body: await this.#get(vehicleId, userId),
     };
@@ -41,14 +42,10 @@ class VehicleStatusHandler implements HttpRequestHandler {
 
     const [odometer, fuel, battery] = await Promise.all([
       this.#odometer.get(vehicleId, userId),
-      [PropulsionType.COMBUSTION, PropulsionType.PLUGIN_HYBRID].includes(
-        vehicle.propulsion
-      )
+      hasCombustionEngine(vehicle.propulsion)
         ? this.#fuel.get(vehicleId, userId)
         : null,
-      [PropulsionType.ELECTRICITY, PropulsionType.PLUGIN_HYBRID].includes(
-        vehicle.propulsion
-      )
+      hasElectricEngine(vehicle.propulsion)
         ? this.#battery.get(vehicleId, userId)
         : null,
     ]);

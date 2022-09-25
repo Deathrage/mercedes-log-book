@@ -1,15 +1,10 @@
 import { z } from "zod";
+import { schema as date } from "./Date";
 
 const withDate = <Type extends z.ZodTypeAny>(inner: Type) =>
   z.object({
     value: inner,
-    date: z.preprocess(
-      (arg) =>
-        typeof arg === "string" || arg instanceof Date
-          ? new Date(arg)
-          : undefined,
-      z.date()
-    ),
+    date,
   });
 
 export default withDate;

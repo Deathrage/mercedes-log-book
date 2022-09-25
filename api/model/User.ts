@@ -3,6 +3,7 @@ import entity from "../decorators/entity";
 import Entity from "./Entity";
 import Validatable from "./Validatable";
 import extend from "just-extend";
+import { schema as date } from "../model-shared/Date";
 
 const schema = z
   .object({
@@ -12,13 +13,7 @@ const schema = z
         accessToken: z
           .object({
             value: z.string(),
-            expiresAt: z.preprocess(
-              (arg) =>
-                typeof arg === "string" || arg instanceof Date
-                  ? new Date(arg)
-                  : undefined,
-              z.date()
-            ),
+            expiresAt: date,
           })
           .optional(),
         refreshToken: z.string(),

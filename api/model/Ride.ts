@@ -1,52 +1,19 @@
 import extend from "just-extend";
-import { z } from "zod";
 import entity from "../decorators/entity";
 import Entity from "./Entity";
 import Validatable from "./Validatable";
-
-const state = z.object({
-  odometer: z.number().positive(),
-  date: z.preprocess(
-    (arg) =>
-      typeof arg === "string" || arg instanceof Date
-        ? new Date(arg)
-        : undefined,
-    z.date()
-  ),
-  consumption: z.object({
-    gas: z.number().positive().optional(),
-    battery: z.number().positive().optional(),
-  }),
-  location: z.object({
-    address: z.string().optional(),
-    gps: z
-      .object({
-        lat: z.number(),
-        lon: z.number(),
-      })
-      .optional(),
-  }),
-});
-
-const schema = z.object({
-  id: z.string(),
-  reason: z.string().optional(),
-  note: z.string().optional(),
-  vehicleId: z.string(),
-  start: state,
-  end: state.optional(),
-});
+import RideData, { RidePointData, schema } from "../model-shared/RideData";
 
 @entity("Rides")
-export default class Ride
-  implements Entity, Validatable, z.infer<typeof schema>
-{
+export default class Ride implements Entity, Validatable, RideData {
   id: string;
   vehicleId: string;
-  start: z.infer<typeof state>;
-  end?: z.infer<typeof state>;
+  start: RidePointData;
+  end?: RidePointData;
+  note?: string;
+  reason?: string;
 
-  constructor(data?: z.infer<typeof schema>) {
+  constructor(data?: RideData) {
     if (data) extend(this, schema.parse(data));
   }
 

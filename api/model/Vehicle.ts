@@ -7,22 +7,17 @@ import VehicleData, {
   schema as VehicleDataSchema,
 } from "../model-shared/VehicleData";
 import { z } from "zod";
+import { hasCombustionEngine, hasElectricEngine } from "../helpers/propulsion";
 
 const schema = VehicleDataSchema.extend({
   userId: z.string(),
 })
   .refine(
-    (data) =>
-      [PropulsionType.COMBUSTION, PropulsionType.PLUGIN_HYBRID].includes(
-        data.propulsion
-      ) && data.capacity.gas,
+    (data) => hasCombustionEngine(data.propulsion) && data.capacity.gas,
     "Vehicle with combustion engine has to have gas tank capacity set!"
   )
   .refine(
-    (data) =>
-      [PropulsionType.ELECTRICITY, PropulsionType.PLUGIN_HYBRID].includes(
-        data.propulsion
-      ) && data.capacity.battery,
+    (data) => hasElectricEngine(data.propulsion) && data.capacity.battery,
     "Vehicle with electric engine has to have battery capacity set!"
   )
   .refine(
