@@ -64,7 +64,7 @@ const VehicleStatus: FC = () => {
           loading={running}
           format={(val) =>
             `${formatPercentage(val)} approx. ${formatLiters(
-              data!.gas!.capacity * val
+              data!.gas!.absLevel
             )}`
           }
         />
@@ -76,7 +76,7 @@ const VehicleStatus: FC = () => {
           loading={running}
           format={(val) =>
             `${formatPercentage(val)} approx. ${formatKilowattHours(
-              data!.battery!.capacity * val
+              data!.battery!.absLevel
             )}`
           }
         />
