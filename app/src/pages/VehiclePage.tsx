@@ -3,7 +3,7 @@ import React, { FC } from "react";
 import VehicleForm from "../components/VehicleForm";
 import { useVehiclesContext } from "../components/vehicles/hooks";
 
-const Vehicle: FC = () => {
+const VehiclePage: FC = () => {
   const { activeVehicle, updateVehicle } = useVehiclesContext();
   if (!activeVehicle) throw new Error("There is no active vehicle!");
 
@@ -49,4 +49,4 @@ const Vehicle: FC = () => {
   );
 };
 
-export default Vehicle;
+export default VehiclePage;

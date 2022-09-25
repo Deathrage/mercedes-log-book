@@ -13,9 +13,9 @@ const state = z.object({
         : undefined,
     z.date()
   ),
-  capacity: z.object({
+  consumption: z.object({
     gas: z.number().positive().optional(),
-    batter: z.number().positive().optional(),
+    battery: z.number().positive().optional(),
   }),
   location: z.object({
     address: z.string().optional(),
@@ -30,6 +30,8 @@ const state = z.object({
 
 const schema = z.object({
   id: z.string(),
+  reason: z.string().optional(),
+  note: z.string().optional(),
   vehicleId: z.string(),
   start: state,
   end: state.optional(),

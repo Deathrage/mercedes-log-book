@@ -5,11 +5,11 @@ import Copyright from "./components/Copyright";
 import Header from "./components/Header";
 import { Container } from "@mui/material";
 import Drawer from "./components/Drawer";
-import Dashboard from "./pages/Dashboard";
+import DashboardPage from "./pages/DashboardPage";
 import { BrowserRouter, Routes as Switch, Route } from "react-router-dom";
 import Routes from "./consts/Routes";
-import Rides from "./pages/Rides";
-import Vehicle from "./pages/Vehicle";
+import RidesPage from "./pages/RidesPage";
+import VehiclePage from "./pages/VehiclePage";
 import { useCurrentUserContext } from "./components/current-user/hooks";
 import ConnectToMercedesDialog from "./components/ConnectToMercedesDialog";
 import AddVehicleDialog from "./components/AddVehicleDialog";
@@ -44,9 +44,9 @@ const Layout = () => {
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           {mercedesBenzPaired && activeVehicle && (
             <Switch>
-              <Route path={Routes.VEHICLE} element={<Vehicle />} />
-              <Route path={Routes.RIDES} element={<Rides />} />
-              <Route path={Routes.DASHBOARD} element={<Dashboard />} />
+              <Route path={Routes.VEHICLE} element={<VehiclePage />} />
+              <Route path={Routes.RIDES} element={<RidesPage />} />
+              <Route path={Routes.DASHBOARD} element={<DashboardPage />} />
             </Switch>
           )}
           <ConnectToMercedesDialog />

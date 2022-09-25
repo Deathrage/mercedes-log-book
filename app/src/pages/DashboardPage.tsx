@@ -1,14 +1,14 @@
 import { Grid, Paper, Typography } from "@mui/material";
 import React from "react";
+import Rides from "src/components/Rides";
 import { useVehiclesContext } from "../components/vehicles/hooks";
 import VehicleStatus from "../components/VehicleStatus";
 
-const Dashboard = () => {
+const DashboardPage = () => {
   const { activeVehicle } = useVehiclesContext();
 
   return (
     <Grid container spacing={3}>
-      {/* Chart */}
       <Grid item xs={12} md={8} lg={9}>
         <Paper
           sx={{
@@ -39,14 +39,13 @@ const Dashboard = () => {
           VIN: {activeVehicle?.id ?? "-"}
         </Paper>
       </Grid>
-      {/* Recent Orders */}
       <Grid item xs={12}>
         <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
           <Typography variant="h6">Recent rides</Typography>
-          {/* <Orders /> */}
+          <Rides onlyFirstPage />
         </Paper>
       </Grid>
     </Grid>
   );
 };
-export default Dashboard;
+export default DashboardPage;
