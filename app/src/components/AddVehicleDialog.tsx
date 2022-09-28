@@ -13,6 +13,7 @@ import React, { FC, useState } from "react";
 import VehicleForm from "./VehicleForm";
 import { useVehiclesContext } from "./vehicles/hooks";
 import CloseIcon from "@mui/icons-material/Close";
+import { turnEmptyValuesToUndefined } from "src/helpers/form";
 
 const AddVehicleDialog: FC = () => {
   const { activeVehicle, loading, createVehicle } = useVehiclesContext();
@@ -38,6 +39,7 @@ const AddVehicleDialog: FC = () => {
         <Dialog open onClose={() => setCreating(true)} fullScreen>
           <VehicleForm
             onSubmit={async (state) => {
+              state = turnEmptyValuesToUndefined(state);
               await createVehicle({
                 id: state.vin,
                 license: state.license,
@@ -50,7 +52,7 @@ const AddVehicleDialog: FC = () => {
               });
               setCreating(false);
             }}
-            wrap={(children) => (
+            wrap={(children, { submitting, pristine }) => (
               <>
                 <AppBar sx={{ position: "relative" }}>
                   <Toolbar>
@@ -63,6 +65,7 @@ const AddVehicleDialog: FC = () => {
                       color="inherit"
                       sx={{ ml: "auto" }}
                       type="submit"
+                      disabled={submitting || pristine}
                     >
                       Save
                     </Button>

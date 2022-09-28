@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   IconButton,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -10,26 +11,53 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
-import React, { FC, useState } from "react";
+import React, { FC, useCallback, useState } from "react";
 import {
   formatDateTime,
   formatKilometers,
   formatKilowattHours,
   formatLiters,
   formatPercentage,
-} from "src/helpers/formaters";
+} from "src/helpers/formatters";
 import { DoubleTableCell } from "./DoubleTableCell";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RideDialog from "./RideDialog";
+import { useApi } from "../api";
+import useVehicleId from "../hooks/useVehicle";
+import useOnMount from "src/hooks/useOnMount";
+import { isNumber } from "src/helpers/predicate";
 
 const CREATE = Symbol("Creating rides");
+
+const pageSize = 10;
 
 const Rides: FC<{ onlyFirstPage?: true; allowCreate?: true }> = ({
   onlyFirstPage,
   allowCreate,
 }) => {
+  const vehicleId = useVehicleId();
+
   const [id, setId] = useState<string | typeof CREATE | null>(null);
+
+  const [page, setPage] = useState(0);
+
+  const {
+    data,
+    running: loadingGet,
+    invoke: invokeGet,
+  } = useApi((_) => _.getRides);
+  const fetch = useCallback(
+    () => invokeGet({ vehicleId, page, pageSize }),
+    [invokeGet, page, vehicleId]
+  );
+  useOnMount(() => {
+    fetch();
+  });
+
+  const { running: loadingDelete, invoke: invokeDelete } = useApi(
+    (_) => _.deleteRide
+  );
 
   return (
     <TableContainer>
@@ -55,68 +83,110 @@ const Rides: FC<{ onlyFirstPage?: true; allowCreate?: true }> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          <TableRow>
-            <DoubleTableCell
-              first="J. Novak 86, Brno"
-              second={formatDateTime(new Date())}
-            />
-            <DoubleTableCell
-              first="J. Novak 86, Praha"
-              second={formatDateTime(new Date())}
-            />
-            <TableCell align="right">{formatKilometers(12.52)}</TableCell>
-            <DoubleTableCell
-              first={`Gas: ${formatPercentage(0.15)} approx. ${formatLiters(
-                10
-              )}`}
-              second={`Battery: ${formatPercentage(
-                0.55
-              )} approx. ${formatKilowattHours(25)}`}
-            />
-            <TableCell>
-              <Box
-                sx={{
-                  maxWidth: "10rem",
-                  maxHeight: "3rem",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: "2",
-                  WebkitBoxOrient: "vertical",
-                }}
-              >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-                lectus augue, molestie non lectus non, volutpat tristique lacus.
-                Nunc egestas ante maximus eros gravida, nec bibendum nisl
-                aliquam.
-              </Box>
-            </TableCell>
-            <TableCell align="right">
-              <IconButton onClick={() => setId("foo")}>
-                <EditIcon />
-              </IconButton>
-              <IconButton color="error">
-                <DeleteIcon />
-              </IconButton>
-            </TableCell>
-          </TableRow>
+          {loadingGet || !data ? (
+            <TableRow>
+              <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
+              <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
+              <TableCell>
+                <Skeleton />
+              </TableCell>
+              <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
+              <TableCell>
+                <Skeleton />
+              </TableCell>
+            </TableRow>
+          ) : (
+            data.rides.map((ride) => (
+              <TableRow key={ride.id}>
+                <DoubleTableCell
+                  first={ride.startLocation.address || "-"}
+                  second={formatDateTime(ride.departed)}
+                />
+                <DoubleTableCell
+                  first={ride.endLocation.address || "-"}
+                  second={formatDateTime(ride.arrived)}
+                />
+                <TableCell align="right">
+                  {isNumber(ride.distance)
+                    ? formatKilometers(ride.distance)
+                    : "-"}
+                </TableCell>
+                <DoubleTableCell
+                  first={`Gas: ${
+                    isNumber(ride.consumption.gas?.relative)
+                      ? formatPercentage(ride.consumption.gas!.relative)
+                      : "-"
+                  } approx. ${
+                    isNumber(ride.consumption.gas?.absolute)
+                      ? formatLiters(ride.consumption.gas!.absolute)
+                      : "-"
+                  }`}
+                  second={`Battery: ${
+                    isNumber(ride.consumption.battery?.relative)
+                      ? formatPercentage(ride.consumption.battery!.relative)
+                      : "-"
+                  } approx. ${
+                    isNumber(ride.consumption.battery?.absolute)
+                      ? formatKilowattHours(ride.consumption.battery!.absolute)
+                      : "-"
+                  }`}
+                />
+                <TableCell>
+                  <Box
+                    sx={{
+                      maxWidth: "10rem",
+                      maxHeight: "3rem",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      WebkitLineClamp: "2",
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    {ride.reason || "-"}
+                  </Box>
+                </TableCell>
+                <TableCell align="right">
+                  <IconButton
+                    onClick={() => setId(ride.id)}
+                    disabled={loadingDelete}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={async () => {
+                      await invokeDelete({ id: ride.id, vehicleId });
+                      fetch();
+                    }}
+                    disabled={loadingDelete}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
       {!onlyFirstPage && (
         <TablePagination
           component="div"
-          count={15}
-          rowsPerPageOptions={[10]}
-          rowsPerPage={10}
-          page={0}
-          onPageChange={console.log}
+          count={-1}
+          rowsPerPageOptions={[pageSize]}
+          rowsPerPage={pageSize}
+          page={page}
+          onPageChange={(_, page) => setPage(page)}
         />
       )}
       <RideDialog
         open={!!id}
         rideId={typeof id === "string" ? id : undefined}
-        onClose={() => setId(null)}
-        onSaved={() => setId(null)}
+        onClose={useCallback(() => setId(null), [])}
+        onSaved={useCallback(() => {
+          setId(null);
+          fetch();
+        }, [fetch])}
       />
     </TableContainer>
   );

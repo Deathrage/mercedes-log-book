@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import fetchJson from "./helpers/fetchJson";
 import api from "./consts/api";
 import PublicUserData, {
@@ -13,6 +13,12 @@ import VehiclesData, {
 import VehicleStatusData, {
   schema as VehicleStatusSchema,
 } from "../../api/model-shared/VehicleStatusData";
+import RideData, {
+  schema as RideDataSchema,
+} from "../../api/model-shared/RideData";
+import ListRidesData, {
+  schema as ListRidesDataSchema,
+} from "../../api/model-shared/ListRidesData";
 import { useErrorsContext } from "./components/errors/hooks";
 
 const endpoints = {
@@ -25,16 +31,26 @@ const endpoints = {
   postVehicle: (request: VehicleData) =>
     fetchJson<VehicleData>(api.vehicle(), VehicleSchema.parse, "POST", request),
   deleteVehicle: (request: { vin: string }) =>
-    fetchJson<VehicleData>(
-      api.vehicle(request.vin),
-      VehicleSchema.parse,
-      "DELETE"
-    ),
+    fetch(api.vehicle(request.vin), { method: "DELETE" }).then(),
   getVehicleStatus: (request: { vin: string }) =>
     fetchJson<VehicleStatusData>(
       api.vehicleStatus(request.vin),
       VehicleStatusSchema.parse
     ),
+  getRide: (request: { id: string; vehicleId: string }) =>
+    fetchJson<RideData>(
+      api.ride(request.vehicleId, request.id),
+      RideDataSchema.parse
+    ),
+  postRide: (request: RideData) =>
+    fetchJson<RideData>(api.ride(), RideDataSchema.parse, "POST", request),
+  getRides: (request: { vehicleId: string; pageSize: number; page: number }) =>
+    fetchJson<ListRidesData>(
+      api.rides(request.vehicleId, request.pageSize, request.page),
+      ListRidesDataSchema.parse
+    ),
+  deleteRide: (request: { id: string; vehicleId: string }) =>
+    fetch(api.ride(request.vehicleId, request.id), { method: "DELETE" }).then(),
 };
 
 export const useApi = <Request, Response>(
@@ -54,21 +70,39 @@ export const useApi = <Request, Response>(
     error: null,
   });
 
+  const abortHandler = useRef<() => void>();
+
+  const reset = useCallback(() => {
+    // Abort ongoing request if reset called
+    abortHandler.current?.();
+    setState({ running: false, data: null, error: null });
+  }, []);
+
   const invoke = useCallback(
-    async (request: Request) => {
-      setState({ running: true, data: null, error: null });
-      try {
-        const response = (await endpoint(request)) as Response;
-        setState({ running: false, data: response, error: null });
-        return response;
-      } catch (error) {
-        setState({ running: false, data: null, error });
-        show(error);
-        throw error;
-      }
-    },
+    (request: Request) =>
+      new Promise<Response>(async (resolve, reject) => {
+        // Abort already ongoing abort it
+        abortHandler.current?.();
+        abortHandler.current = () => {
+          reject();
+          abortHandler.current = undefined;
+        };
+
+        setState({ running: true, data: null, error: null });
+        try {
+          const response = (await endpoint(request)) as Response;
+          setState({ running: false, data: response, error: null });
+
+          resolve(response);
+        } catch (error) {
+          setState({ running: false, data: null, error });
+          show(error);
+
+          reject(error);
+        }
+      }),
     [endpoint, show]
   );
 
-  return { ...state, invoke };
+  return { ...state, invoke, reset };
 };

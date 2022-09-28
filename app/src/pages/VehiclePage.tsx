@@ -1,5 +1,6 @@
 import { Button, Paper } from "@mui/material";
 import React, { FC } from "react";
+import { turnEmptyValuesToUndefined } from "../helpers/form";
 import VehicleForm from "../components/VehicleForm";
 import { useVehiclesContext } from "../components/vehicles/hooks";
 
@@ -10,8 +11,9 @@ const VehiclePage: FC = () => {
   return (
     <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
       <VehicleForm
-        onSubmit={(state) =>
-          updateVehicle({
+        onSubmit={(state) => {
+          state = turnEmptyValuesToUndefined(state);
+          return updateVehicle({
             id: state.vin,
             license: state.license,
             model: state.model,
@@ -20,8 +22,8 @@ const VehiclePage: FC = () => {
               gas: state.gasCapacity,
               battery: state.batteryCapacity,
             },
-          })
-        }
+          });
+        }}
         initialValues={{
           vin: activeVehicle.id,
           license: activeVehicle.license,
@@ -30,7 +32,7 @@ const VehiclePage: FC = () => {
           gasCapacity: activeVehicle.capacity.gas,
           batteryCapacity: activeVehicle.capacity.battery,
         }}
-        wrap={(children, { isDirty, isSubmitting }) => (
+        wrap={(children, { submitting, pristine }) => (
           <>
             {children}
             <Button
@@ -38,7 +40,7 @@ const VehiclePage: FC = () => {
               sx={{ ml: "auto", display: "block", marginTop: "1rem" }}
               type="submit"
               variant="contained"
-              disabled={!isDirty || isSubmitting}
+              disabled={submitting || pristine}
             >
               Save
             </Button>

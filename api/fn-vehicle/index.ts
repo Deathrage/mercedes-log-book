@@ -43,33 +43,28 @@ class VehicleHandler implements HttpRequestHandler {
   #repository: VehicleRepository;
 
   async #get(vehicleId: string, userId: string): Promise<VehicleData> {
-    const vehicle = await this.#repository.getRequired(vehicleId);
+    const vehicle = await this.#repository.getRequired(vehicleId, userId);
 
     assertVehicleOwner(vehicle, userId);
 
     return VehicleDataSchema.parse(vehicle);
   }
 
-  async #delete(vehicleId: string, userId: string): Promise<VehicleData> {
-    const vehicle = await this.#repository.getRequired(vehicleId);
+  async #delete(vehicleId: string, userId: string): Promise<void> {
+    const vehicle = await this.#repository.getRequired(vehicleId, userId);
 
     assertVehicleOwner(vehicle, userId);
 
-    const deletedVehicle = await this.#repository.delete(vehicleId);
-    return VehicleDataSchema.parse(deletedVehicle);
+    await this.#repository.delete(vehicleId, userId);
   }
 
   async #post(body: VehicleData, userId: string): Promise<VehicleData> {
-    let vehicle = await this.#repository.get(body.id);
-
+    let vehicle = await this.#repository.get(body.id, userId);
     if (vehicle) assertVehicleOwner(vehicle, userId);
-    if (!vehicle) {
-      vehicle = new Vehicle();
-      vehicle.userId = userId;
-    }
 
-    // Update vehicle from body
+    vehicle = new Vehicle();
     extend(vehicle, body);
+    vehicle.userId = userId;
 
     await this.#repository.createOrUpdate(vehicle);
 

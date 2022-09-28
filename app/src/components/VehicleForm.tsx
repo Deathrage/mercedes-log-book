@@ -1,16 +1,11 @@
-import {
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from "@mui/material";
-import deepEqual from "deep-equal";
-import React, { ReactNode, useEffect, useRef } from "react";
+import { FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material";
+import { FormState, FormApi } from "final-form";
+import React, { ReactNode, useCallback } from "react";
 import { FC } from "react";
-import { FormState, useForm } from "react-hook-form";
+import { Field, Form } from "react-final-form";
 import PropulsionType from "../../../api/model-shared/PropulsionType";
+import NumberInputField from "./fields/NumberInputField";
+import TextInputField from "./fields/TextInputField";
 
 export interface VehicleFormValues {
   vin: string;
@@ -26,117 +21,101 @@ const VehicleForm: FC<{
   onSubmit: (values: VehicleFormValues) => Promise<void>;
   wrap: (content: ReactNode, state: FormState<VehicleFormValues>) => ReactNode;
 }> = ({ initialValues, onSubmit, wrap }) => {
-  const { register, handleSubmit, watch, formState, reset } =
-    useForm<VehicleFormValues>({
-      defaultValues: initialValues,
-    });
-  const { propulsion } = watch();
-
-  const lastInitialValuesRef = useRef(initialValues);
-  useEffect(() => {
-    // If initial values change reset form to is no longer dirty.
-    // Compared to React Final Form, no dirtySinceLastSubmit is available
-    if (!deepEqual(lastInitialValuesRef.current, initialValues))
-      reset(initialValues);
-
-    lastInitialValuesRef.current = initialValues;
-  }, [initialValues, reset]);
-
-  const requireGas = [
-    PropulsionType.COMBUSTION,
-    PropulsionType.PLUGIN_HYBRID,
-  ].includes(propulsion);
-
-  const requireBattery = [
-    PropulsionType.ELECTRICITY,
-    PropulsionType.PLUGIN_HYBRID,
-  ].includes(propulsion);
-
-  const content = (
-    <Grid container spacing={3}>
-      <Grid item xs={4}>
-        <TextField
-          required
-          label="VIN code"
-          variant="filled"
-          disabled={!!initialValues}
-          fullWidth
-          {...register("vin")}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <TextField
-          label="License plate"
-          variant="filled"
-          fullWidth
-          {...register("license")}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <TextField
-          label="Model"
-          variant="filled"
-          fullWidth
-          {...register("model")}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <FormControl required fullWidth variant="filled">
-          <InputLabel required id="propulsion-label" variant="filled">
-            Propulsion
-          </InputLabel>
-          <Select
-            labelId="propulsion-label"
-            label="Propulsion"
-            required
-            variant="filled"
-            {...register("propulsion")}
-            // Does not work properly with hook form, initial value has to be provided explicitly
-            defaultValue={initialValues?.propulsion}
-          >
-            <MenuItem value={PropulsionType.COMBUSTION}>Combustion</MenuItem>
-            <MenuItem value={PropulsionType.ELECTRICITY}>Electric</MenuItem>
-            <MenuItem value={PropulsionType.PLUGIN_HYBRID}>
-              Plugin hybrid
-            </MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs={4}>
-        <TextField
-          label="Gas capacity"
-          variant="filled"
-          fullWidth
-          type="number"
-          required={requireGas}
-          InputProps={{ endAdornment: "l" }}
-          {...register("gasCapacity", {
-            valueAsNumber: true,
-          })}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <TextField
-          label="Battery capacity"
-          variant="filled"
-          fullWidth
-          type="number"
-          inputMode="decimal"
-          inputProps={{
-            step: "0.1",
-          }}
-          required={requireBattery}
-          InputProps={{ endAdornment: "kWh" }}
-          {...register("batteryCapacity", {
-            valueAsNumber: true,
-          })}
-        />
-      </Grid>
-    </Grid>
+  const submit = useCallback(
+    async (values: VehicleFormValues, formApi: FormApi<VehicleFormValues>) => {
+      await onSubmit(values);
+      formApi.restart();
+    },
+    [onSubmit]
   );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>{wrap(content, formState)}</form>
+    <Form<VehicleFormValues> onSubmit={submit} initialValues={initialValues}>
+      {({ handleSubmit, ...formState }) => {
+        const requireGas = [
+          PropulsionType.COMBUSTION,
+          PropulsionType.PLUGIN_HYBRID,
+        ].includes(formState.values.propulsion);
+
+        const requireBattery = [
+          PropulsionType.ELECTRICITY,
+          PropulsionType.PLUGIN_HYBRID,
+        ].includes(formState.values.propulsion);
+
+        return (
+          <form onSubmit={handleSubmit}>
+            {wrap(
+              <Grid container spacing={3}>
+                <Grid item xs={4}>
+                  <TextInputField
+                    name="vin"
+                    required
+                    label="VIN code"
+                    disabled={!!initialValues}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <TextInputField name="license" label="License plate" />
+                </Grid>
+                <Grid item xs={4}>
+                  <TextInputField name="model" label="Model" />
+                </Grid>
+                <Grid item xs={4}>
+                  <Field<PropulsionType> name="propulsion">
+                    {({ input }) => (
+                      <FormControl required fullWidth variant="filled">
+                        <InputLabel
+                          required
+                          id="propulsion-label"
+                          variant="filled"
+                        >
+                          Propulsion
+                        </InputLabel>
+                        <Select
+                          labelId="propulsion-label"
+                          label="Propulsion"
+                          required
+                          {...input}
+                        >
+                          <MenuItem value={PropulsionType.COMBUSTION}>
+                            Combustion
+                          </MenuItem>
+                          <MenuItem value={PropulsionType.ELECTRICITY}>
+                            Electric
+                          </MenuItem>
+                          <MenuItem value={PropulsionType.PLUGIN_HYBRID}>
+                            Plugin hybrid
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    )}
+                  </Field>
+                </Grid>
+                <Grid item xs={4}>
+                  <NumberInputField
+                    name="gasCapacity"
+                    label="Gas capacity"
+                    required={requireGas}
+                    disabled={!requireGas}
+                    suffix="L"
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <NumberInputField
+                    name="batteryCapacity"
+                    label="Battery capacity"
+                    required={requireBattery}
+                    disabled={!requireBattery}
+                    suffix="kWh"
+                  />
+                </Grid>
+              </Grid>,
+              formState
+            )}
+          </form>
+        );
+      }}
+    </Form>
   );
 };
 

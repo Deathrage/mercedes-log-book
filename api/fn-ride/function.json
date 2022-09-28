@@ -6,7 +6,7 @@
       "direction": "in",
       "name": "req",
       "methods": ["get", "post", "delete"],
-      "route": "ride/{id?}"
+      "route": "ride/{vehicleId?}/{id?}"
     },
     {
       "type": "http",

@@ -9,20 +9,21 @@ export default class VehicleRepository {
   }
 
   getAll(userId: string): Promise<Vehicle[]> {
-    return this.#dataSource.readAll(Vehicle);
+    return this.#dataSource.readAll(Vehicle, userId);
   }
 
-  get(id: string): Promise<Vehicle | null> {
-    return this.#dataSource.read(Vehicle, id);
+  get(id: string, userId: string): Promise<Vehicle | null> {
+    return this.#dataSource.read(Vehicle, id, userId);
   }
 
-  delete(id: string): Promise<Vehicle> {
-    return this.#dataSource.delete(Vehicle, id);
+  delete(id: string, userId: string): Promise<void> {
+    return this.#dataSource.delete(Vehicle, id, userId);
   }
 
-  async getRequired(id: string): Promise<Vehicle> {
-    const vehicle = await this.get(id);
-    if (!vehicle) throw new Error(`Vehicle ${id} does not exist!`);
+  async getRequired(id: string, userId: string): Promise<Vehicle> {
+    const vehicle = await this.get(id, userId);
+    if (!vehicle)
+      throw new Error(`Vehicle ${id} does not exist for user ${userId}!`);
     return vehicle;
   }
 

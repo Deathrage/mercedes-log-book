@@ -1,5 +1,7 @@
 import { Grid } from "@mui/material";
 import React, { FC, useEffect } from "react";
+import useOnMount from "src/hooks/useOnMount";
+import useVehicleId from "src/hooks/useVehicle";
 import { useApi } from "../api";
 import {
   formatDateTime,
@@ -7,9 +9,8 @@ import {
   formatKilowattHours,
   formatLiters,
   formatPercentage,
-} from "../helpers/formaters";
+} from "../helpers/formatters";
 import InfoField from "./InfoField";
-import { useVehiclesContext } from "./vehicles/hooks";
 
 const StatusField = <Value extends unknown>({
   label,
@@ -37,15 +38,13 @@ const StatusField = <Value extends unknown>({
 );
 
 const VehicleStatus: FC = () => {
-  const { activeVehicle } = useVehiclesContext();
-  const activeVehicleId = activeVehicle?.id;
+  const activeVehicleId = useVehicleId();
 
   const { data, running, invoke } = useApi((_) => _.getVehicleStatus);
 
-  useEffect(() => {
-    if (!activeVehicleId) return;
+  useOnMount(() => {
     invoke({ vin: activeVehicleId });
-  }, [activeVehicleId, invoke]);
+  });
 
   return (
     <Grid container spacing={3}>

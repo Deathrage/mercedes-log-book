@@ -16,7 +16,8 @@ const fetchJson = async <Response>(
 
   if (res.status !== 200) throw new Error(responseText);
 
-  return JSON.parse(responseText) as Response;
+  const object = JSON.parse(responseText);
+  return parse(object);
 };
 
 export default fetchJson;

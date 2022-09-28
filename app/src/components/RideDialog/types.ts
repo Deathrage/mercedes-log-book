@@ -3,7 +3,7 @@ export enum PointParametersType {
   END = "END",
 }
 
-export interface RideFormValues {
+export type RideFormValues = Partial<{
   departed: Date;
   arrived: Date;
   startAddress: string;
@@ -20,4 +20,4 @@ export interface RideFormValues {
   endBattery: number;
   reason: string;
   note: string;
-}
+}>;

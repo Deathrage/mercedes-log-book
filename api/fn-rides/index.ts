@@ -41,7 +41,10 @@ class RidesHandler implements HttpRequestHandler {
     page: number,
     pageSize: number
   ): Promise<ListRidesData> {
-    const vehicle = await this.#vehicleRepository.getRequired(vehicleId);
+    const vehicle = await this.#vehicleRepository.getRequired(
+      vehicleId,
+      userId
+    );
     if (vehicle.userId !== userId)
       throw new Error(`Vehicle ${vehicleId} is not owned by user ${userId}!`);
 
@@ -56,8 +59,8 @@ class RidesHandler implements HttpRequestHandler {
       hasMore,
       rides: rides.slice(hasMore ? -1 : 0).map((ride) => {
         const relativeGasConsumption =
-          ride.start.gas && ride.end?.gas
-            ? ride.start.gas - ride.end.gas
+          ride.gas.start && ride.gas.end
+            ? ride.gas.start - ride.gas.end
             : undefined;
         const absoluteGasConsumption =
           relativeGasConsumption && vehicle.capacity.gas
@@ -65,12 +68,12 @@ class RidesHandler implements HttpRequestHandler {
             : undefined;
 
         const relativeBatteryConsumption =
-          ride.start.battery && ride.end?.battery
-            ? ride.start.battery - ride.end.battery
+          ride.battery.start && ride.battery.end
+            ? ride.battery.start - ride.battery.end
             : undefined;
         const absoluteBatteryConsumption =
-          relativeGasConsumption && vehicle.capacity.battery
-            ? relativeGasConsumption * vehicle.capacity.battery
+          relativeBatteryConsumption && vehicle.capacity.battery
+            ? relativeBatteryConsumption * vehicle.capacity.battery
             : undefined;
 
         return {
@@ -78,17 +81,17 @@ class RidesHandler implements HttpRequestHandler {
           reason: ride.reason,
           departed: ride.departed,
           startLocation: {
-            address: ride.start.address,
-            coordinates: ride.start.coordinates,
+            address: ride.address.start,
+            coordinates: ride.coordinates.start,
           },
           arrived: ride.arrived,
           endLocation: {
-            address: ride.end.address,
-            coordinates: ride.end.coordinates,
+            address: ride.address.end,
+            coordinates: ride.coordinates.end,
           },
           distance:
-            ride.start.odometer && ride.end?.odometer
-              ? ride.end.odometer - ride.start.odometer
+            ride.odometer.start && ride.odometer.end
+              ? ride.odometer.end - ride.odometer.start
               : undefined,
           consumption: {
             gas: hasCombustionEngine(vehicle.propulsion)

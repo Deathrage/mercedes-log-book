@@ -36,7 +36,7 @@ class VehicleStatusHandler implements HttpRequestHandler {
   }
 
   async #get(vehicleId: string, userId: string): Promise<VehicleStatusData> {
-    const vehicle = await this.#repository.getRequired(vehicleId);
+    const vehicle = await this.#repository.getRequired(vehicleId, userId);
     if (vehicle.userId !== userId)
       throw new Error(`Vehicle ${vehicleId} is not owned by ${userId}!`);
 

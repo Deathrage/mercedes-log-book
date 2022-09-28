@@ -1,10 +1,14 @@
-import { Grid, TextField, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import React, { FC } from "react";
-import { useFormContext } from "react-hook-form";
-import { formatKilowattHours, formatLiters } from "src/helpers/formaters";
+import { useField } from "react-final-form";
+import { formatKilowattHours, formatLiters } from "../../helpers/formatters";
 import PropulsionType from "../../../../api/model-shared/PropulsionType";
 import { useVehiclesContext } from "../vehicles/hooks";
 import { PointParametersType } from "./types";
+import { isNumber } from "src/helpers/predicate";
+import DateInputField from "../fields/DateInputField";
+import TextInputField from "../fields/TextInputField";
+import NumberInputField from "../fields/NumberInputField";
 
 const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
   const { activeVehicle } = useVehiclesContext();
@@ -19,9 +23,14 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
 
   const isStart = type === PointParametersType.START;
 
-  const { watch, register } = useFormContext();
-  const gas = watch(isStart ? "startGas" : "endGas");
-  const battery = watch(isStart ? "startBattery" : "endBattery");
+  const {
+    input: { value: gas },
+  } = useField(isStart ? "startGas" : "endGas", {
+    subscription: { value: true },
+  });
+  const {
+    input: { value: battery },
+  } = useField(isStart ? "startBattery" : "endBattery");
 
   return (
     <>
@@ -32,64 +41,39 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
           </Typography>
         </Grid>
         <Grid item xs={6}>
-          <TextField
+          <DateInputField
+            name={isStart ? "departed" : "arrived"}
             label={isStart ? "Departed" : "Arrived"}
-            type="datetime-local"
-            variant="filled"
             required={isStart}
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-            }}
-            {...register(isStart ? "departed" : "arrived", {
-              valueAsDate: true,
-            })}
           />
         </Grid>
         <Grid item xs={7}>
-          <TextField
+          <TextInputField
+            name={isStart ? "startAddress" : "endAddress"}
             label="Address"
-            variant="filled"
-            fullWidth
-            {...register(isStart ? "startAddress" : "endAddress")}
           />
         </Grid>
         <Grid item xs={5}>
-          <TextField
+          <NumberInputField
+            name={isStart ? "startOdometer" : "endOdometer"}
             label="Odometer"
-            variant="filled"
-            fullWidth
-            type="number"
-            InputProps={{ endAdornment: "km" }}
-            {...register(isStart ? "startOdometer" : "endOdometer", {
-              valueAsNumber: true,
-            })}
+            suffix="km"
           />
         </Grid>
         <Grid item xs={7}>
           <Grid container spacing={3}>
             <Grid item xs={6}>
-              <TextField
-                variant="filled"
+              <NumberInputField
+                name={isStart ? "startLatitude" : "endLatitude"}
                 label="Latitude"
-                type="number"
-                fullWidth
-                InputProps={{ endAdornment: "°" }}
-                {...register(isStart ? "startLatitude" : "endLatitude", {
-                  valueAsNumber: true,
-                })}
+                suffix="°"
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField
-                variant="filled"
-                fullWidth
-                type="number"
+              <NumberInputField
+                name={isStart ? "startLongitude" : "endLongitude"}
                 label="Longitude"
-                InputProps={{ endAdornment: "°" }}
-                {...register(isStart ? "startLongitude" : "endLongitude", {
-                  valueAsNumber: true,
-                })}
+                suffix="°"
               />
             </Grid>
           </Grid>
@@ -97,43 +81,35 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
         <Grid item xs={5}>
           <Grid container spacing={3}>
             <Grid item xs={6}>
-              <TextField
-                type="number"
-                variant="filled"
+              <NumberInputField
+                name={isStart ? "startGas" : "endGas"}
                 label="Gas"
+                suffix="%"
+                rate={100}
                 disabled={!usesGas}
-                InputProps={{ endAdornment: "%" }}
-                fullWidth
                 helperText={
-                  gas && activeVehicle?.capacity.gas
+                  isNumber(gas) && isNumber(activeVehicle?.capacity.gas)
                     ? `Approx. ${formatLiters(
-                        (gas / 100) * activeVehicle.capacity.gas
+                        (gas / 100) * activeVehicle!.capacity.gas
                       )}.`
                     : undefined
                 }
-                {...register(isStart ? "startGas" : "endGas", {
-                  valueAsNumber: true,
-                })}
               />
             </Grid>
             <Grid item xs={6}>
-              <TextField
-                type="number"
-                variant="filled"
-                fullWidth
-                InputProps={{ endAdornment: "%" }}
-                disabled={!usesBattery}
+              <NumberInputField
+                name={isStart ? "startBattery" : "endBattery"}
                 label="Battery"
+                suffix="%"
+                rate={100}
+                disabled={!usesBattery}
                 helperText={
-                  battery && activeVehicle?.capacity.battery
+                  isNumber(battery) && isNumber(activeVehicle?.capacity.battery)
                     ? `Approx. ${formatKilowattHours(
-                        (battery / 100) * activeVehicle.capacity.battery
+                        (battery / 100) * activeVehicle!.capacity.battery
                       )}.`
                     : undefined
                 }
-                {...register(isStart ? "startBattery" : "endBattery", {
-                  valueAsNumber: true,
-                })}
               />
             </Grid>
           </Grid>

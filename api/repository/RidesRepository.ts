@@ -8,20 +8,19 @@ export default class RidesRepository {
     this.#dataSource = dataSource;
   }
 
-  get(id: string): Promise<Ride | null> {
-    return this.#dataSource.read(Ride, id);
+  get(id: string, vehicleId: string): Promise<Ride | null> {
+    return this.#dataSource.read(Ride, id, vehicleId);
   }
 
-  async getRequired(id: string): Promise<Ride> {
-    const ride = await this.get(id);
-    if (!ride) throw new Error(`Ride ${id} does not exist!`);
+  async getRequired(id: string, vehicleId: string): Promise<Ride> {
+    const ride = await this.get(id, vehicleId);
+    if (!ride)
+      throw new Error(`Ride ${id} does not exist for vehicle ${vehicleId}!`);
     return ride;
   }
 
-  async delete(id: string): Promise<Ride> {
-    const ride = await this.#dataSource.delete(Ride, id);
-    if (!ride) throw new Error(`Ride ${id} does not exist!`);
-    return ride;
+  delete(id: string, vehicleId: string): Promise<void> {
+    return this.#dataSource.delete(Ride, id, vehicleId);
   }
 
   createOrUpdate(ride: Ride) {
@@ -30,12 +29,13 @@ export default class RidesRepository {
 
   async paginatedFromLatest(vehicleId: string, skip: number, take: number) {
     const rides = await this.#dataSource.query(Ride, {
-      where: `vehicleId = ${vehicleId}`,
+      alias: "r",
+      where: `r.vehicleId = '${vehicleId}'`,
       pagination: {
         skip,
         take,
       },
-      orderby: "start DESC",
+      orderby: "r.departed DESC",
     });
     return rides;
   }

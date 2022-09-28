@@ -26,13 +26,14 @@ export class DataSource {
 
   async read<TEntity extends Entity>(
     type: new (entity: TEntity) => TEntity,
-    id: string
+    id: string,
+    partition: string
   ): Promise<TEntity | null> {
     const container = getEntityContainer(type);
     const { resource } = await this.#cosmos
       .database(this.#database)
       .container(container)
-      .item(id, id)
+      .item(id, partition)
       .read<TEntity>();
 
     if (!resource) return null;
@@ -40,13 +41,16 @@ export class DataSource {
   }
 
   async readAll<TEntity extends Entity>(
-    type: new (entity: TEntity) => TEntity
+    type: new (entity: TEntity) => TEntity,
+    partition?: string
   ) {
     const container = getEntityContainer(type);
     const { resources } = await this.#cosmos
       .database(this.#database)
       .container(container)
-      .items.readAll<TEntity>()
+      .items.readAll<TEntity>({
+        partitionKey: partition,
+      })
       .fetchAll();
 
     return resources.map((resource) => new type(resource));
@@ -55,6 +59,7 @@ export class DataSource {
   async query<TEntity extends Entity>(
     type: new (entity: TEntity) => TEntity,
     query: {
+      alias: string;
       where?: string;
       parameters?: SqlParameter[];
       pagination?: {
@@ -76,7 +81,7 @@ export class DataSource {
       .database(this.#database)
       .container(container)
       .items.query<TEntity>({
-        query: `SELECT * FROM entity${whereClause}${orderByClause}${pagingClause}`,
+        query: `SELECT * FROM ${query.alias}${whereClause}${orderByClause}${pagingClause}`,
         parameters: query.parameters,
       })
       .fetchAll();
@@ -86,18 +91,15 @@ export class DataSource {
 
   async delete<TEntity extends Entity>(
     type: new (...args: any[]) => TEntity,
-    id: string
-  ): Promise<TEntity> {
+    id: string,
+    partition: string
+  ): Promise<void> {
     const container = getEntityContainer(type);
-    const { resource } = await this.#cosmos
+    await this.#cosmos
       .database(this.#database)
       .container(container)
-      .item(id, id)
+      .item(id, partition)
       .delete<Entity>();
-
-    if (!resource) throw new Error(`Entity for id ${id} was not found!`);
-
-    return new type(resource);
   }
 
   #getEntityContainer(entity: any) {

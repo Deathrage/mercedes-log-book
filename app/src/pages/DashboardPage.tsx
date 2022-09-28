@@ -1,6 +1,6 @@
 import { Grid, Paper, Typography } from "@mui/material";
 import React from "react";
-import Rides from "src/components/Rides";
+import Rides from "../components/Rides";
 import { useVehiclesContext } from "../components/vehicles/hooks";
 import VehicleStatus from "../components/VehicleStatus";
 

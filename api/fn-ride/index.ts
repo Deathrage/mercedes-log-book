@@ -20,8 +20,8 @@ class RideHandler implements HttpRequestHandler {
 
   async handle(req: HttpRequest): Promise<HttpResponse> {
     assertValidRequest(req, ["GET", "POST", "DELETE"], {
-      GET: ["id"],
-      DELETE: ["id"],
+      GET: ["id", "vehicleId"],
+      DELETE: ["id", "vehicleId"],
     });
 
     if (req.method === "POST")
@@ -32,44 +32,55 @@ class RideHandler implements HttpRequestHandler {
         ),
       };
 
+    const vehicleId = req.params.vehicleId;
     const rideId = req.params.id;
     if (req.method === "DELETE")
       return {
-        body: await this.#delete(rideId, req.user!.username),
+        body: await this.#delete(rideId, vehicleId, req.user!.username),
       };
 
     return {
-      body: await this.#get(rideId, req.user!.username),
+      body: await this.#get(rideId, vehicleId, req.user!.username),
     };
   }
 
   #repository: RidesRepository;
   #vehicleRepository: VehicleRepository;
 
-  async #get(rideId: string, userId: string): Promise<RideData> {
-    const ride = await this.#repository.getRequired(rideId);
+  async #get(
+    rideId: string,
+    vehicleId: string,
+    userId: string
+  ): Promise<RideData> {
+    const ride = await this.#repository.getRequired(rideId, vehicleId);
 
     this.#assertAuthorization(ride, userId);
 
     return RideDataSchema.parse(ride);
   }
 
-  async #delete(rideId: string, userId: string): Promise<RideData> {
-    const ride = await this.#repository.getRequired(rideId);
+  async #delete(
+    rideId: string,
+    vehicleId: string,
+    userId: string
+  ): Promise<void> {
+    const ride = await this.#repository.getRequired(rideId, vehicleId);
 
     this.#assertAuthorization(ride, userId);
 
-    const deletedRide = await this.#repository.delete(rideId);
-    return RideDataSchema.parse(deletedRide);
+    await this.#repository.delete(rideId, vehicleId);
   }
 
   async #post(body: RideData, userId: string): Promise<RideData> {
-    let ride = await this.#repository.get(body.id);
+    let ride = body.id
+      ? await this.#repository.get(body.id, body.vehicleId)
+      : null;
+    if (ride) {
+      this.#assertVehicleNotChanged(ride, body);
+      this.#assertAuthorization(ride, userId);
+    }
 
-    if (ride) this.#assertAuthorization(ride, userId);
-    if (!ride) ride = new Ride();
-
-    // Update vehicle from body
+    ride = new Ride();
     extend(ride, body);
 
     await this.#repository.createOrUpdate(ride);
@@ -78,8 +89,18 @@ class RideHandler implements HttpRequestHandler {
   }
 
   async #assertAuthorization(ride: Ride, userId: string) {
-    const vehicle = await this.#vehicleRepository.getRequired(ride.vehicleId);
+    const vehicle = await this.#vehicleRepository.getRequired(
+      ride.vehicleId,
+      userId
+    );
     assertVehicleOwner(vehicle, userId);
+  }
+
+  async #assertVehicleNotChanged(current: RideData, incoming: RideData) {
+    if (current.vehicleId != incoming.vehicleId)
+      throw new Error(
+        `Cannot change vehicle from ${current.vehicleId} to ${incoming.vehicleId}!`
+      );
   }
 }
 
