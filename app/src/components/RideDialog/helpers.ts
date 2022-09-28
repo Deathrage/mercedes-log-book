@@ -20,6 +20,17 @@ export const mapToValues = (data: RideData): RideFormValues => ({
   note: data.note,
 });
 
+export const mapToReturnValues = (data: RideData): RideFormValues => ({
+  departed: data.arrived,
+  startAddress: data.address.end,
+  endAddress: data.address.start,
+  startLatitude: data.coordinates.end?.lat,
+  startLongitude: data.coordinates.end?.lon,
+  startOdometer: data.odometer.end,
+  startGas: data.gas.end,
+  startBattery: data.battery.end,
+});
+
 export const mapToRideData = (
   id: string | undefined,
   vehicleId: string,

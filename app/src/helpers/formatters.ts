@@ -5,7 +5,7 @@ export const formatDate = (date: Date | string | number | undefined | null) =>
 
 export const formatDateTime = (
   date: Date | string | number | undefined | null
-) => (date ? moment(date).format("DD. MM. yyyy hh:mm:ss") : undefined);
+) => (date ? moment(date).format("DD. MM. yyyy HH:mm:ss") : undefined);
 
 const percentageInt = new Intl.NumberFormat("en-US", {
   style: "percent",

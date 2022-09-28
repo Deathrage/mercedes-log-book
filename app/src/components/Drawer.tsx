@@ -13,7 +13,6 @@ import {
 import React, { FC } from "react";
 import {
   ChevronLeft as ChevronLeftIcon,
-  Dashboard as DashboardIcon,
   DirectionsCarFilled as DirectionsCarFilledIcon,
   Route as RouteIcon,
   Flag as FlagIcon,
@@ -23,6 +22,9 @@ import {
 import Routes from "../consts/Routes";
 import { useLocation, useNavigate } from "react-router-dom";
 import VehicleSelect from "./VehicleSelect";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PolylineIcon from "@mui/icons-material/Polyline";
+import GradingIcon from "@mui/icons-material/Grading";
 
 export const drawerWidth: number = 240;
 
@@ -81,9 +83,9 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
           onClick={() => navigate(Routes.DASHBOARD)}
         >
           <ListItemIcon>
-            <DashboardIcon />
+            <PlayArrowIcon />
           </ListItemIcon>
-          <ListItemText primary="Dashboard" />
+          <ListItemText primary="Quick ride" />
         </ListItemButton>
         <ListItemButton
           selected={pathname === Routes.VEHICLE}
@@ -103,21 +105,17 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
           </ListItemIcon>
           <ListItemText primary="Rides" />
         </ListItemButton>
-        <Divider sx={{ my: 1 }} />
-        <ListSubheader component="div" inset>
-          Ride tracking
-        </ListSubheader>
         <ListItemButton>
           <ListItemIcon>
-            <FlagOutlinedIcon />
+            <PolylineIcon />
           </ListItemIcon>
-          <ListItemText primary="Begin ride" />
+          <ListItemText primary="Generator" />
         </ListItemButton>
         <ListItemButton>
           <ListItemIcon>
-            <FlagIcon />
+            <GradingIcon />
           </ListItemIcon>
-          <ListItemText primary="Finish ride" />
+          <ListItemText primary="Templates" />
         </ListItemButton>
         <Divider sx={{ my: 1 }} />
         <ListSubheader component="div" inset>

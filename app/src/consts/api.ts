@@ -8,6 +8,7 @@ const api = {
     `/api/ride${vehicleId && id ? `/${vehicleId}/${id}` : ""}`,
   rides: (vehicleId: string, pageSize: number, page: number) =>
     `/api/rides/${vehicleId}/${pageSize}/${page}`,
+  ridesTraveled: (vehicleId: string) => `/api/rides/${vehicleId}/traveled`,
 };
 
 export default api;

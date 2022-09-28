@@ -63,19 +63,9 @@ class RidesHandler implements HttpRequestHandler {
           isNumber(ride.gas.start) && isNumber(ride.gas.end)
             ? ride.gas.start - ride.gas.end
             : undefined;
-        const absoluteGasConsumption =
-          isNumber(relativeGasConsumption) && isNumber(vehicle.capacity.gas)
-            ? relativeGasConsumption * vehicle.capacity.gas
-            : undefined;
-
         const relativeBatteryConsumption =
           isNumber(ride.battery.start) && isNumber(ride.battery.end)
             ? ride.battery.start - ride.battery.end
-            : undefined;
-        const absoluteBatteryConsumption =
-          isNumber(relativeBatteryConsumption) &&
-          isNumber(vehicle.capacity.battery)
-            ? relativeBatteryConsumption * vehicle.capacity.battery
             : undefined;
 
         return {
@@ -97,16 +87,10 @@ class RidesHandler implements HttpRequestHandler {
               : undefined,
           consumption: {
             gas: hasCombustionEngine(vehicle.propulsion)
-              ? {
-                  relative: relativeGasConsumption,
-                  absolute: absoluteGasConsumption,
-                }
+              ? relativeGasConsumption
               : undefined,
             battery: hasElectricEngine(vehicle.propulsion)
-              ? {
-                  relative: relativeBatteryConsumption,
-                  absolute: absoluteBatteryConsumption,
-                }
+              ? relativeBatteryConsumption
               : undefined,
           },
         };

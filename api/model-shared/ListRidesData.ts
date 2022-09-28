@@ -7,11 +7,6 @@ const location = z.object({
   coordinates: coordinates.optional(),
 });
 
-const consumptionItem = z.object({
-  relative: z.number().positive().optional(),
-  absolute: z.number().positive().optional(),
-});
-
 export const schema = z.object({
   rides: z.array(
     z.object({
@@ -21,10 +16,10 @@ export const schema = z.object({
       startLocation: location,
       arrived: date.optional(),
       endLocation: location,
-      distance: z.number().positive().optional(),
+      distance: z.number().optional(),
       consumption: z.object({
-        gas: consumptionItem.optional(),
-        battery: consumptionItem.optional(),
+        gas: z.number().optional(),
+        battery: z.number().optional(),
       }),
     })
   ),

@@ -23,6 +23,9 @@ import {
   MercedesBenzErrorType,
   schema as MercedesBenzErrorDataSchema,
 } from "../../api/model-shared/MercedesBenzErrorData";
+import RidesTraveled, {
+  schema as RidesTraveledSchema,
+} from "../../api/model-shared/RidesTraveled";
 import { useErrorsContext } from "./components/errors/hooks";
 import { tryParseJson } from "./helpers/parsers";
 
@@ -56,6 +59,11 @@ const endpoints = {
     ),
   deleteRide: (request: { id: string; vehicleId: string }) =>
     fetch(api.ride(request.vehicleId, request.id), { method: "DELETE" }).then(),
+  getRidesTraveled: (request: { vehicleId: string }) =>
+    fetchJson<RidesTraveled>(
+      api.ridesTraveled(request.vehicleId),
+      RidesTraveledSchema.parse
+    ),
 };
 
 export const useApi = <Request, Response>(

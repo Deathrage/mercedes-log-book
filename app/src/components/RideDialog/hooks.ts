@@ -1,30 +1,36 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "../../api";
-import { mapToValues } from "./helpers";
-import { RideFormValues } from "./types";
+import { mapToReturnValues, mapToValues } from "./helpers";
+import { RideDialogMode, RideDialogModeType, RideFormValues } from "./types";
 import { mapToRideData } from "./helpers";
 import { turnEmptyValuesToUndefined } from "../../helpers/form";
-import useVehicleId from "../../hooks/useVehicle";
+import { useVehicleId } from "../../hooks/vehicle";
 import { FormApi } from "final-form";
 
-export const useInitialValues = (id: string | undefined) => {
+export const useInitialValues = ({ type }: RideDialogMode) => {
   const { data, running, invoke, reset } = useApi((_) => _.getRide);
 
   const initialValues = useMemo<RideFormValues | undefined>(() => {
-    if (!id || running || !data) return undefined;
+    if (type === RideDialogModeType.CLOSED) return undefined;
+    if (running || !data) return undefined;
+
+    if (type === RideDialogModeType.RETURN) return mapToReturnValues(data);
+
     return mapToValues(data);
-  }, [data, id, running]);
+  }, [data, type, running]);
 
   return {
-    loading: id ? running : false,
+    loading: running,
     initialValues,
     reset,
     load: invoke,
   };
 };
 
-export const useOnSubmit = (id: string | undefined, onSaved: () => void) => {
+export const useOnSubmit = (mode: RideDialogMode, onSaved: () => void) => {
   const vehicleId = useVehicleId();
+
+  const id = mode.type === RideDialogModeType.EDIT ? mode.id : undefined;
 
   const { invoke: invokePost } = useApi((_) => _.postRide);
   const onSubmit = useCallback(
@@ -40,7 +46,7 @@ export const useOnSubmit = (id: string | undefined, onSaved: () => void) => {
       onSaved();
       formApi.restart();
     },
-    [id, vehicleId, onSaved, invokePost]
+    [id, vehicleId, invokePost, onSaved]
   );
 
   return onSubmit;

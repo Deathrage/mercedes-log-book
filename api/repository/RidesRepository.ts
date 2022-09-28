@@ -8,6 +8,15 @@ export default class RidesRepository {
     this.#dataSource = dataSource;
   }
 
+  sumDistance(vehicleId: string) {
+    return this.#dataSource.sum(Ride, {
+      alias: "r",
+      // end is a reserved word
+      expression: "r.odometer['end'] - r.odometer.start",
+      where: `r.vehicleId = '${vehicleId}'`,
+    });
+  }
+
   get(id: string, vehicleId: string): Promise<Ride | null> {
     return this.#dataSource.read(Ride, id, vehicleId);
   }
@@ -27,8 +36,8 @@ export default class RidesRepository {
     return this.#dataSource.upsert(ride);
   }
 
-  async paginatedFromLatest(vehicleId: string, skip: number, take: number) {
-    const rides = await this.#dataSource.query(Ride, {
+  paginatedFromLatest(vehicleId: string, skip: number, take: number) {
+    return this.#dataSource.query(Ride, {
       alias: "r",
       where: `r.vehicleId = '${vehicleId}'`,
       pagination: {
@@ -37,7 +46,6 @@ export default class RidesRepository {
       },
       orderby: "r.departed DESC",
     });
-    return rides;
   }
 
   #dataSource: DataSource;

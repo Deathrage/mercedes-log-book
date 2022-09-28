@@ -1,8 +1,9 @@
 import { FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material";
-import { FormState, FormApi } from "final-form";
+import { FormState, FormApi, ValidationErrors } from "final-form";
 import React, { ReactNode, useCallback } from "react";
 import { FC } from "react";
 import { Field, Form } from "react-final-form";
+import { numberIsGreater, numberIsMultiple } from "src/helpers/form";
 import PropulsionType from "../../../api/model-shared/PropulsionType";
 import NumberInputField from "./fields/NumberInputField";
 import TextInputField from "./fields/TextInputField";
@@ -15,6 +16,18 @@ export interface VehicleFormValues {
   gasCapacity?: number;
   batteryCapacity?: number;
 }
+
+const validate = (values: VehicleFormValues): ValidationErrors => {
+  const errors: ValidationErrors = {};
+
+  numberIsGreater(values, "gasCapacity", errors).than(0);
+  numberIsGreater(values, "batteryCapacity", errors).than(0);
+
+  numberIsMultiple(values, "gasCapacity", errors).of(1);
+  numberIsMultiple(values, "batteryCapacity", errors).of(0.1, 10);
+
+  return errors;
+};
 
 const VehicleForm: FC<{
   initialValues?: VehicleFormValues;
@@ -30,7 +43,11 @@ const VehicleForm: FC<{
   );
 
   return (
-    <Form<VehicleFormValues> onSubmit={submit} initialValues={initialValues}>
+    <Form<VehicleFormValues>
+      onSubmit={submit}
+      initialValues={initialValues}
+      validate={validate}
+    >
       {({ handleSubmit, ...formState }) => {
         const requireGas = [
           PropulsionType.COMBUSTION,
@@ -97,6 +114,7 @@ const VehicleForm: FC<{
                     label="Gas capacity"
                     required={requireGas}
                     disabled={!requireGas}
+                    step={1}
                     suffix="L"
                   />
                 </Grid>
@@ -106,6 +124,7 @@ const VehicleForm: FC<{
                     label="Battery capacity"
                     required={requireBattery}
                     disabled={!requireBattery}
+                    step={0.1}
                     suffix="kWh"
                   />
                 </Grid>

@@ -7,8 +7,28 @@ export const DoubleTableCell: FC<{ first: ReactNode; second: ReactNode }> = ({
 }) => (
   <TableCell>
     <Stack>
-      <Typography>{first}</Typography>
-      <Typography>{second}</Typography>
+      <Typography
+        sx={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          display: "-webkit-box",
+          WebkitLineClamp: "1",
+          WebkitBoxOrient: "vertical",
+        }}
+      >
+        {first}
+      </Typography>
+      <Typography
+        sx={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          display: "-webkit-box",
+          WebkitLineClamp: "1",
+          WebkitBoxOrient: "vertical",
+        }}
+      >
+        {second}
+      </Typography>
     </Stack>
   </TableCell>
 );

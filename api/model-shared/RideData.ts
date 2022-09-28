@@ -15,9 +15,9 @@ export const schema = z.object({
   arrived: date.optional(),
   address: difSchema(z.string()),
   coordinates: difSchema(coordinates),
-  odometer: difSchema(z.number()),
-  gas: difSchema(z.number()),
-  battery: difSchema(z.number()),
+  odometer: difSchema(z.number().int().nonnegative()),
+  gas: difSchema(z.number().step(0.01).nonnegative()),
+  battery: difSchema(z.number().step(0.01).nonnegative()),
   reason: z.string().optional(),
   note: z.string().optional(),
 });

@@ -8,7 +8,7 @@ export const schema = z.object({
   propulsion: z.nativeEnum(PropulsionType),
   capacity: z.object({
     gas: z.number().positive().int().optional(),
-    battery: z.number().positive().optional(),
+    battery: z.number().positive().step(0.1).optional(),
   }),
 });
 

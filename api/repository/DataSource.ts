@@ -1,7 +1,7 @@
 import { CosmosClient, SqlParameter } from "@azure/cosmos";
 import { injectable } from "inversify";
 import { getEntityContainer } from "../decorators/entity";
-import { isValidatable } from "../helpers/predicate";
+import { isNumber, isValidatable } from "../helpers/predicate";
 import Entity from "../model/Entity";
 
 @injectable()
@@ -87,6 +87,35 @@ export class DataSource {
       .fetchAll();
 
     return resources.map((resource) => new type(resource));
+  }
+
+  async sum<TEntity extends Entity>(
+    type: new (...args: any[]) => TEntity,
+    query: {
+      alias: string;
+      expression: string;
+      where?: string;
+      parameters?: SqlParameter[];
+    }
+  ) {
+    const container = getEntityContainer(type);
+
+    const whereClause = query.where ? ` WHERE ${query.where}` : "";
+
+    const { resources } = await this.#cosmos
+      .database(this.#database)
+      .container(container)
+      .items.query<{ sum: number }>({
+        query: `SELECT SUM(${query.expression}) as sum FROM ${query.alias}${whereClause}`,
+        parameters: query.parameters,
+      })
+      .fetchAll();
+
+    if (resources.length !== 1) throw new Error("Expected one row!");
+    const sum = resources[0].sum;
+    if (!isNumber(sum)) throw new Error("Result of sum is not a number!");
+
+    return sum;
   }
 
   async delete<TEntity extends Entity>(

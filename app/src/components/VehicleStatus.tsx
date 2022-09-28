@@ -1,55 +1,33 @@
 import { Grid } from "@mui/material";
 import React, { FC } from "react";
-import useOnMount from "src/hooks/useOnMount";
-import useVehicleId from "src/hooks/useVehicle";
+import { isNumber } from "../helpers/predicate";
+import useOnMount from "../hooks/useOnMount";
+import { useVehicle } from "src/hooks/vehicle";
 import { useApi } from "../api";
 import {
-  formatDateTime,
   formatKilometers,
   formatKilowattHours,
   formatLiters,
   formatPercentage,
 } from "../helpers/formatters";
-import InfoField from "./InfoField";
-
-const StatusField = <Value extends unknown>({
-  label,
-  data,
-  loading,
-  format,
-}: {
-  label: string;
-  loading: boolean;
-  data:
-    | {
-        value: Value;
-        date: Date;
-      }
-    | undefined;
-  format: (value: Value) => string;
-}) => (
-  <InfoField
-    loading={loading}
-    label={label}
-    underline={formatDateTime(data?.date)}
-  >
-    {data && format(data.value)}
-  </InfoField>
-);
+import InfoFieldWithDate from "./InfoFieldWithDate";
 
 const VehicleStatus: FC = () => {
-  const activeVehicleId = useVehicleId();
+  const {
+    id: vin,
+    capacity: { gas, battery },
+  } = useVehicle();
 
   const { data, running, invoke } = useApi((_) => _.getVehicleStatus);
 
   useOnMount(() => {
-    invoke({ vin: activeVehicleId });
+    invoke({ vin });
   });
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={4}>
-        <StatusField
+        <InfoFieldWithDate
           label="Odometer"
           data={data?.odometer}
           loading={running}
@@ -57,32 +35,32 @@ const VehicleStatus: FC = () => {
         />
       </Grid>
       <Grid item xs={4}>
-        <StatusField
+        <InfoFieldWithDate
           label="Gas level"
           data={data?.gas?.level}
           loading={running}
           format={(val) =>
-            `${formatPercentage(val)} approx. ${formatLiters(
-              data!.gas!.absLevel!
-            )}`
+            `${formatPercentage(val)} approx. ${
+              isNumber(gas) ? formatLiters(gas * val) : "-"
+            }`
           }
         />
       </Grid>
       <Grid item xs={4}>
-        <StatusField
+        <InfoFieldWithDate
           label="Battery level"
           data={data?.battery?.level}
           loading={running}
           format={(val) =>
-            `${formatPercentage(val)} approx. ${formatKilowattHours(
-              data!.battery!.absLevel!
-            )}`
+            `${formatPercentage(val)} approx. ${
+              isNumber(battery) ? formatKilowattHours(battery * val) : "-"
+            }`
           }
         />
       </Grid>
       <Grid item xs={4} />
       <Grid item xs={4}>
-        <StatusField
+        <InfoFieldWithDate
           label="Gas range"
           data={data?.gas?.range}
           loading={running}
@@ -90,7 +68,7 @@ const VehicleStatus: FC = () => {
         />
       </Grid>
       <Grid item xs={4}>
-        <StatusField
+        <InfoFieldWithDate
           label="Battery range"
           data={data?.battery?.range}
           loading={running}

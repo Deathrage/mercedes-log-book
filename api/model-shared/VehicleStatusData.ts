@@ -3,19 +3,17 @@ import withDate from "./withDate";
 
 export const schema = z.object({
   vehicleId: z.string(),
-  odometer: withDate(z.number().positive()).optional(),
+  odometer: withDate(z.number().int().nonnegative()).optional(),
   gas: z
     .object({
-      range: withDate(z.number().positive()).optional(),
-      level: withDate(z.number().positive()).optional(),
-      absLevel: z.number().positive().optional(),
+      range: withDate(z.number().int().nonnegative()).optional(),
+      level: withDate(z.number().step(0.01).nonnegative()).optional(),
     })
     .optional(),
   battery: z
     .object({
-      range: withDate(z.number().positive()).optional(),
-      level: withDate(z.number().positive()).optional(),
-      absLevel: z.number().positive().optional(),
+      range: withDate(z.number().int().nonnegative()).optional(),
+      level: withDate(z.number().step(0.01).nonnegative()).optional(),
     })
     .optional(),
 });

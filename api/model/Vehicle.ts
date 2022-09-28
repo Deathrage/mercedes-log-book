@@ -31,8 +31,10 @@ const schema = VehicleDataSchema.extend({
     "Vehicle with electric engine cannot have gas tank capacity set!"
   );
 
+type DatabaseData = VehicleData & z.infer<typeof schema>;
+
 @entity("Vehicles")
-export default class Vehicle implements Entity, Validatable, VehicleData {
+export default class Vehicle implements Entity, Validatable, DatabaseData {
   id: string;
   license?: string;
   model?: string;
@@ -43,7 +45,7 @@ export default class Vehicle implements Entity, Validatable, VehicleData {
   };
   userId: string;
 
-  constructor(data?: VehicleData) {
+  constructor(data?: DatabaseData) {
     if (data) extend(this, schema.parse(data));
   }
 

@@ -9,7 +9,7 @@ const DateInputField: FC<{
   required?: boolean;
 }> = ({ name, label, required }) => (
   <Field<Date> name={name}>
-    {({ input: { value, onChange, ...input } }) => (
+    {({ input: { value, onChange, ...input }, meta: { error } }) => (
       <TextField
         label={label}
         type="datetime-local"
@@ -19,10 +19,12 @@ const DateInputField: FC<{
         InputLabelProps={{
           shrink: true,
         }}
-        value={value ? moment(value).format("YYYY-MM-DDThh:mm") : ""}
+        value={value ? moment(value).format("YYYY-MM-DDTHH:mm") : ""}
         onChange={(e) =>
           onChange(e.target.value ? moment(e.target.value).toDate() : undefined)
         }
+        error={error}
+        helperText={error}
         {...input}
       />
     )}

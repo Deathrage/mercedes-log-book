@@ -9,13 +9,15 @@ const TextInputField: FC<{
   disabled?: boolean;
 }> = ({ name, label, required, disabled }) => (
   <Field<string> name={name}>
-    {({ input }) => (
+    {({ input, meta: { error } }) => (
       <TextField
         label={label}
         required={required}
         variant="filled"
         fullWidth
         disabled={disabled}
+        error={error}
+        helperText={error}
         {...input}
       />
     )}

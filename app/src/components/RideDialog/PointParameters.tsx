@@ -58,6 +58,7 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
             name={isStart ? "startOdometer" : "endOdometer"}
             label="Odometer"
             suffix="km"
+            step={1}
           />
         </Grid>
         <Grid item xs={7}>
@@ -86,11 +87,12 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
                 label="Gas"
                 suffix="%"
                 rate={100}
+                step={1}
                 disabled={!usesGas}
                 helperText={
                   isNumber(gas) && isNumber(activeVehicle?.capacity.gas)
                     ? `Approx. ${formatLiters(
-                        (gas / 100) * activeVehicle!.capacity.gas
+                        gas * activeVehicle!.capacity.gas
                       )}.`
                     : undefined
                 }
@@ -102,11 +104,12 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
                 label="Battery"
                 suffix="%"
                 rate={100}
+                step={1}
                 disabled={!usesBattery}
                 helperText={
                   isNumber(battery) && isNumber(activeVehicle?.capacity.battery)
                     ? `Approx. ${formatKilowattHours(
-                        (battery / 100) * activeVehicle!.capacity.battery
+                        battery * activeVehicle!.capacity.battery
                       )}.`
                     : undefined
                 }

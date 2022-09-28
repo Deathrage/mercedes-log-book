@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  ButtonGroup,
   IconButton,
   Skeleton,
   Table,
@@ -24,21 +25,38 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RideDialog from "./RideDialog";
 import { useApi } from "../api";
-import useVehicleId from "../hooks/useVehicle";
+import { useVehicle } from "../hooks/vehicle";
 import useOnMount from "src/hooks/useOnMount";
 import { isNumber } from "src/helpers/predicate";
-
-const CREATE = Symbol("Creating rides");
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { RideDialogMode, RideDialogModeType } from "./RideDialog/types";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 
 const pageSize = 10;
 
-const Rides: FC<{ onlyFirstPage?: true; allowCreate?: true }> = ({
+const Rides: FC<{
+  onlyFirstPage?: true;
+  disableCreate?: true;
+  disableReturn?: true;
+  disableCopy?: true;
+  disableEdit?: true;
+  disableDelete?: true;
+}> = ({
   onlyFirstPage,
-  allowCreate,
+  disableCreate,
+  disableReturn,
+  disableCopy,
+  disableEdit,
+  disableDelete,
 }) => {
-  const vehicleId = useVehicleId();
+  const {
+    id: vehicleId,
+    capacity: { gas: gasCapacity, battery: batteryCapacity },
+  } = useVehicle();
 
-  const [id, setId] = useState<string | typeof CREATE | null>(null);
+  const [mode, setMode] = useState<RideDialogMode>({
+    type: RideDialogModeType.CLOSED,
+  });
 
   const [page, setPage] = useState(0);
 
@@ -61,12 +79,12 @@ const Rides: FC<{ onlyFirstPage?: true; allowCreate?: true }> = ({
 
   return (
     <TableContainer>
-      {allowCreate && (
+      {!disableCreate && (
         <Button
           autoFocus
           color="inherit"
           sx={{ ml: "auto", display: "block" }}
-          onClick={() => setId(CREATE)}
+          onClick={() => setMode({ type: RideDialogModeType.CREATE })}
         >
           New
         </Button>
@@ -113,21 +131,24 @@ const Rides: FC<{ onlyFirstPage?: true; allowCreate?: true }> = ({
                 </TableCell>
                 <DoubleTableCell
                   first={`Gas: ${
-                    isNumber(ride.consumption.gas?.relative)
-                      ? formatPercentage(ride.consumption.gas!.relative)
+                    isNumber(ride.consumption.gas)
+                      ? formatPercentage(ride.consumption.gas)
                       : "-"
                   } approx. ${
-                    isNumber(ride.consumption.gas?.absolute)
-                      ? formatLiters(ride.consumption.gas!.absolute)
+                    isNumber(ride.consumption.gas) && isNumber(gasCapacity)
+                      ? formatLiters(gasCapacity * ride.consumption.gas)
                       : "-"
                   }`}
                   second={`Battery: ${
-                    isNumber(ride.consumption.battery?.relative)
-                      ? formatPercentage(ride.consumption.battery!.relative)
+                    isNumber(ride.consumption.battery)
+                      ? formatPercentage(ride.consumption.battery)
                       : "-"
                   } approx. ${
-                    isNumber(ride.consumption.battery?.absolute)
-                      ? formatKilowattHours(ride.consumption.battery!.absolute)
+                    isNumber(ride.consumption.battery) &&
+                    isNumber(batteryCapacity)
+                      ? formatKilowattHours(
+                          batteryCapacity * ride.consumption.battery
+                        )
                       : "-"
                   }`}
                 />
@@ -147,22 +168,59 @@ const Rides: FC<{ onlyFirstPage?: true; allowCreate?: true }> = ({
                   </Box>
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton
-                    onClick={() => setId(ride.id)}
-                    disabled={loadingDelete}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={async () => {
-                      await invokeDelete({ id: ride.id, vehicleId });
-                      fetch();
-                    }}
-                    disabled={loadingDelete}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  <ButtonGroup>
+                    {!disableReturn && (
+                      <IconButton
+                        onClick={() =>
+                          setMode({
+                            type: RideDialogModeType.RETURN,
+                            returnFromId: ride.id,
+                          })
+                        }
+                        disabled={loadingDelete}
+                      >
+                        <KeyboardReturnIcon />
+                      </IconButton>
+                    )}
+                    {!disableCopy && (
+                      <IconButton
+                        onClick={() =>
+                          setMode({
+                            type: RideDialogModeType.CREATE,
+                            templateId: ride.id,
+                          })
+                        }
+                        disabled={loadingDelete}
+                      >
+                        <ContentCopyIcon />
+                      </IconButton>
+                    )}
+                    {!disableEdit && (
+                      <IconButton
+                        onClick={() =>
+                          setMode({
+                            type: RideDialogModeType.EDIT,
+                            id: ride.id,
+                          })
+                        }
+                        disabled={loadingDelete}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    )}
+                    {!disableDelete && (
+                      <IconButton
+                        color="error"
+                        onClick={async () => {
+                          await invokeDelete({ id: ride.id, vehicleId });
+                          fetch();
+                        }}
+                        disabled={loadingDelete}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
+                  </ButtonGroup>
                 </TableCell>
               </TableRow>
             ))
@@ -180,11 +238,13 @@ const Rides: FC<{ onlyFirstPage?: true; allowCreate?: true }> = ({
         />
       )}
       <RideDialog
-        open={!!id}
-        rideId={typeof id === "string" ? id : undefined}
-        onClose={useCallback(() => setId(null), [])}
+        mode={mode}
+        onClose={useCallback(
+          () => setMode({ type: RideDialogModeType.CLOSED }),
+          []
+        )}
         onSaved={useCallback(() => {
-          setId(null);
+          setMode({ type: RideDialogModeType.CLOSED });
           fetch();
         }, [fetch])}
       />
