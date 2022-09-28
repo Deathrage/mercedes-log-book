@@ -83,9 +83,9 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
           onClick={() => navigate(Routes.DASHBOARD)}
         >
           <ListItemIcon>
-            <PlayArrowIcon />
+            <PolylineIcon />
           </ListItemIcon>
-          <ListItemText primary="Quick ride" />
+          <ListItemText primary="Tracked ride" />
         </ListItemButton>
         <ListItemButton
           selected={pathname === Routes.VEHICLE}
@@ -107,7 +107,7 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
         </ListItemButton>
         <ListItemButton>
           <ListItemIcon>
-            <PolylineIcon />
+            <PlayArrowIcon />
           </ListItemIcon>
           <ListItemText primary="Generator" />
         </ListItemButton>
