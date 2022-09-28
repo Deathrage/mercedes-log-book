@@ -15,8 +15,6 @@ import {
   ChevronLeft as ChevronLeftIcon,
   DirectionsCarFilled as DirectionsCarFilledIcon,
   Route as RouteIcon,
-  Flag as FlagIcon,
-  FlagOutlined as FlagOutlinedIcon,
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
 import Routes from "../consts/Routes";

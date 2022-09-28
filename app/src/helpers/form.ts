@@ -1,4 +1,4 @@
-import { AnyObject, ValidationErrors } from "final-form";
+import { AnyObject } from "final-form";
 import { isNumber } from "./predicate";
 
 const turnEmptyValueToUndefined = (v: unknown) => {

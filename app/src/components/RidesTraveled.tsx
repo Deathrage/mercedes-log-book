@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import React, { FC } from "react";
 import { useApi } from "src/api";
 import { formatKilometers, formatPercentage } from "src/helpers/formatters";
