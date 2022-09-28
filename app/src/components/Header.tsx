@@ -37,7 +37,7 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 const titles: Record<string, string> = {
-  [Routes.DASHBOARD]: "Dashboard",
+  [Routes.TRACKED_RIDE]: "Tracked ride",
   [Routes.RIDES]: "Rides",
   [Routes.VEHICLE]: "Vehicle",
 };

@@ -30,6 +30,7 @@ import { isNumber } from "src/helpers/predicate";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { RideDialogMode, RideDialogModeType } from "./RideDialog/types";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import { WithConfirm } from "./WithConfirm";
 
 const pageSize = 10;
 
@@ -208,16 +209,34 @@ const Rides: FC<{
                       </IconButton>
                     )}
                     {!disableDelete && (
-                      <IconButton
-                        color="error"
-                        onClick={async () => {
+                      <WithConfirm
+                        text={
+                          <>
+                            Are you sure you wanna delete this ride?
+                            <br />
+                            <br />
+                            Id:{ride.id}
+                            <br />
+                            From: {ride.startLocation.address ?? "-"}
+                            <br />
+                            To: {ride.endLocation.address ?? "-"}
+                          </>
+                        }
+                        onConfirmed={async () => {
                           await invokeDelete({ id: ride.id, vehicleId });
                           fetch();
                         }}
-                        disabled={loadingDelete}
                       >
-                        <DeleteIcon />
-                      </IconButton>
+                        {(ask) => (
+                          <IconButton
+                            color="error"
+                            onClick={ask}
+                            disabled={loadingDelete}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )}
+                      </WithConfirm>
                     )}
                   </ButtonGroup>
                 </TableCell>

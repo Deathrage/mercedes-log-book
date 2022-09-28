@@ -5,7 +5,7 @@ import Copyright from "./components/Copyright";
 import Header from "./components/Header";
 import { Container } from "@mui/material";
 import Drawer from "./components/Drawer";
-import DashboardPage from "./pages/DashboardPage";
+import TrackedRidePage from "./pages/TrackedRidePage";
 import { BrowserRouter, Routes as Switch, Route } from "react-router-dom";
 import Routes from "./consts/Routes";
 import RidesPage from "./pages/RidesPage";
@@ -46,7 +46,7 @@ const Layout = () => {
             <Switch>
               <Route path={Routes.VEHICLE} element={<VehiclePage />} />
               <Route path={Routes.RIDES} element={<RidesPage />} />
-              <Route path={Routes.DASHBOARD} element={<DashboardPage />} />
+              <Route path={Routes.TRACKED_RIDE} element={<TrackedRidePage />} />
             </Switch>
           )}
           <ConnectToMercedesDialog />

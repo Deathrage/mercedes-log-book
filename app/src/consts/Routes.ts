@@ -1,5 +1,5 @@
 enum Routes {
-  DASHBOARD = "/",
+  TRACKED_RIDE = "/",
   VEHICLE = "/vehicle",
   RIDES = "/rides",
 }

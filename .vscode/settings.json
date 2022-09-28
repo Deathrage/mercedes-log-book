@@ -5,5 +5,5 @@
   "azureFunctions.projectRuntime": "~4",
   "debug.internalConsoleOptions": "neverOpen",
   "azureFunctions.preDeployTask": "npm prune (functions)",
-  "cSpell.words": ["Validatable"]
+  "cSpell.words": ["localforage", "Validatable"]
 }

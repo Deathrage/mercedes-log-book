@@ -77,8 +77,8 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
       <Divider />
       <List component="nav">
         <ListItemButton
-          selected={pathname === Routes.DASHBOARD}
-          onClick={() => navigate(Routes.DASHBOARD)}
+          selected={pathname === Routes.TRACKED_RIDE}
+          onClick={() => navigate(Routes.TRACKED_RIDE)}
         >
           <ListItemIcon>
             <PolylineIcon />
