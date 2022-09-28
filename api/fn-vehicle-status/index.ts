@@ -1,6 +1,7 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
+import { isNumber } from "../helpers/predicate";
 import { hasCombustionEngine, hasElectricEngine } from "../helpers/propulsion";
 import PropulsionType from "../model-shared/PropulsionType";
 import VehicleStatusData, {
@@ -72,7 +73,10 @@ class VehicleStatusHandler implements HttpRequestHandler {
                   date: new Date(fuel.tankLevel.timestamp!),
                 }
               : undefined,
-            absLevel: vehicle.capacity.gas,
+            absLevel:
+              fuel.tankLevel && isNumber(vehicle.capacity.gas)
+                ? fuel.tankLevel.value * vehicle.capacity.gas
+                : undefined,
           }
         : undefined,
       battery: battery
@@ -89,7 +93,10 @@ class VehicleStatusHandler implements HttpRequestHandler {
                   date: new Date(battery.batteryLevel.timestamp!),
                 }
               : undefined,
-            absLevel: vehicle.capacity.battery,
+            absLevel:
+              battery.batteryLevel && isNumber(vehicle.capacity.battery)
+                ? battery.batteryLevel.value * vehicle.capacity.battery
+                : undefined,
           }
         : undefined,
     });

@@ -19,7 +19,12 @@ import RideData, {
 import ListRidesData, {
   schema as ListRidesDataSchema,
 } from "../../api/model-shared/ListRidesData";
+import {
+  MercedesBenzErrorType,
+  schema as MercedesBenzErrorDataSchema,
+} from "../../api/model-shared/MercedesBenzErrorData";
 import { useErrorsContext } from "./components/errors/hooks";
+import { tryParseJson } from "./helpers/parsers";
 
 const endpoints = {
   getCurrentUser: () =>
@@ -96,8 +101,22 @@ export const useApi = <Request, Response>(
           resolve(response);
         } catch (error) {
           setState({ running: false, data: null, error });
-          show(error);
 
+          if (error instanceof Error) {
+            const jsonResult = tryParseJson(error.message);
+            if (jsonResult.success) {
+              const result = MercedesBenzErrorDataSchema.safeParse(
+                jsonResult.data
+              );
+              if (
+                result.success &&
+                result.data.type === MercedesBenzErrorType.INVALID_GRANT
+              )
+                window.location.href = api.mercedesAuth;
+            }
+          }
+
+          show(error);
           reject(error);
         }
       }),

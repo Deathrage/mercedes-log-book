@@ -6,6 +6,7 @@ import {
 } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
+import { isNumber } from "../helpers/predicate";
 import { hasCombustionEngine, hasElectricEngine } from "../helpers/propulsion";
 import ListRidesData from "../model-shared/ListRidesData";
 import RidesRepository from "../repository/RidesRepository";
@@ -59,20 +60,21 @@ class RidesHandler implements HttpRequestHandler {
       hasMore,
       rides: rides.slice(hasMore ? -1 : 0).map((ride) => {
         const relativeGasConsumption =
-          ride.gas.start && ride.gas.end
+          isNumber(ride.gas.start) && isNumber(ride.gas.end)
             ? ride.gas.start - ride.gas.end
             : undefined;
         const absoluteGasConsumption =
-          relativeGasConsumption && vehicle.capacity.gas
+          isNumber(relativeGasConsumption) && isNumber(vehicle.capacity.gas)
             ? relativeGasConsumption * vehicle.capacity.gas
             : undefined;
 
         const relativeBatteryConsumption =
-          ride.battery.start && ride.battery.end
+          isNumber(ride.battery.start) && isNumber(ride.battery.end)
             ? ride.battery.start - ride.battery.end
             : undefined;
         const absoluteBatteryConsumption =
-          relativeBatteryConsumption && vehicle.capacity.battery
+          isNumber(relativeBatteryConsumption) &&
+          isNumber(vehicle.capacity.battery)
             ? relativeBatteryConsumption * vehicle.capacity.battery
             : undefined;
 
@@ -90,7 +92,7 @@ class RidesHandler implements HttpRequestHandler {
             coordinates: ride.coordinates.end,
           },
           distance:
-            ride.odometer.start && ride.odometer.end
+            isNumber(ride.odometer.start) && isNumber(ride.odometer.end)
               ? ride.odometer.end - ride.odometer.start
               : undefined,
           consumption: {

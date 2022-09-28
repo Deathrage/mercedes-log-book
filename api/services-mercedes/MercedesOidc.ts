@@ -1,8 +1,10 @@
 import { injectable } from "inversify";
-import { Issuer, Client, TokenSet } from "openid-client";
+import { Issuer, Client, TokenSet, errors } from "openid-client";
 import UserRepository from "../repository/UserRepository";
 import { v4 as uuidv4 } from "uuid";
 import User from "../model/User";
+import MercedesBenzError from "../model/MercedesBenzError";
+import { MercedesBenzErrorType } from "../model-shared/MercedesBenzErrorData";
 
 let client: Client;
 const tryInitializeOidcClient = async () => {
@@ -92,13 +94,26 @@ export default class MercedesOidc {
     // Initialization of oidc client should happen as late as possible as most of the times users will have valid access token in DB.
     await tryInitializeOidcClient();
 
-    const tokens = await client.refresh(user.mercedesBenz.refreshToken);
-    const { access_token: accessToken } = await this.#storeTokens(user, tokens);
-
-    return accessToken;
+    try {
+      const tokens = await client.refresh(user.mercedesBenz.refreshToken);
+      const { accessToken } = await this.#storeTokens(user, tokens);
+      return accessToken;
+    } catch (error) {
+      if (error instanceof errors.OPError && error.error === "invalid_grant")
+        throw new MercedesBenzError(MercedesBenzErrorType.INVALID_GRANT, error);
+      if (error instanceof Error)
+        throw new MercedesBenzError(MercedesBenzErrorType.OTHER, error);
+      throw error;
+    }
   }
 
-  async #storeTokens(user: User, tokens: TokenSet): Promise<TokenSet> {
+  async #storeTokens(
+    user: User,
+    tokens: TokenSet
+  ): Promise<{ accessToken: string }> {
+    if (!tokens.access_token) throw new Error("Fetched access token is nil!");
+    if (!tokens.refresh_token) throw new Error("Fetched refresh token is nil!");
+
     const expiresAt = new Date();
     expiresAt.setUTCSeconds(expiresAt.getUTCSeconds() + tokens.expires_in!);
 
@@ -113,7 +128,9 @@ export default class MercedesOidc {
 
     await this.#repository.createOrUpdate(user);
 
-    return tokens;
+    return {
+      accessToken: tokens.access_token!,
+    };
   }
 
   #repository: UserRepository;

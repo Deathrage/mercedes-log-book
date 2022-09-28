@@ -1,6 +1,8 @@
 import { AzureFunction, HttpRequest, HttpResponse } from "@azure/functions";
 import { interfaces } from "inversify";
 import container from "../container";
+import { MercedesBenzErrorType } from "../model-shared/MercedesBenzErrorData";
+import MercedesBenzError from "../model/MercedesBenzError";
 
 export interface HttpRequestHandler {
   handle(req: HttpRequest): Promise<HttpResponse> | HttpResponse;
@@ -26,6 +28,17 @@ export const createHttpRequestHandler =
       context.res = await container.get(type).handle(req);
     } catch (error) {
       context.log.error(error);
+
+      if (error instanceof MercedesBenzError) {
+        context.res = {
+          status: 500,
+          body: {
+            type: error.type,
+            message: error.message,
+          },
+        } as HttpResponse;
+        return;
+      }
 
       context.res = {
         status: 500,

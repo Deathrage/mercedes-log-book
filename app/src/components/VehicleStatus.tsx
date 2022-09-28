@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import React, { FC, useEffect } from "react";
+import React, { FC } from "react";
 import useOnMount from "src/hooks/useOnMount";
 import useVehicleId from "src/hooks/useVehicle";
 import { useApi } from "../api";
