@@ -28,7 +28,7 @@ export const useOnSubmit = (id: string | undefined, onSaved: () => void) => {
 
   const { invoke: invokePost } = useApi((_) => _.postRide);
   const onSubmit = useCallback(
-    async (state: RideFormValues, formApi: FormApi) => {
+    async (state: RideFormValues, formApi: FormApi<RideFormValues>) => {
       const request = mapToRideData(
         id,
         vehicleId,
