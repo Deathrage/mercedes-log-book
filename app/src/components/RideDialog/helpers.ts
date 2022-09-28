@@ -1,5 +1,5 @@
 import RideData from "../../../../api/model-shared/RideData";
-import { RideFormValues } from "./types";
+import { RideFormValues } from "../RideForm/types";
 
 export const mapToValues = (data: RideData): RideFormValues => ({
   departed: data.departed,

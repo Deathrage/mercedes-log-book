@@ -58,7 +58,7 @@ class RidesHandler implements HttpRequestHandler {
 
     return {
       hasMore,
-      rides: rides.slice(hasMore ? -1 : 0).map((ride) => {
+      rides: rides.slice(0, pageSize).map((ride) => {
         const relativeGasConsumption =
           isNumber(ride.gas.start) && isNumber(ride.gas.end)
             ? ride.gas.start - ride.gas.end

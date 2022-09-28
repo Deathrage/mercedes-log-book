@@ -13,18 +13,16 @@ const mdTheme = createTheme({
 });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <ThemeProvider theme={mdTheme}>
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <ErrorsProvider>
-          <CurrentUserProvider>
-            <VehiclesProvider>
-              <Layout />
-            </VehiclesProvider>
-          </CurrentUserProvider>
-        </ErrorsProvider>
-      </Box>
-    </ThemeProvider>
-  </React.StrictMode>
+  <ThemeProvider theme={mdTheme}>
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      <ErrorsProvider>
+        <CurrentUserProvider>
+          <VehiclesProvider>
+            <Layout />
+          </VehiclesProvider>
+        </CurrentUserProvider>
+      </ErrorsProvider>
+    </Box>
+  </ThemeProvider>
 );

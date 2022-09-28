@@ -1,28 +1,8 @@
-import {
-  AppBar,
-  Button,
-  Dialog,
-  DialogContent,
-  Divider,
-  Grid,
-  IconButton,
-  Toolbar,
-  Typography,
-} from "@mui/material";
 import React, { FC, useCallback, useEffect } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-import {
-  PointParametersType,
-  RideDialogMode,
-  RideDialogModeType,
-  RideFormValues,
-} from "./types";
-import PointParameters from "./PointParameters";
+import { RideDialogMode, RideDialogModeType } from "./types";
 import { useInitialValues, useOnSubmit } from "./hooks";
 import { useVehicleId } from "../../hooks/vehicle";
-import { Form } from "react-final-form";
-import TextInputField from "../fields/TextInputField";
-import validate from "./validate";
+import RideForm from "../RideForm";
 
 const getTitle = (mode: RideDialogMode) => {
   if (mode.type === RideDialogModeType.EDIT) return `Editing a ride ${mode.id}`;
@@ -68,61 +48,14 @@ const RideDialog: FC<{
   }, [load, open, rideToLoadId, vehicleId]);
 
   return (
-    <Dialog open={open} onClose={onClose} fullScreen>
-      <Form<RideFormValues>
-        onSubmit={onSubmit}
-        initialValues={initialValues}
-        validate={validate}
-      >
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            <AppBar sx={{ position: "relative" }}>
-              <Toolbar>
-                <IconButton edge="start" onClick={onClose}>
-                  <CloseIcon />
-                </IconButton>
-                {getTitle(mode)}
-                <Button
-                  autoFocus
-                  color="inherit"
-                  sx={{ ml: "auto" }}
-                  type="submit"
-                  disabled={loading}
-                >
-                  Save
-                </Button>
-              </Toolbar>
-            </AppBar>
-            <DialogContent>
-              <Grid container spacing={3}>
-                <Grid item xs={6}>
-                  <PointParameters type={PointParametersType.START} />
-                </Grid>
-                <Grid item xs={6}>
-                  <PointParameters type={PointParametersType.END} />
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-                <Grid item xs={12}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Typography variant="h6">Other parameters</Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <TextInputField name="reason" label="Reason" />
-                    </Grid>
-                    <Grid item xs={8}>
-                      <TextInputField name="note" label="Note" />
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </DialogContent>
-          </form>
-        )}
-      </Form>
-    </Dialog>
+    <RideForm
+      open={open}
+      title={getTitle(mode)}
+      loading={loading}
+      initialValues={initialValues}
+      onClose={onClose}
+      onSubmit={onSubmit}
+    />
   );
 };
 

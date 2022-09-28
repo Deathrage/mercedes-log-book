@@ -1,11 +1,11 @@
 import { useCallback, useMemo } from "react";
 import { useApi } from "../../api";
 import { mapToReturnValues, mapToValues } from "./helpers";
-import { RideDialogMode, RideDialogModeType, RideFormValues } from "./types";
+import { RideDialogMode, RideDialogModeType } from "./types";
 import { mapToRideData } from "./helpers";
 import { turnEmptyValuesToUndefined } from "../../helpers/form";
 import { useVehicleId } from "../../hooks/vehicle";
-import { FormApi } from "final-form";
+import { RideFormValues } from "../RideForm/types";
 
 export const useInitialValues = ({ type }: RideDialogMode) => {
   const { data, running, invoke, reset } = useApi((_) => _.getRide);
@@ -34,7 +34,7 @@ export const useOnSubmit = (mode: RideDialogMode, onSaved: () => void) => {
 
   const { invoke: invokePost } = useApi((_) => _.postRide);
   const onSubmit = useCallback(
-    async (state: RideFormValues, formApi: FormApi<RideFormValues>) => {
+    async (state: RideFormValues) => {
       const request = mapToRideData(
         id,
         vehicleId,
@@ -44,7 +44,6 @@ export const useOnSubmit = (mode: RideDialogMode, onSaved: () => void) => {
       await invokePost(request);
 
       onSaved();
-      formApi.restart();
     },
     [id, vehicleId, invokePost, onSaved]
   );

@@ -12,7 +12,7 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
-import React, { FC, useCallback, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import {
   formatDateTime,
   formatKilometers,
@@ -26,7 +26,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import RideDialog from "./RideDialog";
 import { useApi } from "../api";
 import { useVehicle } from "../hooks/vehicle";
-import useOnMount from "src/hooks/useOnMount";
 import { isNumber } from "src/helpers/predicate";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { RideDialogMode, RideDialogModeType } from "./RideDialog/types";
@@ -69,9 +68,9 @@ const Rides: FC<{
     () => invokeGet({ vehicleId, page, pageSize }),
     [invokeGet, page, vehicleId]
   );
-  useOnMount(() => {
+  useEffect(() => {
     fetch();
-  });
+  }, [fetch]);
 
   const { running: loadingDelete, invoke: invokeDelete } = useApi(
     (_) => _.deleteRide
