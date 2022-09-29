@@ -1,7 +1,8 @@
 import { CosmosClient, SqlParameter } from "@azure/cosmos";
 import { injectable } from "inversify";
 import { getEntityContainer } from "../decorators/entity";
-import { isNumber, isValidatable } from "../helpers/predicate";
+import { isNumber } from "../helpers-shared/predicate";
+import { isValidatable } from "../helpers/predicate";
 import Entity from "../model/Entity";
 
 @injectable()

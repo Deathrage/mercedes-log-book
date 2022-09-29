@@ -7,7 +7,10 @@ import VehicleData, {
   schema as VehicleDataSchema,
 } from "../model-shared/VehicleData";
 import { z } from "zod";
-import { hasCombustionEngine, hasElectricEngine } from "../helpers/propulsion";
+import {
+  hasCombustionEngine,
+  hasElectricEngine,
+} from "../helpers-shared/propulsion";
 
 const schema = VehicleDataSchema.extend({
   userId: z.string(),

@@ -1,5 +1,5 @@
 import { AnyObject } from "final-form";
-import { isNumber } from "./predicate";
+import { isNumber } from "../../../api/helpers-shared/predicate";
 
 const turnEmptyValueToUndefined = (v: unknown) => {
   if (typeof v === "number") {

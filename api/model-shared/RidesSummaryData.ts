@@ -6,6 +6,6 @@ export const schema = z.object({
   odometer: withDate(z.number().int().nonnegative()).optional(),
 });
 
-type RidesTraveled = z.infer<typeof schema>;
+type RidesSummaryData = z.infer<typeof schema>;
 
-export default RidesTraveled;
+export default RidesSummaryData;

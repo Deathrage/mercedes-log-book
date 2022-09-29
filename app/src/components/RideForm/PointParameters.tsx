@@ -2,24 +2,22 @@ import { Grid, Typography } from "@mui/material";
 import React, { FC } from "react";
 import { useField } from "react-final-form";
 import { formatKilowattHours, formatLiters } from "../../helpers/formatters";
-import PropulsionType from "../../../../api/model-shared/PropulsionType";
-import { useVehiclesContext } from "../vehicles/hooks";
 import { PointParametersType } from "./types";
-import { isNumber } from "src/helpers/predicate";
 import DateInputField from "../fields/DateInputField";
 import TextInputField from "../fields/TextInputField";
 import NumberInputField from "../fields/NumberInputField";
+import {
+  hasCombustionEngine,
+  hasElectricEngine,
+} from "../../../../api/helpers-shared/propulsion";
+import { useVehicle } from "src/hooks/vehicle";
+import { isNumber } from "../../../../api/helpers-shared/predicate";
 
 const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
-  const { activeVehicle } = useVehiclesContext();
-  const usesGas = [
-    PropulsionType.COMBUSTION,
-    PropulsionType.PLUGIN_HYBRID,
-  ].includes(activeVehicle!.propulsion);
-  const usesBattery = [
-    PropulsionType.ELECTRICITY,
-    PropulsionType.PLUGIN_HYBRID,
-  ].includes(activeVehicle!.propulsion);
+  const activeVehicle = useVehicle();
+
+  const usesGas = hasCombustionEngine(activeVehicle.propulsion);
+  const usesBattery = hasElectricEngine(activeVehicle.propulsion);
 
   const isStart = type === PointParametersType.START;
 

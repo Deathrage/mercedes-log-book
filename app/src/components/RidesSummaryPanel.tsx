@@ -7,10 +7,10 @@ import { useVehicleId } from "src/hooks/vehicle";
 import InfoField from "./InfoField";
 import InfoFieldWithDate from "./InfoFieldWithDate";
 
-const RidesTraveled: FC = () => {
+const RideSummaryPanel: FC = () => {
   const vehicleId = useVehicleId();
 
-  const { data, running, invoke } = useApi((_) => _.getRidesTraveled);
+  const { data, running, invoke } = useApi((_) => _.getRidesSummary);
   useOnMount(() => {
     invoke({ vehicleId });
   });
@@ -41,4 +41,4 @@ const RidesTraveled: FC = () => {
   );
 };
 
-export default RidesTraveled;
+export default RideSummaryPanel;

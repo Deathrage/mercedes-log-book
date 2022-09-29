@@ -1,7 +1,7 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
-import { schema as RidesTraveledSchema } from "../model-shared/RidesTraveled";
+import RidesSummaryData from "../model-shared/RidesSummaryData";
 import RidesRepository from "../repository/RidesRepository";
 import VehicleOdometerStatusService from "../services-mercedes/VehicleOdometerStatusService";
 
@@ -25,7 +25,7 @@ class RidesTraveledHandler implements HttpRequestHandler {
     ]);
 
     return {
-      body: RidesTraveledSchema.parse({
+      body: {
         rides,
         odometer: odometer?.distance
           ? {
@@ -33,7 +33,7 @@ class RidesTraveledHandler implements HttpRequestHandler {
               date: new Date(odometer.distance.timestamp!),
             }
           : undefined,
-      }),
+      } as RidesSummaryData,
     };
   }
 

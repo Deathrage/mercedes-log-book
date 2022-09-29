@@ -1,11 +1,12 @@
-import { Stack, TableCell, Typography } from "@mui/material";
+import { Stack, SxProps, TableCell, Typography } from "@mui/material";
 import React, { FC, ReactNode } from "react";
 
-export const DoubleTableCell: FC<{ first: ReactNode; second: ReactNode }> = ({
-  first,
-  second,
-}) => (
-  <TableCell>
+export const DoubleTableCell: FC<{
+  first: ReactNode;
+  second: ReactNode;
+  sx?: SxProps;
+}> = ({ sx, first, second }) => (
+  <TableCell sx={sx}>
     <Stack>
       <Typography
         sx={{

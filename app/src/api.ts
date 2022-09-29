@@ -16,16 +16,16 @@ import VehicleStatusData, {
 import RideData, {
   schema as RideDataSchema,
 } from "../../api/model-shared/RideData";
-import ListRidesData, {
-  schema as ListRidesDataSchema,
-} from "../../api/model-shared/ListRidesData";
+import RidesData, {
+  schema as RidesDataSchema,
+} from "../../api/model-shared/RidesData";
 import {
   MercedesBenzErrorType,
   schema as MercedesBenzErrorDataSchema,
 } from "../../api/model-shared/MercedesBenzErrorData";
-import RidesTraveled, {
-  schema as RidesTraveledSchema,
-} from "../../api/model-shared/RidesTraveled";
+import RidesSummaryData, {
+  schema as RidesSummaryDataSchema,
+} from "../../api/model-shared/RidesSummaryData";
 import { useErrorsContext } from "./components/errors/hooks";
 import { tryParseJson } from "./helpers/parsers";
 
@@ -53,16 +53,16 @@ const endpoints = {
   postRide: (request: RideData) =>
     fetchJson<RideData>(api.ride(), RideDataSchema.parse, "POST", request),
   getRides: (request: { vehicleId: string; pageSize: number; page: number }) =>
-    fetchJson<ListRidesData>(
+    fetchJson<RidesData>(
       api.rides(request.vehicleId, request.pageSize, request.page),
-      ListRidesDataSchema.parse
+      RidesDataSchema.parse
     ),
   deleteRide: (request: { id: string; vehicleId: string }) =>
     fetch(api.ride(request.vehicleId, request.id), { method: "DELETE" }).then(),
-  getRidesTraveled: (request: { vehicleId: string }) =>
-    fetchJson<RidesTraveled>(
-      api.ridesTraveled(request.vehicleId),
-      RidesTraveledSchema.parse
+  getRidesSummary: (request: { vehicleId: string }) =>
+    fetchJson<RidesSummaryData>(
+      api.ridesSummary(request.vehicleId),
+      RidesSummaryDataSchema.parse
     ),
 };
 

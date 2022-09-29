@@ -1,6 +1,5 @@
 import { Grid } from "@mui/material";
 import React, { FC } from "react";
-import { isNumber } from "../helpers/predicate";
 import useOnMount from "../hooks/useOnMount";
 import { useVehicle } from "src/hooks/vehicle";
 import { useApi } from "../api";
@@ -11,6 +10,7 @@ import {
   formatPercentage,
 } from "../helpers/formatters";
 import InfoFieldWithDate from "./InfoFieldWithDate";
+import { isNumber } from "../../../api/helpers-shared/predicate";
 
 const VehicleStatus: FC = () => {
   const {
@@ -40,8 +40,8 @@ const VehicleStatus: FC = () => {
           data={data?.gas?.level}
           loading={running}
           format={(val) =>
-            `${formatPercentage(val)} approx. ${
-              isNumber(gas) ? formatLiters(gas * val) : "-"
+            `${formatPercentage(val) ?? "-"} approx. ${
+              isNumber(gas) && isNumber(val) ? formatLiters(gas * val) : "-"
             }`
           }
         />
@@ -52,8 +52,10 @@ const VehicleStatus: FC = () => {
           data={data?.battery?.level}
           loading={running}
           format={(val) =>
-            `${formatPercentage(val)} approx. ${
-              isNumber(battery) ? formatKilowattHours(battery * val) : "-"
+            `${formatPercentage(val) ?? "-"} approx. ${
+              isNumber(battery) && isNumber(val)
+                ? formatKilowattHours(battery * val)
+                : "-"
             }`
           }
         />

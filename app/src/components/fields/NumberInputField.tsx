@@ -1,7 +1,7 @@
 import { TextField } from "@mui/material";
 import React, { FC } from "react";
 import { Field } from "react-final-form";
-import { isNumber } from "src/helpers/predicate";
+import { isNumber } from "../../../../api/helpers-shared/predicate";
 
 const NumberInputField: FC<{
   name: string;

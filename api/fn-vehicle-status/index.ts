@@ -1,12 +1,11 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
-import { isNumber } from "../helpers/predicate";
-import { hasCombustionEngine, hasElectricEngine } from "../helpers/propulsion";
-import PropulsionType from "../model-shared/PropulsionType";
-import VehicleStatusData, {
-  schema as VehicleStatusDataSchema,
-} from "../model-shared/VehicleStatusData";
+import {
+  hasCombustionEngine,
+  hasElectricEngine,
+} from "../helpers-shared/propulsion";
+import VehicleStatusData from "../model-shared/VehicleStatusData";
 import VehicleRepository from "../repository/VehicleRepository";
 import VehicleEvBatteryStatusService from "../services-mercedes/VehicleEvBatteryStatusService";
 import VehicleFuelStatusService from "../services-mercedes/VehicleFuelStatusService";
@@ -51,7 +50,7 @@ class VehicleStatusHandler implements HttpRequestHandler {
         : null,
     ]);
 
-    return VehicleStatusDataSchema.parse({
+    return {
       vehicleId,
       odometer: odometer?.distance
         ? {
@@ -91,7 +90,7 @@ class VehicleStatusHandler implements HttpRequestHandler {
               : undefined,
           }
         : undefined,
-    });
+    };
   }
 
   #repository: VehicleRepository;

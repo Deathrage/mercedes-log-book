@@ -1,7 +1,6 @@
 import { AzureFunction, HttpRequest, HttpResponse } from "@azure/functions";
 import { interfaces } from "inversify";
 import container from "../container";
-import { MercedesBenzErrorType } from "../model-shared/MercedesBenzErrorData";
 import MercedesBenzError from "../model/MercedesBenzError";
 
 export interface HttpRequestHandler {

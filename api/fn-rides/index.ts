@@ -6,9 +6,7 @@ import {
 } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
-import { isNumber } from "../helpers/predicate";
-import { hasCombustionEngine, hasElectricEngine } from "../helpers/propulsion";
-import ListRidesData from "../model-shared/ListRidesData";
+import RidesData from "../model-shared/RidesData";
 import RidesRepository from "../repository/RidesRepository";
 import VehicleRepository from "../repository/VehicleRepository";
 
@@ -41,7 +39,7 @@ class RidesHandler implements HttpRequestHandler {
     userId: string,
     page: number,
     pageSize: number
-  ): Promise<ListRidesData> {
+  ): Promise<RidesData> {
     const vehicle = await this.#vehicleRepository.getRequired(
       vehicleId,
       userId
@@ -58,43 +56,7 @@ class RidesHandler implements HttpRequestHandler {
 
     return {
       hasMore,
-      rides: rides.slice(0, pageSize).map((ride) => {
-        const relativeGasConsumption =
-          isNumber(ride.gas.start) && isNumber(ride.gas.end)
-            ? ride.gas.start - ride.gas.end
-            : undefined;
-        const relativeBatteryConsumption =
-          isNumber(ride.battery.start) && isNumber(ride.battery.end)
-            ? ride.battery.start - ride.battery.end
-            : undefined;
-
-        return {
-          id: ride.id,
-          reason: ride.reason,
-          departed: ride.departed,
-          startLocation: {
-            address: ride.address.start,
-            coordinates: ride.coordinates.start,
-          },
-          arrived: ride.arrived,
-          endLocation: {
-            address: ride.address.end,
-            coordinates: ride.coordinates.end,
-          },
-          distance:
-            isNumber(ride.odometer.start) && isNumber(ride.odometer.end)
-              ? ride.odometer.end - ride.odometer.start
-              : undefined,
-          consumption: {
-            gas: hasCombustionEngine(vehicle.propulsion)
-              ? relativeGasConsumption
-              : undefined,
-            battery: hasElectricEngine(vehicle.propulsion)
-              ? relativeBatteryConsumption
-              : undefined,
-          },
-        };
-      }),
+      rides: rides.slice(0, pageSize),
     };
   }
 
