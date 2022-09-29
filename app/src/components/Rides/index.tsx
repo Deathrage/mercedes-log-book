@@ -47,8 +47,8 @@ const pageSize = 10;
 
 const Rides: FC<{
   onlyFirstPage?: true;
-  onlyEdit?: boolean;
-}> = ({ onlyFirstPage, onlyEdit }) => {
+  disableActions?: boolean;
+}> = ({ onlyFirstPage, disableActions }) => {
   const {
     id: vehicleId,
     propulsion,
@@ -81,9 +81,11 @@ const Rides: FC<{
   const showGas = hasCombustionEngine(propulsion);
   const showBattery = hasElectricEngine(propulsion);
 
+  const maxWidth = disableActions ? "20rem" : "15rem";
+
   return (
     <TableContainer>
-      {!onlyEdit && (
+      {!disableActions && (
         <Button
           autoFocus
           color="inherit"
@@ -96,33 +98,35 @@ const Rides: FC<{
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell sx={{ maxWidth: "15rem" }}>Started</TableCell>
-            <TableCell sx={{ maxWidth: "15rem" }}>Ended</TableCell>
+            <TableCell sx={{ maxWidth }}>Started</TableCell>
+            <TableCell sx={{ maxWidth }}>Ended</TableCell>
             <TableCell>Odometer</TableCell>
             {showGas && <TableCell>Gas</TableCell>}
             {showBattery && <TableCell>Battery</TableCell>}
-            <TableCell />
+            {!disableActions && <TableCell />}
           </TableRow>
         </TableHead>
         <TableBody>
           {loadingGet || !data ? (
             <TableRow>
               <DoubleTableCell
-                sx={{ maxWidth: "15rem" }}
+                sx={{ maxWidth }}
                 first={<Skeleton />}
                 second={<Skeleton />}
               />
               <DoubleTableCell
-                sx={{ maxWidth: "15rem" }}
+                sx={{ maxWidth }}
                 first={<Skeleton />}
                 second={<Skeleton />}
               />
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
-              <TableCell>
-                <Skeleton />
-              </TableCell>
+              {disableActions && (
+                <TableCell>
+                  <Skeleton />
+                </TableCell>
+              )}
             </TableRow>
           ) : (
             data.rides.map(
@@ -145,14 +149,14 @@ const Rides: FC<{
                       "-"
                     }
                     second={formatDateTime(departed)}
-                    sx={{ maxWidth: "15rem" }}
+                    sx={{ maxWidth }}
                   />
                   <DoubleTableCell
                     first={
                       address.end ?? formatCoordinates(coordinates.end) ?? "-"
                     }
                     second={formatDateTime(arrived)}
-                    sx={{ maxWidth: "15rem" }}
+                    sx={{ maxWidth }}
                   />
                   <DoubleTableCell
                     first={
@@ -206,45 +210,46 @@ const Rides: FC<{
                       }`}
                     />
                   )}
-                  <TableCell align="right">
-                    <RideActions
-                      loading={loadingDelete}
-                      onlyEdit={onlyEdit ?? false}
-                      ride={{
-                        id,
-                        departed,
-                        arrived,
-                        address,
-                        coordinates,
-                        odometer,
-                        gas,
-                        battery,
-                        ...rest,
-                      }}
-                      onReturn={() =>
-                        setMode({
-                          type: RideDialogModeType.RETURN,
-                          returnFromId: id!,
-                        })
-                      }
-                      onCopy={() =>
-                        setMode({
-                          type: RideDialogModeType.CREATE,
-                          templateId: id,
-                        })
-                      }
-                      onEdit={() =>
-                        setMode({
-                          type: RideDialogModeType.EDIT,
-                          id: id!,
-                        })
-                      }
-                      onDelete={async () => {
-                        await invokeDelete({ id: id!, vehicleId });
-                        fetch();
-                      }}
-                    />
-                  </TableCell>
+                  {!disableActions && (
+                    <TableCell align="right">
+                      <RideActions
+                        loading={loadingDelete}
+                        ride={{
+                          id,
+                          departed,
+                          arrived,
+                          address,
+                          coordinates,
+                          odometer,
+                          gas,
+                          battery,
+                          ...rest,
+                        }}
+                        onReturn={() =>
+                          setMode({
+                            type: RideDialogModeType.RETURN,
+                            returnFromId: id!,
+                          })
+                        }
+                        onCopy={() =>
+                          setMode({
+                            type: RideDialogModeType.CREATE,
+                            templateId: id,
+                          })
+                        }
+                        onEdit={() =>
+                          setMode({
+                            type: RideDialogModeType.EDIT,
+                            id: id!,
+                          })
+                        }
+                        onDelete={async () => {
+                          await invokeDelete({ id: id!, vehicleId });
+                          fetch();
+                        }}
+                      />
+                    </TableCell>
+                  )}
                 </TableRow>
               )
             )

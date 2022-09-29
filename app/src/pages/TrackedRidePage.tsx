@@ -77,7 +77,7 @@ const TrackedRide = () => {
       <Grid item xs={12}>
         <Paper sx={{ p: 2 }}>
           <Typography variant="h6">Recent rides</Typography>
-          <Rides onlyFirstPage onlyEdit />
+          <Rides onlyFirstPage disableActions />
         </Paper>
       </Grid>
     </Grid>

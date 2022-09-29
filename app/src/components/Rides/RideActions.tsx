@@ -28,7 +28,6 @@ export const RideActions: FC<{
   onEdit: () => void;
   onDelete: () => void;
   loading: boolean;
-  onlyEdit: boolean;
 }> = ({
   ride: { id, address, coordinates },
   onReturn,
@@ -36,23 +35,11 @@ export const RideActions: FC<{
   onEdit,
   onDelete,
   loading,
-  onlyEdit,
 }) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
 
-  return onlyEdit ? (
-    <Tooltip title="Edit" placement="top">
-      <Button
-        onClick={onEdit}
-        disabled={loading}
-        variant="text"
-        color="inherit"
-      >
-        <EditIcon />
-      </Button>
-    </Tooltip>
-  ) : (
+  return (
     <>
       <ButtonGroup variant="text" color="inherit" ref={anchorRef}>
         <Tooltip title="Return ride" placement="top">
