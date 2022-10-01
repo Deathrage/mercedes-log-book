@@ -2,13 +2,19 @@ const api = {
   currentUser: "/api/current-user",
   mercedesAuth: "/api/.mb-auth",
   vehicles: "/api/vehicles",
-  vehicle: (vin?: string) => `/api/vehicle${vin ? `/${vin}` : ""}`,
-  vehicleStatus: (vin: string) => `/api/vehicle/${vin}/status`,
+  vehicle: (vehicleId?: string) =>
+    `/api/vehicle${vehicleId ? `/${vehicleId}` : ""}`,
+  vehicleStatus: (vehicleId: string) => `/api/vehicle/${vehicleId}/status`,
   ride: (vehicleId?: string, id?: string) =>
     `/api/ride${vehicleId && id ? `/${vehicleId}/${id}` : ""}`,
   rides: (vehicleId: string, pageSize: number, page: number) =>
     `/api/rides/${vehicleId}/${pageSize}/${page}`,
   ridesSummary: (vehicleId: string) => `/api/rides/${vehicleId}/summary`,
+  vehicleRide: (vehicleId: string) => `/api/vehicle/${vehicleId}/ride`,
+  vehicleRideBegin: (vehicleId: string) =>
+    `/api/vehicle/${vehicleId}/ride/begin`,
+  vehicleRideFinish: (vehicleId: string) =>
+    `/api/vehicle/${vehicleId}/ride/finish`,
 };
 
 export default api;

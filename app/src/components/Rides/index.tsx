@@ -10,7 +10,14 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, {
+  FC,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import {
   formatCoordinates,
   formatDateTime,
@@ -45,10 +52,17 @@ const FromTo: FC<{
 
 const pageSize = 10;
 
-const Rides: FC<{
-  onlyFirstPage?: true;
-  disableActions?: boolean;
-}> = ({ onlyFirstPage, disableActions }) => {
+export interface RidesHandler {
+  refetch: () => void;
+}
+
+const Rides = forwardRef<
+  RidesHandler,
+  {
+    onlyFirstPage?: true;
+    disableActions?: boolean;
+  }
+>(({ onlyFirstPage, disableActions }, ref) => {
   const {
     id: vehicleId,
     propulsion,
@@ -73,6 +87,14 @@ const Rides: FC<{
   useEffect(() => {
     fetch();
   }, [fetch]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      refetch: fetch,
+    }),
+    [fetch]
+  );
 
   const { running: loadingDelete, invoke: invokeDelete } = useApi(
     (_) => _.deleteRide
@@ -279,6 +301,6 @@ const Rides: FC<{
       />
     </TableContainer>
   );
-};
+});
 
 export default Rides;

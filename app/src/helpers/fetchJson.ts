@@ -16,7 +16,7 @@ const fetchJson = async <Response>(
 
   if (res.status !== 200) throw new Error(responseText);
 
-  const object = JSON.parse(responseText);
+  const object = responseText ? JSON.parse(responseText) : null;
   return parse(object);
 };
 

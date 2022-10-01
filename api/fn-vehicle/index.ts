@@ -1,6 +1,5 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
-import extend from "just-extend";
 import { assertValidRequest, assertVehicleOwner } from "../helpers/assert";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
 import VehicleData, {
@@ -59,12 +58,14 @@ class VehicleHandler implements HttpRequestHandler {
   }
 
   async #post(body: VehicleData, userId: string): Promise<VehicleData> {
-    let vehicle = await this.#repository.get(body.id, userId);
-    if (vehicle) assertVehicleOwner(vehicle, userId);
+    const oldVehicle = await this.#repository.get(body.id, userId);
+    if (oldVehicle) assertVehicleOwner(oldVehicle, userId);
 
-    vehicle = new Vehicle();
-    extend(vehicle, body);
-    vehicle.userId = userId;
+    const vehicle = new Vehicle({
+      ...body,
+      userId,
+      onRideId: oldVehicle?.onRideId,
+    });
 
     await this.#repository.createOrUpdate(vehicle);
 

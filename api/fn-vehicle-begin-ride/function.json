@@ -5,10 +5,8 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": [
-        "get",
-        "post"
-      ]
+      "methods": ["post"],
+      "route": "vehicle/{id}/ride/begin"
     },
     {
       "type": "http",
@@ -16,5 +14,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/fn-tracked-ride-begin/index.js"
+  "scriptFile": "../dist/fn-vehicle-begin-ride/index.js"
 }

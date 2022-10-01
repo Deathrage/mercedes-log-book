@@ -80,8 +80,7 @@ class RideHandler implements HttpRequestHandler {
       this.#assertAuthorization(ride, userId);
     }
 
-    ride = new Ride();
-    extend(ride, body);
+    ride = new Ride(body);
 
     await this.#repository.createOrUpdate(ride);
 

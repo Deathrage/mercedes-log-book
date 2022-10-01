@@ -1,12 +1,50 @@
 import { Grid, Button, Paper, Typography, Stack } from "@mui/material";
 import React, { useCallback, useState } from "react";
-import Rides from "../components/Rides";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
-import InfoField from "src/components/InfoField";
+import InfoField from "../components/InfoField";
+import { useApi } from "../api";
+import RideData from "../../../api/model-shared/RideData";
+import useOnMount from "src/hooks/useOnMount";
+import { useVehicleId } from "src/hooks/vehicle";
+import useGeolocation from "src/hooks/useGeolocation";
+import { useErrorsContext } from "src/components/errors/hooks";
 
 const TrackedRide = () => {
-  const [currentRide, setCurrentRide] = useState<string>();
+  const { show: showError } = useErrorsContext();
+
+  const vehicleId = useVehicleId();
+
+  const { current: currentLocation } = useGeolocation();
+
+  const [currentRide, setCurrentRide] = useState<RideData>();
+
+  const { running: loadingInitialRide, invoke: getInitialRide } = useApi(
+    (_) => _.getVehicleRide
+  );
+  useOnMount(() => {
+    getInitialRide({ vehicleId }).then((maybeRide) => {
+      if (maybeRide) setCurrentRide(maybeRide);
+    });
+  });
+
+  const { running: loadingBeginRide, invoke: postBeginRide } = useApi(
+    (_) => _.postVehicleRideBegin
+  );
+  const begin = useCallback(async () => {
+    try {
+      const { latitude, longitude } = await currentLocation();
+      const currentRide = await postBeginRide({
+        vehicleId,
+        body: { lat: latitude, lon: longitude },
+      });
+      setCurrentRide(currentRide);
+    } catch (err) {
+      showError(err);
+    }
+  }, [currentLocation, postBeginRide, showError, vehicleId]);
+
+  const loading = loadingInitialRide || loadingBeginRide;
 
   return (
     <Grid container spacing={3} alignItems="stretch">
@@ -18,10 +56,10 @@ const TrackedRide = () => {
               aspectRatio: "1/1",
               borderWidth: "clamp(0.125rem, 1vw, 0.75rem)",
             }}
-            disabled={!!currentRide}
+            disabled={!!currentRide || loading}
             variant="outlined"
             color="success"
-            onClick={useCallback(() => setCurrentRide("foo"), [])}
+            onClick={begin}
           >
             <PlayArrowOutlinedIcon
               sx={{ fontSize: "clamp(2rem, 4vw, 5rem)" }}
@@ -33,7 +71,7 @@ const TrackedRide = () => {
               aspectRatio: "1/1",
               borderWidth: "clamp(0.125rem, 1vw, 0.75rem)",
             }}
-            disabled={!currentRide}
+            disabled={!currentRide || loading}
             variant="outlined"
             color="error"
             onClick={useCallback(() => setCurrentRide(undefined), [])}
@@ -48,38 +86,50 @@ const TrackedRide = () => {
             <Typography variant="h6">Ongoing ride</Typography>
             {currentRide && (
               <Typography variant="subtitle1" sx={{ marginLeft: "0.5rem" }}>
-                {currentRide}
+                {currentRide.id}
               </Typography>
             )}
           </Stack>
           <Grid container spacing={3}>
             <Grid item xs={4}>
-              <InfoField label="Departed">-</InfoField>
+              <InfoField label="Departed" loading={loading}>
+                -
+              </InfoField>
             </Grid>
             <Grid item xs={4}>
-              <InfoField label="Address">-</InfoField>
+              <InfoField label="Address" loading={loading}>
+                -
+              </InfoField>
             </Grid>
             <Grid item xs={4}>
-              <InfoField label="Coordinates">-</InfoField>
+              <InfoField label="Coordinates" loading={loading}>
+                -
+              </InfoField>
             </Grid>
             <Grid item xs={4}>
-              <InfoField label="Odometer">-</InfoField>
+              <InfoField label="Odometer" loading={loading}>
+                -
+              </InfoField>
             </Grid>
             <Grid item xs={4}>
-              <InfoField label="Gas level">-</InfoField>
+              <InfoField label="Gas level" loading={loading}>
+                -
+              </InfoField>
             </Grid>
             <Grid item xs={4}>
-              <InfoField label="Battery level">-</InfoField>
+              <InfoField label="Battery level" loading={loading}>
+                -
+              </InfoField>
             </Grid>
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Paper sx={{ p: 2 }}>
           <Typography variant="h6">Recent rides</Typography>
           <Rides onlyFirstPage disableActions />
         </Paper>
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 };

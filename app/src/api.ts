@@ -28,6 +28,7 @@ import RidesSummaryData, {
 } from "../../api/model-shared/RidesSummaryData";
 import { useErrorsContext } from "./components/errors/hooks";
 import { tryParseJson } from "./helpers/parsers";
+import CoordinatesData from "../../api/model-shared/Coordinates";
 
 const endpoints = {
   getCurrentUser: () =>
@@ -63,6 +64,34 @@ const endpoints = {
     fetchJson<RidesSummaryData>(
       api.ridesSummary(request.vehicleId),
       RidesSummaryDataSchema.parse
+    ),
+  getVehicleRide: (request: { vehicleId: string }): Promise<RideData | null> =>
+    fetchJson<RideData | null>(
+      api.vehicleRide(request.vehicleId),
+      (response) => {
+        if (!response) return null;
+        return RideDataSchema.parse(response);
+      }
+    ),
+  postVehicleRideBegin: (request: {
+    vehicleId: string;
+    body?: CoordinatesData;
+  }) =>
+    fetchJson<RideData>(
+      api.vehicleRideBegin(request.vehicleId),
+      RideDataSchema.parse,
+      "POST",
+      request.body
+    ),
+  postVehicleRideFinish: (request: {
+    vehicleId: string;
+    body?: CoordinatesData;
+  }) =>
+    fetchJson<RideData>(
+      api.vehicleRideFinish(request.vehicleId),
+      RideDataSchema.parse,
+      "POST",
+      request.body
     ),
 };
 

@@ -14,6 +14,7 @@ import {
 
 const schema = VehicleDataSchema.extend({
   userId: z.string(),
+  onRideId: z.string().optional(),
 })
   .refine(
     (data) => hasCombustionEngine(data.propulsion) && data.capacity.gas,
@@ -47,6 +48,7 @@ export default class Vehicle implements Entity, Validatable, DatabaseData {
     battery?: number;
   };
   userId: string;
+  onRideId?: string;
 
   constructor(data?: DatabaseData) {
     if (data) extend(this, schema.parse(data));
