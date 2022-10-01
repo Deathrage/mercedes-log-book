@@ -10,7 +10,7 @@ import { BrowserRouter, Routes as Switch, Route } from "react-router-dom";
 import Routes from "./consts/Routes";
 import RidesPage from "./pages/RidesPage";
 import VehiclePage from "./pages/VehiclePage";
-import { useCurrentUserContext } from "./components/current-user/hooks";
+import { useCurrentUserContext } from "./components/currentUser/hooks";
 import ConnectToMercedesDialog from "./components/ConnectToMercedesDialog";
 import AddVehicleDialog from "./components/AddVehicleDialog";
 import { useVehiclesContext } from "./components/vehicles/hooks";

@@ -1,17 +1,22 @@
 import {
   AppBar as MuiAppBar,
   AppBarProps as MuiAppBarProps,
+  Box,
   IconButton,
+  MenuItem,
+  PaletteMode,
+  Select,
   styled,
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import { drawerWidth } from "./Drawer";
-import CurrentUserCard from "./current-user/CurrentUserCard";
+import CurrentUserCard from "./currentUser/CurrentUserCard";
 import Routes from "../consts/Routes";
 import { useLocation } from "react-router-dom";
+import context from "./theme/context";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -43,6 +48,8 @@ const titles: Record<string, string> = {
 };
 
 const Header: FC<AppBarProps> = ({ open, onToggleDrawer }) => {
+  const { mode, setMode } = useContext(context);
+
   const { pathname } = useLocation();
   const title = titles[pathname];
 
@@ -74,6 +81,22 @@ const Header: FC<AppBarProps> = ({ open, onToggleDrawer }) => {
         >
           {title}
         </Typography>
+        <Box sx={{ marginRight: "1rem" }}>
+          <Select
+            value={mode}
+            onChange={(e) => setMode(e.target.value as PaletteMode)}
+            sx={{
+              border: "none",
+              color: "white",
+              "& svg": { color: "white" },
+              "& fieldset": { border: "none" },
+            }}
+          >
+            <MenuItem value={"light" as PaletteMode}>Light</MenuItem>
+            <MenuItem value={"dark" as PaletteMode}>Dark</MenuItem>
+          </Select>
+        </Box>
+
         <CurrentUserCard />
       </Toolbar>
     </AppBar>

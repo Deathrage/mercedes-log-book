@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import React, { FC } from "react";
 import api from "../consts/api";
-import { useCurrentUserContext } from "./current-user/hooks";
+import { useCurrentUserContext } from "./currentUser/hooks";
 
 const ConnectToMercedesDialog: FC = () => {
   const { mercedesBenzPaired } = useCurrentUserContext();
