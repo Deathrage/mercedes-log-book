@@ -10,14 +10,7 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
-import React, {
-  FC,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import {
   formatCoordinates,
   formatDateTime,
@@ -38,6 +31,7 @@ import {
 import { RideDialogMode, RideDialogModeType } from "../RideDialog/types";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import { RideActions } from "./RideActions";
+import RideData from "../../../../api/model-shared/RideData";
 
 const FromTo: FC<{
   from: string | null | undefined;
@@ -52,17 +46,17 @@ const FromTo: FC<{
 
 const pageSize = 10;
 
-export interface RidesHandler {
-  refetch: () => void;
-}
+const Rides: FC<{
+  controlled?: {
+    rides: RideData[];
+    onDeleted: (rideId: string) => void;
+    onEdited: (ride: RideData) => void;
+  };
+}> = ({ controlled }) => {
+  const controlledFromAbove = !!controlled;
+  const controlledRides = controlled?.rides;
+  const controlledOnEdited = controlled?.onEdited;
 
-const Rides = forwardRef<
-  RidesHandler,
-  {
-    onlyFirstPage?: true;
-    disableActions?: boolean;
-  }
->(({ onlyFirstPage, disableActions }, ref) => {
   const {
     id: vehicleId,
     propulsion,
@@ -85,16 +79,9 @@ const Rides = forwardRef<
     [invokeGet, page, vehicleId]
   );
   useEffect(() => {
+    if (controlledFromAbove) return;
     fetch();
-  }, [fetch]);
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      refetch: fetch,
-    }),
-    [fetch]
-  );
+  }, [fetch, controlledFromAbove]);
 
   const { running: loadingDelete, invoke: invokeDelete } = useApi(
     (_) => _.deleteRide
@@ -103,11 +90,9 @@ const Rides = forwardRef<
   const showGas = hasCombustionEngine(propulsion);
   const showBattery = hasElectricEngine(propulsion);
 
-  const maxWidth = disableActions ? "20rem" : "15rem";
-
   return (
     <TableContainer>
-      {!disableActions && (
+      {!controlledFromAbove && (
         <Button
           autoFocus
           color="inherit"
@@ -120,38 +105,28 @@ const Rides = forwardRef<
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell sx={{ maxWidth }}>Started</TableCell>
-            <TableCell sx={{ maxWidth }}>Ended</TableCell>
+            <TableCell>Started</TableCell>
+            <TableCell>Ended</TableCell>
             <TableCell>Odometer</TableCell>
             {showGas && <TableCell>Gas</TableCell>}
             {showBattery && <TableCell>Battery</TableCell>}
-            {!disableActions && <TableCell />}
+            <TableCell />
           </TableRow>
         </TableHead>
         <TableBody>
-          {loadingGet || !data ? (
+          {!controlledRides && (loadingGet || !data) ? (
             <TableRow>
-              <DoubleTableCell
-                sx={{ maxWidth }}
-                first={<Skeleton />}
-                second={<Skeleton />}
-              />
-              <DoubleTableCell
-                sx={{ maxWidth }}
-                first={<Skeleton />}
-                second={<Skeleton />}
-              />
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
-              {disableActions && (
-                <TableCell>
-                  <Skeleton />
-                </TableCell>
-              )}
+              <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
+              <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
+              <TableCell>
+                <Skeleton />
+              </TableCell>
             </TableRow>
           ) : (
-            data.rides.map(
+            (controlledRides ?? data?.rides)?.map(
               ({
                 id,
                 departed,
@@ -171,14 +146,12 @@ const Rides = forwardRef<
                       "-"
                     }
                     second={formatDateTime(departed)}
-                    sx={{ maxWidth }}
                   />
                   <DoubleTableCell
                     first={
                       address.end ?? formatCoordinates(coordinates.end) ?? "-"
                     }
                     second={formatDateTime(arrived)}
-                    sx={{ maxWidth }}
                   />
                   <DoubleTableCell
                     first={
@@ -232,59 +205,60 @@ const Rides = forwardRef<
                       }`}
                     />
                   )}
-                  {!disableActions && (
-                    <TableCell align="right">
-                      <RideActions
-                        loading={loadingDelete}
-                        ride={{
-                          id,
-                          departed,
-                          arrived,
-                          address,
-                          coordinates,
-                          odometer,
-                          gas,
-                          battery,
-                          ...rest,
-                        }}
-                        onReturn={() =>
-                          setMode({
-                            type: RideDialogModeType.RETURN,
-                            returnFromId: id!,
-                          })
-                        }
-                        onCopy={() =>
-                          setMode({
-                            type: RideDialogModeType.CREATE,
-                            templateId: id,
-                          })
-                        }
-                        onEdit={() =>
-                          setMode({
-                            type: RideDialogModeType.EDIT,
-                            id: id!,
-                          })
-                        }
-                        onDelete={async () => {
-                          await invokeDelete({ id: id!, vehicleId });
-                          fetch();
-                        }}
-                      />
-                    </TableCell>
-                  )}
+                  <TableCell align="right">
+                    <RideActions
+                      loading={loadingDelete}
+                      onlyEditOrDelete={controlledFromAbove}
+                      ride={{
+                        id,
+                        departed,
+                        arrived,
+                        address,
+                        coordinates,
+                        odometer,
+                        gas,
+                        battery,
+                        ...rest,
+                      }}
+                      onReturn={() =>
+                        setMode({
+                          type: RideDialogModeType.RETURN,
+                          returnFromId: id!,
+                        })
+                      }
+                      onCopy={() =>
+                        setMode({
+                          type: RideDialogModeType.CREATE,
+                          templateId: id,
+                        })
+                      }
+                      onEdit={() =>
+                        setMode({
+                          type: RideDialogModeType.EDIT,
+                          id: id!,
+                        })
+                      }
+                      onDelete={async () => {
+                        await invokeDelete({ id: id!, vehicleId });
+
+                        if (controlled) controlled.onDeleted(id!);
+                        else fetch();
+                      }}
+                    />
+                  </TableCell>
                 </TableRow>
               )
             )
           )}
         </TableBody>
       </Table>
-      {!onlyFirstPage && (
+      {!controlledFromAbove && (
         <TablePagination
           component="div"
           count={-1}
           rowsPerPageOptions={[pageSize]}
           rowsPerPage={pageSize}
-          page={page}
+          page={pageSize}
           onPageChange={(_, page) => setPage(page)}
         />
       )}
@@ -294,13 +268,17 @@ const Rides = forwardRef<
           () => setMode({ type: RideDialogModeType.CLOSED }),
           []
         )}
-        onSaved={useCallback(() => {
-          setMode({ type: RideDialogModeType.CLOSED });
-          fetch();
-        }, [fetch])}
+        onSaved={useCallback(
+          (ride: RideData) => {
+            setMode({ type: RideDialogModeType.CLOSED });
+            if (controlledOnEdited) controlledOnEdited(ride);
+            else fetch();
+          },
+          [controlledOnEdited, fetch]
+        )}
       />
     </TableContainer>
   );
-});
+};
 
 export default Rides;

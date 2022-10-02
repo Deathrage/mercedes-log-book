@@ -3,6 +3,7 @@ import { RideDialogMode, RideDialogModeType } from "./types";
 import { useInitialValues, useOnSubmit } from "./hooks";
 import { useVehicleId } from "../../hooks/vehicle";
 import RideForm from "../RideForm";
+import RideData from "../../../../api/model-shared/RideData";
 
 const getTitle = (mode: RideDialogMode) => {
   if (mode.type === RideDialogModeType.EDIT) return `Editing a ride ${mode.id}`;
@@ -17,7 +18,7 @@ const getTitle = (mode: RideDialogMode) => {
 
 const RideDialog: FC<{
   mode: RideDialogMode;
-  onSaved: () => void;
+  onSaved: (ride: RideData) => void;
   onClose: () => void;
 }> = ({ mode, onClose, onSaved }) => {
   const vehicleId = useVehicleId();
@@ -25,10 +26,13 @@ const RideDialog: FC<{
   const { initialValues, loading, load, reset } = useInitialValues(mode);
   const onSubmit = useOnSubmit(
     mode,
-    useCallback(() => {
-      onSaved();
-      reset();
-    }, [onSaved, reset])
+    useCallback(
+      (ride: RideData) => {
+        onSaved(ride);
+        reset();
+      },
+      [onSaved, reset]
+    )
   );
 
   const open = mode.type !== RideDialogModeType.CLOSED;

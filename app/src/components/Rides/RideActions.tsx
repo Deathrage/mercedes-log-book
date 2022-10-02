@@ -28,6 +28,7 @@ export const RideActions: FC<{
   onEdit: () => void;
   onDelete: () => void;
   loading: boolean;
+  onlyEditOrDelete?: boolean;
 }> = ({
   ride: { id, address, coordinates },
   onReturn,
@@ -35,26 +36,61 @@ export const RideActions: FC<{
   onEdit,
   onDelete,
   loading,
+  onlyEditOrDelete,
 }) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
 
+  const deleteConfirmText = (
+    <>
+      Are you sure you wanna delete this ride?
+      <br />
+      <br />
+      Id:{id}
+      <br />
+      From: {address.start ?? formatCoordinates(coordinates.start) ?? "-"}
+      <br />
+      To: {address.end ?? formatCoordinates(coordinates.end) ?? "-"}
+    </>
+  );
+
   return (
     <>
       <ButtonGroup variant="text" color="inherit" ref={anchorRef}>
-        <Tooltip title="Return ride" placement="top">
-          <Button onClick={onReturn} disabled={loading}>
-            <KeyboardReturnIcon />
-          </Button>
-        </Tooltip>
-        <Button
-          size="small"
-          aria-label="select merge strategy"
-          aria-haspopup="menu"
-          onClick={() => setOpen(true)}
-        >
-          <ArrowDropDownIcon />
-        </Button>
+        {onlyEditOrDelete ? (
+          <>
+            <Tooltip title="Edit" placement="top">
+              <Button onClick={onEdit} disabled={loading}>
+                <EditIcon />
+              </Button>
+            </Tooltip>
+            <WithConfirm text={deleteConfirmText} onConfirmed={onDelete}>
+              {(ask) => (
+                <Tooltip title="Delete" placement="top">
+                  <Button onClick={ask} disabled={loading}>
+                    <DeleteIcon color="error" />
+                  </Button>
+                </Tooltip>
+              )}
+            </WithConfirm>
+          </>
+        ) : (
+          <>
+            <Tooltip title="Return ride" placement="top">
+              <Button onClick={onReturn} disabled={loading}>
+                <KeyboardReturnIcon />
+              </Button>
+            </Tooltip>
+            <Button
+              size="small"
+              aria-label="select merge strategy"
+              aria-haspopup="menu"
+              onClick={() => setOpen(true)}
+            >
+              <ArrowDropDownIcon />
+            </Button>
+          </>
+        )}
       </ButtonGroup>
       <Popper
         sx={{
@@ -89,27 +125,7 @@ export const RideActions: FC<{
                     </ListItemIcon>
                     <ListItemText>Edit</ListItemText>
                   </MenuItem>
-                  <WithConfirm
-                    text={
-                      <>
-                        Are you sure you wanna delete this ride?
-                        <br />
-                        <br />
-                        Id:{id}
-                        <br />
-                        From:{" "}
-                        {address.start ??
-                          formatCoordinates(coordinates.start) ??
-                          "-"}
-                        <br />
-                        To:{" "}
-                        {address.end ??
-                          formatCoordinates(coordinates.end) ??
-                          "-"}
-                      </>
-                    }
-                    onConfirmed={onDelete}
-                  >
+                  <WithConfirm text={deleteConfirmText} onConfirmed={onDelete}>
                     {(ask) => (
                       <MenuItem onClick={ask} disabled={loading}>
                         <ListItemIcon>

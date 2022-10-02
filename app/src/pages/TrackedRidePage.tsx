@@ -5,10 +5,12 @@ import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import InfoField from "../components/InfoField";
 import { useApi } from "../api";
 import RideData from "../../../api/model-shared/RideData";
-import useOnMount from "src/hooks/useOnMount";
-import { useVehicleId } from "src/hooks/vehicle";
-import useGeolocation from "src/hooks/useGeolocation";
-import { useErrorsContext } from "src/components/errors/hooks";
+import useOnMount from "../hooks/useOnMount";
+import { useVehicleId } from "../hooks/vehicle";
+import useGeolocation from "../hooks/useGeolocation";
+import { useErrorsContext } from "../components/errors/hooks";
+import Rides from "../components/Rides";
+import Coordinates from "../../../api/model-shared/Coordinates";
 
 const TrackedRide = () => {
   const { show: showError } = useErrorsContext();
@@ -18,6 +20,7 @@ const TrackedRide = () => {
   const { current: currentLocation } = useGeolocation();
 
   const [currentRide, setCurrentRide] = useState<RideData>();
+  const [ridesInSession, setRidesInSession] = useState<RideData[]>([]);
 
   const { running: loadingInitialRide, invoke: getInitialRide } = useApi(
     (_) => _.getVehicleRide
@@ -28,23 +31,43 @@ const TrackedRide = () => {
     });
   });
 
+  const postRequest = useCallback(
+    async (
+      func: (req: { vehicleId: string; body: Coordinates }) => Promise<RideData>
+    ) => {
+      try {
+        const { latitude, longitude } = await currentLocation();
+        const ride = await func({
+          vehicleId,
+          body: { lat: latitude, lon: longitude },
+        });
+        return ride;
+      } catch (err) {
+        showError(err);
+        throw err;
+      }
+    },
+    [currentLocation, showError, vehicleId]
+  );
+
   const { running: loadingBeginRide, invoke: postBeginRide } = useApi(
     (_) => _.postVehicleRideBegin
   );
   const begin = useCallback(async () => {
-    try {
-      const { latitude, longitude } = await currentLocation();
-      const currentRide = await postBeginRide({
-        vehicleId,
-        body: { lat: latitude, lon: longitude },
-      });
-      setCurrentRide(currentRide);
-    } catch (err) {
-      showError(err);
-    }
-  }, [currentLocation, postBeginRide, showError, vehicleId]);
+    const currentRide = await postRequest(postBeginRide);
+    setCurrentRide(currentRide);
+  }, [postBeginRide, postRequest]);
 
-  const loading = loadingInitialRide || loadingBeginRide;
+  const { running: loadingFinishRide, invoke: postFinishRide } = useApi(
+    (_) => _.postVehicleRideFinish
+  );
+  const finish = useCallback(async () => {
+    const finishedRide = await postRequest(postFinishRide);
+    setCurrentRide(undefined);
+    setRidesInSession((prev) => [finishedRide, ...prev]);
+  }, [postFinishRide, postRequest]);
+
+  const loading = loadingInitialRide || loadingBeginRide || loadingFinishRide;
 
   return (
     <Grid container spacing={3} alignItems="stretch">
@@ -74,7 +97,7 @@ const TrackedRide = () => {
             disabled={!currentRide || loading}
             variant="outlined"
             color="error"
-            onClick={useCallback(() => setCurrentRide(undefined), [])}
+            onClick={finish}
           >
             <FlagOutlinedIcon sx={{ fontSize: "clamp(2rem, 4vw, 5rem)" }} />
           </Button>
@@ -124,12 +147,35 @@ const TrackedRide = () => {
           </Grid>
         </Paper>
       </Grid>
-      {/* <Grid item xs={12}>
+      <Grid item xs={12}>
         <Paper sx={{ p: 2 }}>
           <Typography variant="h6">Recent rides</Typography>
-          <Rides onlyFirstPage disableActions />
+          <Rides
+            controlled={{
+              rides: ridesInSession,
+              onDeleted: useCallback(
+                (rideId: string) =>
+                  setRidesInSession((rides) =>
+                    // Remove deleted ride
+                    rides.filter(({ id }) => id !== rideId)
+                  ),
+                []
+              ),
+              onEdited: useCallback(
+                (ride: RideData) =>
+                  setRidesInSession((prev) =>
+                    // Replace edited ride's object
+                    prev.map((prevRide) => {
+                      if (prevRide.id === ride.id) return ride;
+                      return prevRide;
+                    })
+                  ),
+                []
+              ),
+            }}
+          />
         </Paper>
-      </Grid> */}
+      </Grid>
     </Grid>
   );
 };

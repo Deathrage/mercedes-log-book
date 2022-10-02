@@ -57,6 +57,7 @@ class FinishRideHandler implements HttpRequestHandler {
         : null,
     ]);
 
+    ride.arrived = new Date();
     ride.coordinates.end = req.body
       ? CoordinatesSchema.parse(req.body)
       : undefined;

@@ -6,6 +6,7 @@ import { mapToRideData } from "./helpers";
 import { turnEmptyValuesToUndefined } from "../../helpers/form";
 import { useVehicleId } from "../../hooks/vehicle";
 import { RideFormValues } from "../RideForm/types";
+import RideData from "../../../../api/model-shared/RideData";
 
 export const useInitialValues = ({ type }: RideDialogMode) => {
   const { data, running, invoke, reset } = useApi((_) => _.getRide);
@@ -27,7 +28,10 @@ export const useInitialValues = ({ type }: RideDialogMode) => {
   };
 };
 
-export const useOnSubmit = (mode: RideDialogMode, onSaved: () => void) => {
+export const useOnSubmit = (
+  mode: RideDialogMode,
+  onSaved: (ride: RideData) => void
+) => {
   const vehicleId = useVehicleId();
 
   const id = mode.type === RideDialogModeType.EDIT ? mode.id : undefined;
@@ -41,9 +45,9 @@ export const useOnSubmit = (mode: RideDialogMode, onSaved: () => void) => {
         turnEmptyValuesToUndefined(state)
       );
 
-      await invokePost(request);
+      const rideData = await invokePost(request);
 
-      onSaved();
+      onSaved(rideData);
     },
     [id, vehicleId, invokePost, onSaved]
   );

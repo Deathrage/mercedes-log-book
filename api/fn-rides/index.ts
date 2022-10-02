@@ -27,7 +27,7 @@ class RidesHandler implements HttpRequestHandler {
     const pageSize = Number(params.pageSize);
 
     if (isNaN(page)) throw new Error("Page is not a number!");
-    if (pageSize !== 10) throw new Error("Page size has to be 10!");
+    if (pageSize > 10) throw new Error("Page size has to be at most 10!");
 
     return {
       body: await this.#get(vehicleId, userId, page, pageSize),
