@@ -70,10 +70,10 @@ export const useRideControl = () => {
       setCurrentRide(undefined);
       setFinishedRides((prev) => [finishedRide, ...prev]);
     }, [postFinishRide, postWithCoordinates]),
-    cancel: useCallback(
-      () => postCancelRide({ vehicleId }),
-      [postCancelRide, vehicleId]
-    ),
+    cancel: useCallback(async () => {
+      await postCancelRide({ vehicleId });
+      setCurrentRide(undefined);
+    }, [postCancelRide, vehicleId]),
     current: currentRide,
     finished: {
       rides: finishedRides,
