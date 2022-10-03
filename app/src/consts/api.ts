@@ -15,6 +15,8 @@ const api = {
     `/api/vehicle/${vehicleId}/ride/begin`,
   vehicleRideFinish: (vehicleId: string) =>
     `/api/vehicle/${vehicleId}/ride/finish`,
+  vehicleRideCancel: (vehicleId: string) =>
+    `/api/vehicle/${vehicleId}/ride/cancel`,
 };
 
 export default api;

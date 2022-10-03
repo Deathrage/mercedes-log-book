@@ -93,10 +93,15 @@ const endpoints = {
       "POST",
       request.body
     ),
+  postVehicleRideCancel: (request: { vehicleId: string }) =>
+    fetch(api.vehicleRideCancel(request.vehicleId), {
+      method: "DELETE",
+    }).then(),
 };
 
 export const useApi = <Request, Response>(
-  pick: (list: typeof endpoints) => (request: Request) => Promise<Response>
+  pick: (list: typeof endpoints) => (request: Request) => Promise<Response>,
+  silent = false
 ) => {
   const { show } = useErrorsContext();
 
@@ -153,11 +158,11 @@ export const useApi = <Request, Response>(
             }
           }
 
-          show(error);
+          if (!silent) show(error);
           reject(error);
         }
       }),
-    [endpoint, show]
+    [endpoint, show, silent]
   );
 
   return { ...state, invoke, reset };
