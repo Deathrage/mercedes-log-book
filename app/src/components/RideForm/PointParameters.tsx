@@ -1,4 +1,4 @@
-import { Grid, Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import React, { FC } from "react";
 import { useField } from "react-final-form";
 import { formatKilowattHours, formatLiters } from "../../helpers/formatters";
@@ -28,7 +28,15 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
   });
   const {
     input: { value: battery },
-  } = useField(isStart ? "startBattery" : "endBattery");
+  } = useField(isStart ? "startBattery" : "endBattery", {
+    subscription: { value: true },
+  });
+  const {
+    input: { value: departed, onChange: onChangeDeparted },
+  } = useField("departed", { subscription: { value: !isStart } });
+  const {
+    input: { onChange: onChangeArrived },
+  } = useField("arrived", { subscription: {} });
 
   return (
     <>
@@ -44,6 +52,21 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
             label={isStart ? "Departed" : "Arrived"}
             required={isStart}
           />
+          {isStart && (
+            <Button size="small" onClick={() => onChangeDeparted(new Date())}>
+              Now
+            </Button>
+          )}
+          {!isStart && (
+            <Button
+              size="small"
+              onClick={() => {
+                if (departed) onChangeArrived(departed);
+              }}
+            >
+              Departed
+            </Button>
+          )}
         </Grid>
         <Grid item xs={7}>
           <TextInputField
