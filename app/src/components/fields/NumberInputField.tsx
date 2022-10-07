@@ -12,7 +12,18 @@ const NumberInputField: FC<{
   step?: number;
   helperText?: string;
   disabled?: boolean;
-}> = ({ name, label, disabled, required, suffix, rate, helperText, step }) => (
+  decimals?: number;
+}> = ({
+  name,
+  label,
+  disabled,
+  required,
+  suffix,
+  rate,
+  helperText,
+  step,
+  decimals = 2,
+}) => (
   <Field<number> name={name}>
     {({ input: { value, onChange, ...input }, meta: { error } }) => (
       <TextField
@@ -24,7 +35,9 @@ const NumberInputField: FC<{
         inputProps={{ step }}
         fullWidth
         disabled={disabled}
-        value={isNumber(value) ? Number((value * (rate ?? 1)).toFixed(2)) : ""}
+        value={
+          isNumber(value) ? Number((value * (rate ?? 1)).toFixed(decimals)) : ""
+        }
         onChange={(e) =>
           onChange(
             e.target.value ? Number(e.target.value) / (rate ?? 1) : undefined

@@ -21,7 +21,8 @@ export const useRideControl = () => {
   // Fetches initial ride during mount of the page
   // If ride is already ongoing it has to be finished first before beginning new one
   const { running: loadingInitialRide, invoke: getInitialRide } = useApi(
-    (_) => _.getVehicleRide
+    (_) => _.getVehicleRide,
+    { defaultRunning: true }
   );
   useOnMount(() => {
     getInitialRide({ vehicleId }).then((maybeRide) => {
@@ -50,11 +51,11 @@ export const useRideControl = () => {
 
   const { running: loadingBeginRide, invoke: postBeginRide } = useApi(
     (_) => _.postVehicleRideBegin,
-    true
+    { silent: true }
   );
   const { running: loadingFinishRide, invoke: postFinishRide } = useApi(
     (_) => _.postVehicleRideFinish,
-    true
+    { silent: true }
   );
   const { running: loadingCancelRide, invoke: postCancelRide } = useApi(
     (_) => _.postVehicleRideCancel

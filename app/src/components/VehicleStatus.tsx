@@ -4,13 +4,11 @@ import useOnMount from "../hooks/useOnMount";
 import { useVehicle } from "src/hooks/vehicle";
 import { useApi } from "../api";
 import {
+  formatBatteryLevel,
+  formatGasLevel,
   formatKilometers,
-  formatKilowattHours,
-  formatLiters,
-  formatPercentage,
 } from "../helpers/formatters";
 import InfoFieldWithDate from "./InfoFieldWithDate";
-import { isNumber } from "../../../api/helpers-shared/predicate";
 
 const VehicleStatus: FC = () => {
   const {
@@ -39,11 +37,7 @@ const VehicleStatus: FC = () => {
           label="Gas level"
           data={data?.gas?.level}
           loading={running}
-          format={(val) =>
-            `${formatPercentage(val) ?? "-"} approx. ${
-              isNumber(gas) && isNumber(val) ? formatLiters(gas * val) : "-"
-            }`
-          }
+          format={(val) => formatGasLevel(val, gas)}
         />
       </Grid>
       <Grid item xs={4}>
@@ -51,13 +45,7 @@ const VehicleStatus: FC = () => {
           label="Battery level"
           data={data?.battery?.level}
           loading={running}
-          format={(val) =>
-            `${formatPercentage(val) ?? "-"} approx. ${
-              isNumber(battery) && isNumber(val)
-                ? formatKilowattHours(battery * val)
-                : "-"
-            }`
-          }
+          format={(val) => formatBatteryLevel(val, battery)}
         />
       </Grid>
       <Grid item xs={4} />

@@ -5,9 +5,21 @@ import Rides from "../../components/Rides";
 import BeginFinishButtons from "./BeginFinishButtons";
 import { useRideControl } from "./hooks";
 import CancelIcon from "@mui/icons-material/Cancel";
+import {
+  formatCoordinates,
+  formatDateTime,
+  formatKilometers,
+  formatBatteryLevel,
+  formatGasLevel,
+} from "src/helpers/formatters";
+import { useVehicle } from "src/hooks/vehicle";
 
 const TrackedRide = () => {
-  const { loading, current, finished, begin, finish } = useRideControl();
+  const {
+    capacity: { battery, gas },
+  } = useVehicle();
+  const { loading, current, finished, begin, finish, cancel } =
+    useRideControl();
 
   return (
     <Grid container spacing={3} alignItems="stretch">
@@ -31,8 +43,11 @@ const TrackedRide = () => {
                 <Button
                   color="error"
                   sx={{ marginLeft: "auto", display: "inline-block" }}
+                  onClick={cancel}
                 >
-                  <CancelIcon /> Cancel
+                  <Stack direction="row">
+                    <CancelIcon sx={{ marginRight: "0.25rem" }} /> Cancel
+                  </Stack>
                 </Button>
               </>
             )}
@@ -40,32 +55,33 @@ const TrackedRide = () => {
           <Grid container spacing={3}>
             <Grid item xs={4}>
               <InfoField label="Departed" loading={loading}>
-                -
+                {current?.departed ? formatDateTime(current.departed) : null}
               </InfoField>
             </Grid>
-            <Grid item xs={4}>
-              <InfoField label="Address" loading={loading}>
-                -
-              </InfoField>
-            </Grid>
-            <Grid item xs={4}>
-              <InfoField label="Coordinates" loading={loading}>
-                -
+            <Grid item xs={8}>
+              <InfoField label="Address or coordinates" loading={loading}>
+                {current?.address?.start ?? current?.coordinates?.start
+                  ? formatCoordinates(current.coordinates.start)
+                  : null}
               </InfoField>
             </Grid>
             <Grid item xs={4}>
               <InfoField label="Odometer" loading={loading}>
-                -
+                {current?.odometer?.start
+                  ? formatKilometers(current.odometer.start)
+                  : null}
               </InfoField>
             </Grid>
             <Grid item xs={4}>
               <InfoField label="Gas level" loading={loading}>
-                -
+                {current ? formatGasLevel(current.gas.start, gas) : null}
               </InfoField>
             </Grid>
             <Grid item xs={4}>
               <InfoField label="Battery level" loading={loading}>
-                -
+                {current
+                  ? formatBatteryLevel(current.battery.start, battery)
+                  : null}
               </InfoField>
             </Grid>
           </Grid>

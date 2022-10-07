@@ -89,6 +89,7 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
                 name={isStart ? "startLatitude" : "endLatitude"}
                 label="Latitude"
                 suffix="°"
+                decimals={7}
               />
             </Grid>
             <Grid item xs={6}>
@@ -96,6 +97,7 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
                 name={isStart ? "startLongitude" : "endLongitude"}
                 label="Longitude"
                 suffix="°"
+                decimals={7}
               />
             </Grid>
           </Grid>

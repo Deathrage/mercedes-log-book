@@ -17,7 +17,7 @@ const BeginFinishButtons: FC<{
           aspectRatio: "1/1",
           borderWidth: "clamp(0.125rem, 1vw, 0.75rem)",
         }}
-        disabled={!!onRide || loading}
+        disabled={onRide || loading}
         variant="outlined"
         color="success"
         onClick={onBeginClick}

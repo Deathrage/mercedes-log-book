@@ -38,3 +38,21 @@ export const formatKilowattHours = (value: number | undefined | null) =>
 export const formatCoordinates = (
   value: { lat: number; lon: number } | undefined | null
 ) => (value ? formatcoords(value.lat, value.lon).format() : undefined);
+
+export const formatBatteryLevel = (
+  level: number | null | undefined,
+  capacity: number | null | undefined
+) =>
+  `${formatPercentage(level) ?? "-"} approx. ${
+    isNumber(capacity) && isNumber(level)
+      ? formatKilowattHours(capacity * level)
+      : "-"
+  }`;
+
+export const formatGasLevel = (
+  level: number | null | undefined,
+  capacity: number | null | undefined
+) =>
+  `${formatPercentage(level) ?? "-"} approx. ${
+    isNumber(capacity) && isNumber(level) ? formatLiters(capacity * level) : "-"
+  }`;

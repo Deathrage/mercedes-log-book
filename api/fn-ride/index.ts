@@ -54,7 +54,7 @@ class RideHandler implements HttpRequestHandler {
   ): Promise<RideData> {
     const ride = await this.#repository.getRequired(rideId, vehicleId);
 
-    this.#assertAuthorization(ride, userId);
+    await this.#assertAuthorization(ride, userId);
 
     return RideDataSchema.parse(ride);
   }
@@ -66,7 +66,7 @@ class RideHandler implements HttpRequestHandler {
   ): Promise<void> {
     const ride = await this.#repository.getRequired(rideId, vehicleId);
 
-    this.#assertAuthorization(ride, userId);
+    await this.#assertAuthorization(ride, userId);
 
     await this.#repository.delete(rideId, vehicleId);
   }
@@ -77,7 +77,7 @@ class RideHandler implements HttpRequestHandler {
       : null;
     if (ride) {
       this.#assertVehicleNotChanged(ride, body);
-      this.#assertAuthorization(ride, userId);
+      await this.#assertAuthorization(ride, userId);
     }
 
     ride = new Ride(body);
@@ -93,6 +93,10 @@ class RideHandler implements HttpRequestHandler {
       userId
     );
     assertVehicleOwner(vehicle, userId);
+    if (vehicle.onRideId === ride.id)
+      throw new Error(
+        `Ride ${ride.id} is currently tracked by vehicle ${vehicle.id}. Use vehicle API to access it!`
+      );
   }
 
   async #assertVehicleNotChanged(current: RideData, incoming: RideData) {

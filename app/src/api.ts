@@ -95,14 +95,17 @@ const endpoints = {
     ),
   postVehicleRideCancel: (request: { vehicleId: string }) =>
     fetch(api.vehicleRideCancel(request.vehicleId), {
-      method: "DELETE",
+      method: "POST",
     }).then(),
 };
 
 export const useApi = <Request, Response>(
   pick: (list: typeof endpoints) => (request: Request) => Promise<Response>,
-  silent = false
+  config?: { silent?: boolean; defaultRunning?: boolean }
 ) => {
+  const silent = config?.silent ?? false;
+  const defaultRunning = config?.defaultRunning ?? false;
+
   const { show } = useErrorsContext();
 
   const endpoint = pick(endpoints);
@@ -112,7 +115,7 @@ export const useApi = <Request, Response>(
     data: Response | null;
     error: unknown | null;
   }>({
-    running: false,
+    running: defaultRunning,
     data: null,
     error: null,
   });

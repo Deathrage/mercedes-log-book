@@ -24,8 +24,6 @@ const scopes = [
   "mb:vehicle:mbdata:evstatus",
   "mb:vehicle:mbdata:fuelstatus",
   "mb:vehicle:mbdata:payasyoudrive",
-  "mb:vehicle:mbdata:vehiclelock",
-  "mb:vehicle:mbdata:vehiclestatus",
 ];
 
 @injectable()

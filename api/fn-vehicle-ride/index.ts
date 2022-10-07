@@ -1,46 +1,28 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
-import { assertVehicleOwner } from "../helpers/assert";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
-import RidesRepository from "../repository/RidesRepository";
-import VehicleRepository from "../repository/VehicleRepository";
 import { schema as RideDataSchema } from "../model-shared/RideData";
+import TrackedRideService from "../services/TrackedRideService";
 
 @injectable()
 class VehicleRideHandler implements HttpRequestHandler {
-  constructor(
-    vehicleRepository: VehicleRepository,
-    rideRepository: RidesRepository
-  ) {
-    this.#vehicleRepository = vehicleRepository;
-    this.#rideRepository = rideRepository;
+  constructor(service: TrackedRideService) {
+    this.#service = service;
   }
 
   async handle(req: HttpRequest): Promise<HttpResponse> {
     const userId = req.user!.username;
     const vehicleId = req.params.id;
 
-    const vehicle = await this.#vehicleRepository.getRequired(
-      vehicleId,
-      userId
-    );
-
-    assertVehicleOwner(vehicle, userId);
-
-    if (!vehicle.onRideId) return {};
-
-    const ride = await this.#rideRepository.getRequired(
-      vehicle.onRideId,
-      vehicle.id
-    );
+    const ride = await this.#service.getCurrentRide(vehicleId, userId);
+    if (!ride) return {};
 
     return {
       body: RideDataSchema.parse(ride),
     };
   }
 
-  #vehicleRepository: VehicleRepository;
-  #rideRepository: RidesRepository;
+  #service: TrackedRideService;
 }
 
 export default createHttpRequestHandler(VehicleRideHandler, false);
