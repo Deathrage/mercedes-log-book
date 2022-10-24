@@ -20,6 +20,7 @@ const schema = z
       })
       .optional(),
     mercedesBenzNonce: z.string().optional(),
+    addresses: z.array(z.string()).optional(),
   })
   .refine(
     (data) => !(data.mercedesBenz && data.mercedesBenzNonce),
@@ -39,6 +40,7 @@ export default class User implements Entity, Validatable, UserData {
     refreshToken: string;
   };
   mercedesBenzNonce?: string;
+  addresses?: string[];
 
   constructor(data?: UserData) {
     if (data) extend(this, schema.parse(data));

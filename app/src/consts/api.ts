@@ -5,11 +5,13 @@ const api = {
   vehicle: (vehicleId?: string) =>
     `/api/vehicle${vehicleId ? `/${vehicleId}` : ""}`,
   vehicleStatus: (vehicleId: string) => `/api/vehicle/${vehicleId}/status`,
+  vehicleStatusOdometer: (vehicleId: string) =>
+    `/api/vehicle/${vehicleId}/status/odometer`,
   ride: (vehicleId?: string, id?: string) =>
     `/api/ride${vehicleId && id ? `/${vehicleId}/${id}` : ""}`,
   rides: (vehicleId: string, pageSize: number, page: number) =>
     `/api/rides/${vehicleId}/${pageSize}/${page}`,
-  ridesSummary: (vehicleId: string) => `/api/rides/${vehicleId}/summary`,
+  ridesSum: (vehicleId: string) => `/api/rides/${vehicleId}/sum`,
   vehicleRide: (vehicleId: string) => `/api/vehicle/${vehicleId}/ride`,
   vehicleRideBegin: (vehicleId: string) =>
     `/api/vehicle/${vehicleId}/ride/begin`,

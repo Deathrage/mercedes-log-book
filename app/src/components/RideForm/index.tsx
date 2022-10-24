@@ -9,7 +9,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { FC, useCallback } from "react";
+import React, { FC, ReactNode, useCallback } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { PointParametersType, RideFormValues } from "./types";
 import PointParameters from "./PointParameters";
@@ -23,9 +23,18 @@ const RideForm: FC<{
   open: boolean;
   loading: boolean;
   initialValues?: RideFormValues;
+  leftInfoField?: ReactNode;
   onSubmit: (values: RideFormValues) => Promise<void>;
   onClose: () => void;
-}> = ({ title, open, loading, initialValues, onClose, onSubmit }) => {
+}> = ({
+  title,
+  leftInfoField,
+  open,
+  loading,
+  initialValues,
+  onClose,
+  onSubmit,
+}) => {
   const submit = useCallback(
     async (values: RideFormValues, formApi: FormApi<RideFormValues>) => {
       await onSubmit(values);
@@ -63,7 +72,10 @@ const RideForm: FC<{
             <DialogContent>
               <Grid container spacing={3}>
                 <Grid item xs={6}>
-                  <PointParameters type={PointParametersType.START} />
+                  <PointParameters
+                    type={PointParametersType.START}
+                    infoField={leftInfoField}
+                  />
                 </Grid>
                 <Grid item xs={6}>
                   <PointParameters type={PointParametersType.END} />

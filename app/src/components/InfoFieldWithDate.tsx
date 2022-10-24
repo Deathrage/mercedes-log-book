@@ -15,7 +15,8 @@ const InfoFieldWithDate = <Value extends unknown>({
         value: Value;
         date: Date;
       }
-    | undefined;
+    | undefined
+    | null;
   format: (value: Value | undefined | null) => string | undefined;
 }) => (
   <InfoField

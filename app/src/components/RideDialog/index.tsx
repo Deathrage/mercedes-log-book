@@ -4,6 +4,7 @@ import { useInitialValues, useOnSubmit } from "./hooks";
 import { useVehicleId } from "../../hooks/vehicle";
 import RideForm from "../RideForm";
 import RideData from "../../../../api/model-shared/RideData";
+import Header from "./Header";
 
 const getTitle = (mode: RideDialogMode) => {
   if (mode.type === RideDialogModeType.EDIT) return `Editing a ride ${mode.id}`;
@@ -55,6 +56,9 @@ const RideDialog: FC<{
     <RideForm
       open={open}
       title={getTitle(mode)}
+      leftInfoField={
+        mode.type === RideDialogModeType.CREATE ? <Header /> : null
+      }
       loading={loading}
       initialValues={initialValues}
       onClose={onClose}

@@ -23,9 +23,9 @@ import {
   MercedesBenzErrorType,
   schema as MercedesBenzErrorDataSchema,
 } from "../../api/model-shared/MercedesBenzErrorData";
-import RidesSummaryData, {
-  schema as RidesSummaryDataSchema,
-} from "../../api/model-shared/RidesSummaryData";
+import VehicleStatusOdometerData, {
+  schema as VehicleStatusOdometerDataSchema,
+} from "../../api/model-shared/VehicleStatusOdometerData";
 import { useErrorsContext } from "./components/errors/hooks";
 import { tryParseJson } from "./helpers/parsers";
 import CoordinatesData from "../../api/model-shared/Coordinates";
@@ -35,16 +35,21 @@ const endpoints = {
     fetchJson<PublicUserData>(api.currentUser, PublicUser.parse),
   getVehicles: () =>
     fetchJson<VehiclesData>(api.vehicles, VehiclesSchema.parse),
-  getVehicle: (request: { vin: string }) =>
-    fetchJson<VehicleData>(api.vehicle(request.vin), VehicleSchema.parse),
+  getVehicle: (request: { vehicleId: string }) =>
+    fetchJson<VehicleData>(api.vehicle(request.vehicleId), VehicleSchema.parse),
   postVehicle: (request: VehicleData) =>
     fetchJson<VehicleData>(api.vehicle(), VehicleSchema.parse, "POST", request),
-  deleteVehicle: (request: { vin: string }) =>
-    fetch(api.vehicle(request.vin), { method: "DELETE" }).then(),
-  getVehicleStatus: (request: { vin: string }) =>
+  deleteVehicle: (request: { vehicleId: string }) =>
+    fetch(api.vehicle(request.vehicleId), { method: "DELETE" }).then(),
+  getVehicleStatus: (request: { vehicleId: string }) =>
     fetchJson<VehicleStatusData>(
-      api.vehicleStatus(request.vin),
+      api.vehicleStatus(request.vehicleId),
       VehicleStatusSchema.parse
+    ),
+  getVehicleStatusOdometer: (request: { vehicleId: string }) =>
+    fetchJson<VehicleStatusOdometerData>(
+      api.vehicleStatusOdometer(request.vehicleId),
+      VehicleStatusOdometerDataSchema.parse
     ),
   getRide: (request: { id: string; vehicleId: string }) =>
     fetchJson<RideData>(
@@ -60,11 +65,10 @@ const endpoints = {
     ),
   deleteRide: (request: { id: string; vehicleId: string }) =>
     fetch(api.ride(request.vehicleId, request.id), { method: "DELETE" }).then(),
-  getRidesSummary: (request: { vehicleId: string }) =>
-    fetchJson<RidesSummaryData>(
-      api.ridesSummary(request.vehicleId),
-      RidesSummaryDataSchema.parse
-    ),
+  getRidesSum: (request: { vehicleId: string }) =>
+    fetch(api.ridesSum(request.vehicleId))
+      .then((res) => res.text())
+      .then(Number),
   getVehicleRide: (request: { vehicleId: string }): Promise<RideData | null> =>
     fetchJson<RideData | null>(
       api.vehicleRide(request.vehicleId),

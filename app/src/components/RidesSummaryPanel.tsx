@@ -10,31 +10,39 @@ import InfoFieldWithDate from "./InfoFieldWithDate";
 const RideSummaryPanel: FC = () => {
   const vehicleId = useVehicleId();
 
-  const { data, running, invoke } = useApi((_) => _.getRidesSummary);
+  const {
+    data: sum,
+    running: sumLoading,
+    invoke: invokeSum,
+  } = useApi((_) => _.getRidesSum);
+  const {
+    data: odometer,
+    running: odometerLoading,
+    invoke: invokeOdometer,
+  } = useApi((_) => _.getVehicleStatusOdometer);
   useOnMount(() => {
-    invoke({ vehicleId });
+    invokeSum({ vehicleId });
+    invokeOdometer({ vehicleId });
   });
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={4}>
-        <InfoField label="rides" loading={running}>
-          {data && formatKilometers(data.rides)}
+        <InfoField label="rides" loading={sumLoading}>
+          {sum && formatKilometers(sum)}
         </InfoField>
       </Grid>
       <Grid item xs={4}>
         <InfoFieldWithDate
           label="Odometer"
-          data={data?.odometer}
-          loading={running}
+          data={odometer}
+          loading={odometerLoading}
           format={formatKilometers}
         />
       </Grid>
       <Grid item xs={4}>
-        <InfoField label="Ratio">
-          {data?.rides &&
-            data.odometer?.value &&
-            formatPercentage(data.rides / data.odometer.value)}
+        <InfoField label="Ratio" loading={sumLoading || odometerLoading}>
+          {sum && odometer && formatPercentage(sum / odometer.value)}
         </InfoField>
       </Grid>
     </Grid>

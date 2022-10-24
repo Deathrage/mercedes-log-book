@@ -12,14 +12,14 @@ import InfoFieldWithDate from "./InfoFieldWithDate";
 
 const VehicleStatus: FC = () => {
   const {
-    id: vin,
+    id: vehicleId,
     capacity: { gas, battery },
   } = useVehicle();
 
   const { data, running, invoke } = useApi((_) => _.getVehicleStatus);
 
   useOnMount(() => {
-    invoke({ vin });
+    invoke({ vehicleId });
   });
 
   return (

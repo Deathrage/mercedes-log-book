@@ -1,5 +1,5 @@
 import { Button, Grid, Typography } from "@mui/material";
-import React, { FC } from "react";
+import React, { FC, ReactNode } from "react";
 import { useField } from "react-final-form";
 import { formatKilowattHours, formatLiters } from "../../helpers/formatters";
 import { PointParametersType } from "./types";
@@ -13,7 +13,10 @@ import {
 import { useVehicle } from "src/hooks/vehicle";
 import { isNumber } from "../../../../api/helpers-shared/predicate";
 
-const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
+const PointParameters: FC<{
+  type: PointParametersType;
+  infoField?: ReactNode;
+}> = ({ type, infoField }) => {
   const activeVehicle = useVehicle();
 
   const usesGas = hasCombustionEngine(activeVehicle.propulsion);
@@ -46,7 +49,7 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
             {isStart ? "Starting point" : "Destination"}
           </Typography>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={5}>
           <DateInputField
             name={isStart ? "departed" : "arrived"}
             label={isStart ? "Departed" : "Arrived"}
@@ -68,6 +71,11 @@ const PointParameters: FC<{ type: PointParametersType }> = ({ type }) => {
             </Button>
           )}
         </Grid>
+        <Grid item xs={2} />
+        <Grid item xs={3}>
+          {infoField}
+        </Grid>
+        <Grid item xs={2} />
         <Grid item xs={7}>
           <TextInputField
             name={isStart ? "startAddress" : "endAddress"}
