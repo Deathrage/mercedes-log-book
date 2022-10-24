@@ -22,7 +22,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import VehicleSelect from "./VehicleSelect";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PolylineIcon from "@mui/icons-material/Polyline";
-import GradingIcon from "@mui/icons-material/Grading";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 export const drawerWidth: number = 240;
 
@@ -109,11 +109,14 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
           </ListItemIcon>
           <ListItemText primary="Generator" />
         </ListItemButton>
-        <ListItemButton>
+        <ListItemButton
+          selected={pathname === Routes.ADDRESSES}
+          onClick={() => navigate(Routes.ADDRESSES)}
+        >
           <ListItemIcon>
-            <GradingIcon />
+            <LocationOnIcon />
           </ListItemIcon>
-          <ListItemText primary="Templates" />
+          <ListItemText primary="Addresses" />
         </ListItemButton>
         <Divider sx={{ my: 1 }} />
         <ListSubheader component="div" inset>

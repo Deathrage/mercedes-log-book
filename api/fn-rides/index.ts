@@ -1,9 +1,4 @@
-import {
-  AzureFunction,
-  Context,
-  HttpRequest,
-  HttpResponse,
-} from "@azure/functions";
+import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
 import RidesData from "../model-shared/RidesData";

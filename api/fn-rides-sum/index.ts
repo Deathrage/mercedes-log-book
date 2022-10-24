@@ -2,7 +2,6 @@ import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
 import RidesRepository from "../repository/RidesRepository";
-import VehicleOdometerStatusService from "../services-mercedes/VehicleOdometerStatusService";
 
 @injectable()
 class RidesTraveledHandler implements HttpRequestHandler {

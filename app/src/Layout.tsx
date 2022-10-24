@@ -14,6 +14,7 @@ import { useCurrentUserContext } from "./components/currentUser/hooks";
 import ConnectToMercedesDialog from "./components/ConnectToMercedesDialog";
 import AddVehicleDialog from "./components/AddVehicleDialog";
 import { useVehiclesContext } from "./components/vehicles/hooks";
+import AddressesPage from "./pages/AddressesPage";
 
 const Layout = () => {
   const [open, setOpen] = useState(true);
@@ -47,6 +48,7 @@ const Layout = () => {
               <Route path={Routes.VEHICLE} element={<VehiclePage />} />
               <Route path={Routes.RIDES} element={<RidesPage />} />
               <Route path={Routes.TRACKED_RIDE} element={<TrackedRidePage />} />
+              <Route path={Routes.ADDRESSES} element={<AddressesPage />} />
             </Switch>
           )}
           <ConnectToMercedesDialog />

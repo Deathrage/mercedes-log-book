@@ -4,6 +4,9 @@ import api from "./consts/api";
 import PublicUserData, {
   schema as PublicUser,
 } from "../../api/model-shared/PublicUserData";
+import AddressesData, {
+  schema as AddressesSchema,
+} from "../../api/model-shared/AddressesData";
 import VehicleData, {
   schema as VehicleSchema,
 } from "../../api/model-shared/VehicleData";
@@ -33,6 +36,15 @@ import CoordinatesData from "../../api/model-shared/Coordinates";
 const endpoints = {
   getCurrentUser: () =>
     fetchJson<PublicUserData>(api.currentUser, PublicUser.parse),
+  getCurrentUserAddresses: () =>
+    fetchJson<AddressesData>(api.currentUser, AddressesSchema.parse),
+  postCurrentUserAddresses: (request: AddressesData) =>
+    fetchJson<AddressesData>(
+      api.currentUser,
+      AddressesSchema.parse,
+      "POST",
+      request
+    ),
   getVehicles: () =>
     fetchJson<VehiclesData>(api.vehicles, VehiclesSchema.parse),
   getVehicle: (request: { vehicleId: string }) =>

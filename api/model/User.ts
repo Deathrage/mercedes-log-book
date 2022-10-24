@@ -4,6 +4,9 @@ import Entity from "./Entity";
 import Validatable from "./Validatable";
 import extend from "just-extend";
 import { schema as date } from "../model-shared/Date";
+import AddressesData, {
+  schema as addresses,
+} from "../model-shared/AddressesData";
 
 const schema = z
   .object({
@@ -20,7 +23,7 @@ const schema = z
       })
       .optional(),
     mercedesBenzNonce: z.string().optional(),
-    addresses: z.array(z.string()).optional(),
+    addresses: addresses.optional(),
   })
   .refine(
     (data) => !(data.mercedesBenz && data.mercedesBenzNonce),
@@ -40,7 +43,7 @@ export default class User implements Entity, Validatable, UserData {
     refreshToken: string;
   };
   mercedesBenzNonce?: string;
-  addresses?: string[];
+  addresses?: AddressesData;
 
   constructor(data?: UserData) {
     if (data) extend(this, schema.parse(data));

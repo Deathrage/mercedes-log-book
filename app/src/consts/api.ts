@@ -1,5 +1,6 @@
 const api = {
   currentUser: "/api/current-user",
+  currentUserAddresses: "/api/current-user/addresses",
   mercedesAuth: "/api/.mb-auth",
   vehicles: "/api/vehicles",
   vehicle: (vehicleId?: string) =>

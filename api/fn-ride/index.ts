@@ -1,6 +1,5 @@
 import { HttpRequest, HttpResponse } from "@azure/functions";
 import { injectable } from "inversify";
-import extend from "just-extend";
 import { assertValidRequest, assertVehicleOwner } from "../helpers/assert";
 import { createHttpRequestHandler, HttpRequestHandler } from "../helpers/http";
 import RideData, { schema as RideDataSchema } from "../model-shared/RideData";
