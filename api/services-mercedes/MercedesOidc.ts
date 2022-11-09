@@ -20,6 +20,7 @@ const tryInitializeOidcClient = async () => {
 };
 
 const scopes = [
+  "openid",
   "offline_access",
   "mb:vehicle:mbdata:evstatus",
   "mb:vehicle:mbdata:fuelstatus",
@@ -64,7 +65,7 @@ export default class MercedesOidc {
     await this.#repository.createOrUpdate(user);
 
     const params = client.callbackParams(callbackUrl);
-    const tokens = await client.oauthCallback(
+    const tokens = await client.callback(
       process.env.MERCEDES_BENZ_REDIRECT_URL,
       params,
       {
