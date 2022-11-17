@@ -1,14 +1,4 @@
-import {
-  AppBar,
-  Button,
-  Dialog,
-  DialogContent,
-  Divider,
-  Grid,
-  IconButton,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import { DialogContent, Divider, Grid, Typography } from "@mui/material";
 import React, { FC, ReactNode, useCallback } from "react";
 import { PointParametersType, RideFormValues } from "./types";
 import PointParameters from "./PointParameters";
