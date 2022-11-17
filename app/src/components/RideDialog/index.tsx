@@ -5,6 +5,8 @@ import { useVehicleId } from "../../hooks/vehicle";
 import RideForm from "../RideForm";
 import RideData from "../../../../api/model-shared/RideData";
 import Header from "./Header";
+import { AppBar, Button, Dialog, IconButton, Toolbar } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const getTitle = (mode: RideDialogMode) => {
   if (mode.type === RideDialogModeType.EDIT) return `Editing a ride ${mode.id}`;
@@ -53,17 +55,34 @@ const RideDialog: FC<{
   }, [load, open, rideToLoadId, vehicleId]);
 
   return (
-    <RideForm
-      open={open}
-      title={getTitle(mode)}
-      leftInfoField={
-        mode.type === RideDialogModeType.CREATE ? <Header /> : null
-      }
-      loading={loading}
-      initialValues={initialValues}
-      onClose={onClose}
-      onSubmit={onSubmit}
-    />
+    <Dialog open={open} onClose={onClose} fullScreen>
+      <RideForm
+        leftInfoField={
+          mode.type === RideDialogModeType.CREATE ? <Header /> : null
+        }
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        header={({ submitting, pristine }) => (
+          <AppBar sx={{ position: "relative" }}>
+            <Toolbar>
+              <IconButton edge="start" onClick={onClose}>
+                <CloseIcon />
+              </IconButton>
+              {getTitle(mode)}
+              <Button
+                autoFocus
+                color="inherit"
+                sx={{ ml: "auto" }}
+                type="submit"
+                disabled={loading || submitting || pristine}
+              >
+                Save
+              </Button>
+            </Toolbar>
+          </AppBar>
+        )}
+      />
+    </Dialog>
   );
 };
 

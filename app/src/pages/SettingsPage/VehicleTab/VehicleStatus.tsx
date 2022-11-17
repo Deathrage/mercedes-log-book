@@ -1,14 +1,14 @@
 import { Grid } from "@mui/material";
 import React, { FC } from "react";
-import useOnMount from "../hooks/useOnMount";
+import useOnMount from "../../../hooks/useOnMount";
 import { useVehicle } from "src/hooks/vehicle";
-import { useApi } from "../api";
+import { useApi } from "../../../api";
 import {
   formatBatteryLevel,
   formatGasLevel,
   formatKilometers,
-} from "../helpers/formatters";
-import InfoFieldWithDate from "./InfoFieldWithDate";
+} from "../../../helpers/formatters";
+import InfoFieldWithDate from "../../../components/InfoFieldWithDate";
 
 const VehicleStatus: FC = () => {
   const {

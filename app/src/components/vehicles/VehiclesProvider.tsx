@@ -14,6 +14,8 @@ import context, { VehiclesContext } from "./context";
 const Provider = context.Provider;
 
 const VehiclesProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
+  const [loading, setLoading] = useState(true);
+
   const { data: vehicles, invoke: invokeVehicles } = useApi(
     (_) => _.getVehicles
   );
@@ -36,7 +38,7 @@ const VehiclesProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
   useEffect(() => {
     if (!vehicles) return;
 
-    if (activeVehicle && vehicles.includes(activeVehicle)) return;
+    setLoading(false);
 
     const toActivate = vehicles[0];
     if (!toActivate) return;
@@ -75,10 +77,10 @@ const VehiclesProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
 
   const ctx = useMemo<VehiclesContext>(
     () =>
-      vehicles
+      !loading
         ? {
             loading: false,
-            vehicles,
+            vehicles: [],
             activeVehicle: activeVehicle,
             setActiveVehicle: activateVehicle,
             createVehicle,
@@ -92,7 +94,7 @@ const VehiclesProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
             createVehicle: () => Promise.resolve(),
             updateVehicle: () => Promise.resolve(),
           },
-    [vehicles, activeVehicle, activateVehicle, createVehicle, updateVehicle]
+    [loading, activeVehicle, activateVehicle, createVehicle, updateVehicle]
   );
 
   return <Provider value={ctx}>{children}</Provider>;

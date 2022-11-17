@@ -1,8 +1,7 @@
 enum Routes {
-  TRACKED_RIDE = "/",
-  VEHICLE = "/vehicle",
-  RIDES = "/rides",
+  RIDES = "/",
   ADDRESSES = "/addresses",
+  SETTINGS = "/settings",
 }
 
 export default Routes;

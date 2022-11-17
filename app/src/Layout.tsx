@@ -1,20 +1,17 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import Copyright from "./components/Copyright";
-import Header from "./components/Header";
 import { Container } from "@mui/material";
-import Drawer from "./components/Drawer";
-import TrackedRidePage from "./pages/TrackedRidePage";
+import Menu from "./components/Menu";
 import { BrowserRouter, Routes as Switch, Route } from "react-router-dom";
 import Routes from "./consts/Routes";
 import RidesPage from "./pages/RidesPage";
-import VehiclePage from "./pages/VehiclePage";
 import { useCurrentUserContext } from "./components/currentUser/hooks";
 import ConnectToMercedesDialog from "./components/ConnectToMercedesDialog";
 import AddVehicleDialog from "./components/AddVehicleDialog";
 import { useVehiclesContext } from "./components/vehicles/hooks";
 import AddressesPage from "./pages/AddressesPage";
+import SettingsPage from "./pages/SettingsPage";
 
 const Layout = () => {
   const [open, setOpen] = useState(true);
@@ -27,8 +24,7 @@ const Layout = () => {
 
   return (
     <BrowserRouter>
-      <Header open={open} onToggleDrawer={toggleDrawer} />
-      <Drawer open={open} onToggleDrawer={toggleDrawer} />
+      <Menu open={open} onToggleDrawer={toggleDrawer} />
       <Box
         component="main"
         sx={{
@@ -42,18 +38,16 @@ const Layout = () => {
         }}
       >
         <Toolbar />
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="xl">
           {mercedesBenzPaired && activeVehicle && (
             <Switch>
-              <Route path={Routes.VEHICLE} element={<VehiclePage />} />
               <Route path={Routes.RIDES} element={<RidesPage />} />
-              <Route path={Routes.TRACKED_RIDE} element={<TrackedRidePage />} />
               <Route path={Routes.ADDRESSES} element={<AddressesPage />} />
+              <Route path={Routes.SETTINGS} element={<SettingsPage />} />
             </Switch>
           )}
           <ConnectToMercedesDialog />
           <AddVehicleDialog />
-          <Copyright sx={{ pt: 4 }} />
         </Container>
       </Box>
     </BrowserRouter>

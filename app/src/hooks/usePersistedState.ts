@@ -16,5 +16,8 @@ export const usePersistedState = (
     [key]
   );
 
-  return [value, setState];
+  return [value, setState] as [
+    string,
+    (value: string | null | undefined) => void
+  ];
 };

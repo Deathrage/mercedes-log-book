@@ -9,22 +9,25 @@ import {
   styled,
   Toolbar,
   ListSubheader,
+  Collapse,
+  Box,
 } from "@mui/material";
 import React, { FC } from "react";
 import {
   ChevronLeft as ChevronLeftIcon,
-  DirectionsCarFilled as DirectionsCarFilledIcon,
+  ChevronRight as ChevronRightIcon,
   Route as RouteIcon,
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
 import Routes from "../consts/Routes";
 import { useLocation, useNavigate } from "react-router-dom";
 import VehicleSelect from "./VehicleSelect";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import PolylineIcon from "@mui/icons-material/Polyline";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import SettingsIcon from "@mui/icons-material/Settings";
+import Copyright from "./Copyright";
 
-export const drawerWidth: number = 240;
+export const menuWidth: number = 240;
 
 const StyledDrawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -32,7 +35,8 @@ const StyledDrawer = styled(MuiDrawer, {
   "& .MuiDrawer-paper": {
     position: "relative",
     whiteSpace: "nowrap",
-    width: drawerWidth,
+    width: menuWidth,
+    overflow: "hidden",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -44,15 +48,12 @@ const StyledDrawer = styled(MuiDrawer, {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      width: theme.spacing(7),
-      [theme.breakpoints.up("sm")]: {
-        width: theme.spacing(9),
-      },
+      width: theme.spacing(8),
     }),
   },
 }));
 
-const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
+const Menu: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
   open,
   onToggleDrawer,
 }) => {
@@ -69,31 +70,30 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
           px: [1],
         }}
       >
-        <VehicleSelect />
-        <IconButton onClick={onToggleDrawer}>
-          <ChevronLeftIcon />
+        <Collapse
+          orientation="horizontal"
+          in={open}
+          sx={{ flexGrow: 1, "& .MuiCollapse-wrapperInner": { width: "100%" } }}
+        >
+          <VehicleSelect />
+        </Collapse>
+        <IconButton
+          onClick={onToggleDrawer}
+          sx={{ mr: open ? undefined : "1rem" }}
+        >
+          {open && <ChevronLeftIcon />}
+          {!open && <ChevronRightIcon />}
         </IconButton>
       </Toolbar>
       <Divider />
       <List component="nav">
-        <ListItemButton
-          selected={pathname === Routes.TRACKED_RIDE}
-          onClick={() => navigate(Routes.TRACKED_RIDE)}
-        >
+        <ListItemButton disabled>
           <ListItemIcon>
-            <PolylineIcon />
+            <AddBoxIcon />
           </ListItemIcon>
-          <ListItemText primary="Tracked ride" />
+          <ListItemText primary="New ride" />
         </ListItemButton>
-        <ListItemButton
-          selected={pathname === Routes.VEHICLE}
-          onClick={() => navigate(Routes.VEHICLE)}
-        >
-          <ListItemIcon>
-            <DirectionsCarFilledIcon />
-          </ListItemIcon>
-          <ListItemText primary="Vehicle" />
-        </ListItemButton>
+        <Divider sx={{ my: 1 }} />
         <ListItemButton
           selected={pathname === Routes.RIDES}
           onClick={() => navigate(Routes.RIDES)}
@@ -103,39 +103,61 @@ const Drawer: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
           </ListItemIcon>
           <ListItemText primary="Rides" />
         </ListItemButton>
-        <ListItemButton>
-          <ListItemIcon>
-            <PlayArrowIcon />
-          </ListItemIcon>
-          <ListItemText primary="Generator" />
-        </ListItemButton>
         <ListItemButton
           selected={pathname === Routes.ADDRESSES}
           onClick={() => navigate(Routes.ADDRESSES)}
+          disabled
         >
           <ListItemIcon>
             <LocationOnIcon />
           </ListItemIcon>
-          <ListItemText primary="Addresses" />
+          <ListItemText primary="Address book" />
+        </ListItemButton>
+        <ListItemButton
+          selected={pathname === Routes.SETTINGS}
+          onClick={() => navigate(Routes.SETTINGS)}
+        >
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Settings" />
         </ListItemButton>
         <Divider sx={{ my: 1 }} />
         <ListSubheader component="div" inset>
-          Quick exports
+          Reports
         </ListSubheader>
-        <ListItemButton>
+        <ListItemButton disabled>
           <ListItemIcon>
             <AssignmentIcon />
           </ListItemIcon>
           <ListItemText primary="Current month" />
         </ListItemButton>
-        <ListItemButton>
+        <ListItemButton disabled>
           <ListItemIcon>
             <AssignmentIcon />
           </ListItemIcon>
           <ListItemText primary="Previous month" />
         </ListItemButton>
+        <ListItemButton disabled>
+          <ListItemIcon>
+            <AssignmentIcon />
+          </ListItemIcon>
+          <ListItemText primary="Custom" />
+        </ListItemButton>
       </List>
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: "1rem",
+          width: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <Collapse orientation="horizontal" in={open}>
+          <Copyright sx={{ paddingLeft: "1.5rem" }} />
+        </Collapse>
+      </Box>
     </StyledDrawer>
   );
 };
-export default Drawer;
+export default Menu;

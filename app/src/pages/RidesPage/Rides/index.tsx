@@ -1,5 +1,5 @@
 import {
-  Button,
+  Fab,
   Skeleton,
   Stack,
   Table,
@@ -19,19 +19,22 @@ import {
   formatLiters,
   formatPercentage,
 } from "src/helpers/formatters";
-import { DoubleTableCell } from "../DoubleTableCell";
-import RideDialog from "../RideDialog";
-import { useApi } from "../../api";
-import { useVehicle } from "../../hooks/vehicle";
-import { isNumber } from "../../../../api/helpers-shared/predicate";
+import { DoubleTableCell } from "../../../components/DoubleTableCell";
+import RideDialog from "../../../components/RideDialog";
+import { useApi } from "../../../api";
+import { useVehicle } from "../../../hooks/vehicle";
+import { isNumber } from "../../../../../api/helpers-shared/predicate";
 import {
   hasCombustionEngine,
   hasElectricEngine,
-} from "../../../../api/helpers-shared/propulsion";
-import { RideDialogMode, RideDialogModeType } from "../RideDialog/types";
+} from "../../../../../api/helpers-shared/propulsion";
+import {
+  RideDialogMode,
+  RideDialogModeType,
+} from "../../../components/RideDialog/types";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import { RideActions } from "./RideActions";
-import RideData from "../../../../api/model-shared/RideData";
+import AddIcon from "@mui/icons-material/Add";
 
 const FromTo: FC<{
   from: string | null | undefined;
@@ -46,17 +49,7 @@ const FromTo: FC<{
 
 const pageSize = 10;
 
-const Rides: FC<{
-  controlled?: {
-    rides: RideData[];
-    onDeleted: (rideId: string) => void;
-    onEdited: (ride: RideData) => void;
-  };
-}> = ({ controlled }) => {
-  const controlledFromAbove = !!controlled;
-  const controlledRides = controlled?.rides;
-  const controlledOnEdited = controlled?.onEdited;
-
+const Rides: FC = () => {
   const {
     id: vehicleId,
     propulsion,
@@ -79,9 +72,8 @@ const Rides: FC<{
     [invokeGet, page, vehicleId]
   );
   useEffect(() => {
-    if (controlledFromAbove) return;
     fetch();
-  }, [fetch, controlledFromAbove]);
+  }, [fetch]);
 
   const { running: loadingDelete, invoke: invokeDelete } = useApi(
     (_) => _.deleteRide
@@ -92,16 +84,13 @@ const Rides: FC<{
 
   return (
     <TableContainer>
-      {!controlledFromAbove && (
-        <Button
-          autoFocus
-          color="inherit"
-          sx={{ ml: "auto", display: "block" }}
-          onClick={() => setMode({ type: RideDialogModeType.CREATE })}
-        >
-          New
-        </Button>
-      )}
+      <Fab
+        aria-label="add"
+        sx={{ position: "fixed", bottom: "2rem", right: "2rem" }}
+        onClick={() => setMode({ type: RideDialogModeType.CREATE })}
+      >
+        <AddIcon />
+      </Fab>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -114,7 +103,7 @@ const Rides: FC<{
           </TableRow>
         </TableHead>
         <TableBody>
-          {!controlledRides && (loadingGet || !data) ? (
+          {loadingGet || !data ? (
             <TableRow>
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
@@ -126,7 +115,7 @@ const Rides: FC<{
               </TableCell>
             </TableRow>
           ) : (
-            (controlledRides ?? data?.rides)?.map(
+            data?.rides?.map(
               ({
                 id,
                 departed,
@@ -208,7 +197,6 @@ const Rides: FC<{
                   <TableCell align="right">
                     <RideActions
                       loading={loadingDelete}
-                      onlyEditOrDelete={controlledFromAbove}
                       ride={{
                         id,
                         departed,
@@ -240,9 +228,7 @@ const Rides: FC<{
                       }
                       onDelete={async () => {
                         await invokeDelete({ id: id!, vehicleId });
-
-                        if (controlled) controlled.onDeleted(id!);
-                        else fetch();
+                        fetch();
                       }}
                     />
                   </TableCell>
@@ -252,30 +238,24 @@ const Rides: FC<{
           )}
         </TableBody>
       </Table>
-      {!controlledFromAbove && (
-        <TablePagination
-          component="div"
-          count={-1}
-          rowsPerPageOptions={[pageSize]}
-          rowsPerPage={pageSize}
-          page={pageSize}
-          onPageChange={(_, page) => setPage(page)}
-        />
-      )}
+      <TablePagination
+        component="div"
+        count={-1}
+        rowsPerPageOptions={[pageSize]}
+        rowsPerPage={pageSize}
+        page={page}
+        onPageChange={(_, page) => setPage(page)}
+      />
       <RideDialog
         mode={mode}
         onClose={useCallback(
           () => setMode({ type: RideDialogModeType.CLOSED }),
           []
         )}
-        onSaved={useCallback(
-          (ride: RideData) => {
-            setMode({ type: RideDialogModeType.CLOSED });
-            if (controlledOnEdited) controlledOnEdited(ride);
-            else fetch();
-          },
-          [controlledOnEdited, fetch]
-        )}
+        onSaved={useCallback(() => {
+          setMode({ type: RideDialogModeType.CLOSED });
+          fetch();
+        }, [fetch])}
       />
     </TableContainer>
   );

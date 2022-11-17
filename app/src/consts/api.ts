@@ -11,7 +11,7 @@ const api = {
   ride: (vehicleId?: string, id?: string) =>
     `/api/ride${vehicleId && id ? `/${vehicleId}/${id}` : ""}`,
   rides: (vehicleId: string, pageSize: number, page: number) =>
-    `/api/rides/${vehicleId}/${pageSize}/${page}`,
+    `/api/rides/${vehicleId}?pageSize=${pageSize}&page=${page}`,
   ridesSum: (vehicleId: string) => `/api/rides/${vehicleId}/sum`,
   vehicleRide: (vehicleId: string) => `/api/vehicle/${vehicleId}/ride`,
   vehicleRideBegin: (vehicleId: string) =>

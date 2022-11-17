@@ -1,4 +1,4 @@
-import { Button, Paper } from "@mui/material";
+import { Button } from "@mui/material";
 import React, { FC } from "react";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
@@ -10,34 +10,42 @@ const BeginFinishButtons: FC<{
   onFinishClick: () => void;
 }> = ({ loading, onRide, onBeginClick, onFinishClick }) => {
   return (
-    <Paper sx={{ p: 2, width: "100%", height: "100%" }}>
+    <>
       <Button
         sx={{
-          width: "50%",
+          width: "100%",
           aspectRatio: "1/1",
-          borderWidth: "clamp(0.125rem, 1vw, 0.75rem)",
+          borderWidth: "clamp(0.125rem, 1vw, 0.5rem)",
+          "&:hover": {
+            borderWidth: "clamp(0.125rem, 1vw, 0.5rem)",
+          },
+          p: 0,
         }}
         disabled={onRide || loading}
         variant="outlined"
         color="success"
         onClick={onBeginClick}
       >
-        <PlayArrowOutlinedIcon sx={{ fontSize: "clamp(2rem, 4vw, 5rem)" }} />
+        <PlayArrowOutlinedIcon sx={{ fontSize: "clamp(1rem, 4vw, 3rem)" }} />
       </Button>
       <Button
         sx={{
-          width: "50%",
+          width: "100%",
           aspectRatio: "1/1",
-          borderWidth: "clamp(0.125rem, 1vw, 0.75rem)",
+          borderWidth: "clamp(0.125rem, 1vw, 0.5rem)",
+          "&:hover": {
+            borderWidth: "clamp(0.125rem, 1vw, 0.5rem)",
+          },
+          p: 0,
         }}
         disabled={!onRide || loading}
         variant="outlined"
         color="error"
         onClick={onFinishClick}
       >
-        <FlagOutlinedIcon sx={{ fontSize: "clamp(2rem, 4vw, 5rem)" }} />
+        <FlagOutlinedIcon sx={{ fontSize: "clamp(1rem, 4vw, 3rem)" }} />
       </Button>
-    </Paper>
+    </>
   );
 };
 

@@ -15,11 +15,11 @@ class RidesHandler implements HttpRequestHandler {
     this.#vehicleRepository = vehicleRepository;
   }
 
-  async handle({ params, user }: HttpRequest): Promise<HttpResponse> {
+  async handle({ params, query, user }: HttpRequest): Promise<HttpResponse> {
     const userId = user!.username;
     const vehicleId = params.vehicleId;
-    const page = Number(params.page);
-    const pageSize = Number(params.pageSize);
+    const page = Number(query.page);
+    const pageSize = Number(query.pageSize);
 
     if (isNaN(page)) throw new Error("Page is not a number!");
     if (pageSize > 10) throw new Error("Page size has to be at most 10!");

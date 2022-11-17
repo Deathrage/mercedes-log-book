@@ -3,27 +3,41 @@ import {
   PaletteMode,
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material";
-import React, { FC, PropsWithChildren, useMemo, useState } from "react";
+import React, { FC, PropsWithChildren, useCallback, useMemo } from "react";
+import { usePersistedState } from "src/hooks/usePersistedState";
 import context, { ThemeContext } from "./context";
 
 const Provider = context.Provider;
 
 const ThemeProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
-  const [mode, setMode] = useState<PaletteMode>("dark");
+  const preferDark = useMemo(
+    () => window.matchMedia("(prefers-color-scheme: dark)").matches,
+    []
+  );
+
+  const [mode, setMode] = usePersistedState(
+    "mode",
+    preferDark ? "dark" : "light"
+  );
+
+  const typedSetMode = useCallback(
+    (mode: PaletteMode) => setMode(mode),
+    [setMode]
+  );
 
   const ctx = useMemo<ThemeContext>(
     () => ({
-      setMode,
-      mode,
+      setMode: typedSetMode,
+      mode: mode as PaletteMode,
     }),
-    [mode]
+    [mode, typedSetMode]
   );
 
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode,
+          mode: mode as PaletteMode,
         },
       }),
     [mode]

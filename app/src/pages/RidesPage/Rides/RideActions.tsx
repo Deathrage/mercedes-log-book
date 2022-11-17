@@ -14,11 +14,11 @@ import {
 import React, { FC, useRef, useState } from "react";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { WithConfirm } from "../WithConfirm";
+import { WithConfirm } from "../../../components/WithConfirm";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import RideData from "../../../../api/model-shared/RideData";
+import RideData from "../../../../../api/model-shared/RideData";
 import { formatCoordinates } from "src/helpers/formatters";
 
 export const RideActions: FC<{

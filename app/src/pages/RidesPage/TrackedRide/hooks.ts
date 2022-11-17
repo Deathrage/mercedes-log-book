@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
-import { useVehicleId } from "../../hooks/vehicle";
-import RideData from "../../../../api/model-shared/RideData";
-import useGeolocation from "../../hooks/useGeolocation";
-import Coordinates from "../../../../api/model-shared/Coordinates";
-import { useErrorsContext } from "../../components/errors/hooks";
-import { useApi } from "../../api";
-import useOnMount from "../../hooks/useOnMount";
+import { useVehicleId } from "../../../hooks/vehicle";
+import RideData from "../../../../../api/model-shared/RideData";
+import useGeolocation from "../../../hooks/useGeolocation";
+import Coordinates from "../../../../../api/model-shared/Coordinates";
+import { useErrorsContext } from "../../../components/errors/hooks";
+import { useApi } from "../../../api";
+import useOnMount from "../../../hooks/useOnMount";
 
 export const useRideControl = () => {
   const vehicleId = useVehicleId();
@@ -14,9 +14,6 @@ export const useRideControl = () => {
 
   // Ride that is currently happening
   const [currentRide, setCurrentRide] = useState<RideData>();
-  // All rides that have already been completed in this session
-  // Makes table below buttons
-  const [finishedRides, setFinishedRides] = useState<RideData[]>([]);
 
   // Fetches initial ride during mount of the page
   // If ride is already ongoing it has to be finished first before beginning new one
@@ -67,37 +64,14 @@ export const useRideControl = () => {
       setCurrentRide(currentRide);
     }, [postBeginRide, postWithCoordinates]),
     finish: useCallback(async () => {
-      const finishedRide = await postWithCoordinates(postFinishRide);
+      await postWithCoordinates(postFinishRide);
       setCurrentRide(undefined);
-      setFinishedRides((prev) => [finishedRide, ...prev]);
     }, [postFinishRide, postWithCoordinates]),
     cancel: useCallback(async () => {
       await postCancelRide({ vehicleId });
       setCurrentRide(undefined);
     }, [postCancelRide, vehicleId]),
     current: currentRide,
-    finished: {
-      rides: finishedRides,
-      delete: useCallback(
-        (rideId: string) =>
-          setFinishedRides((rides) =>
-            // Remove deleted ride
-            rides.filter(({ id }) => id !== rideId)
-          ),
-        []
-      ),
-      update: useCallback(
-        (ride: RideData) =>
-          setFinishedRides((prev) =>
-            // Replace edited ride's object
-            prev.map((prevRide) => {
-              if (prevRide.id === ride.id) return ride;
-              return prevRide;
-            })
-          ),
-        []
-      ),
-    },
     loading:
       loadingInitialRide ||
       loadingBeginRide ||

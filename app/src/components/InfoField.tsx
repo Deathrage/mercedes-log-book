@@ -6,18 +6,26 @@ const InfoField: FC<
     label: string;
     loading?: boolean;
     underline?: string;
+    noBorder?: boolean;
   }>
-> = ({ label, loading, children, underline }) => (
-  <Stack>
+> = ({ label, loading, children, underline, noBorder }) => (
+  <Stack position="relative">
     <Typography variant="overline">{label}</Typography>
     {loading ? (
       <Skeleton />
     ) : (
-      <Typography variant="body2" sx={(theme) => ({ borderBottom: 1 })}>
+      <Typography
+        variant="body2"
+        sx={() => ({ borderBottom: noBorder ? undefined : 1 })}
+      >
         {children ?? "-"}
       </Typography>
     )}
-    {underline && <FormHelperText>{underline}</FormHelperText>}
+    {underline && (
+      <FormHelperText sx={{ position: "absolute", bottom: "-1.25rem" }}>
+        {underline}
+      </FormHelperText>
+    )}
   </Stack>
 );
 
