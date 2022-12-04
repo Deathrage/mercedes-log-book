@@ -1,12 +1,6 @@
 import { DialogContent, Divider, Grid, Typography } from "@mui/material";
-import React, {
-  forwardRef,
-  ReactNode,
-  useCallback,
-  useImperativeHandle,
-  useRef,
-} from "react";
-import { PointParametersType, RideFormHandle, RideFormValues } from "./types";
+import React, { FC, ReactNode, useCallback, useRef } from "react";
+import { PointParametersType, RideFormValues } from "./types";
 import PointParameters from "./PointParameters";
 import { Form } from "react-final-form";
 import TextInputField from "../fields/TextInputField";
@@ -15,34 +9,27 @@ import { FormApi, FormState } from "final-form";
 import { useApi } from "../../api";
 import { useVehicleId } from "../../hooks/vehicle";
 
-const RideForm = forwardRef<
-  RideFormHandle,
-  {
-    disabled?: boolean;
-    initialValues?: RideFormValues;
-    onSubmit: (values: RideFormValues) => Promise<void>;
-    wrap?: (content: ReactNode, state: FormState<RideFormValues>) => ReactNode;
-  }
->(({ initialValues, onSubmit, disabled, wrap = (content) => content }, ref) => {
+const RideForm: FC<{
+  disabled?: boolean;
+  initialValues?: RideFormValues;
+  onSubmit: (values: RideFormValues) => Promise<void>;
+  wrap?: (content: ReactNode, state: FormState<RideFormValues>) => ReactNode;
+}> = ({
+  initialValues,
+  onSubmit,
+  disabled: parentDisabled,
+  wrap = (content) => content,
+}) => {
   const vehicleId = useVehicleId();
-  const { data: vehicle } = useApi((_) => _.vehicle, {
+  const { data: vehicle, running: vehicleLoading } = useApi((_) => _.vehicle, {
     request: vehicleId,
   });
+  const { data: addresses, running: addressesLoading } = useApi(
+    (_) => _.currentUserAddresses
+  );
+  const disabled = parentDisabled || vehicleLoading || addressesLoading;
 
   const formRef = useRef<HTMLFormElement>();
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      submit: () => {
-        if (!formRef.current) throw new Error("Missing ref!");
-        formRef.current.dispatchEvent(
-          new Event("submit", { cancelable: true })
-        );
-      },
-    }),
-    []
-  );
 
   return (
     <Form<RideFormValues>
@@ -75,6 +62,7 @@ const RideForm = forwardRef<
                       battery: vehicle?.capacity.battery,
                     }}
                     propulsion={vehicle?.propulsion}
+                    addresses={addresses}
                   />
                 </Grid>
                 <Grid item xs={6}>
@@ -86,6 +74,7 @@ const RideForm = forwardRef<
                       battery: vehicle?.capacity.battery,
                     }}
                     propulsion={vehicle?.propulsion}
+                    addresses={addresses}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -120,6 +109,6 @@ const RideForm = forwardRef<
       )}
     </Form>
   );
-});
+};
 
 export default RideForm;

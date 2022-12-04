@@ -12,18 +12,14 @@ import {
   formatGasLevel,
 } from "src/helpers/formatters";
 import { useVehicleId } from "src/hooks/vehicle";
-import { useLazyApi } from "src/api";
-import useOnMount from "src/hooks/useOnMount";
+import { useApi } from "src/api";
 
 const TrackedRide: FC<{ onFinished?: () => void }> = ({ onFinished }) => {
   const vehicleId = useVehicleId();
 
-  const {
-    running: vehicleLoading,
-    data: vehicle,
-    invoke,
-  } = useLazyApi((_) => _.vehicle, { defaultRunning: true });
-  useOnMount(() => void invoke(vehicleId));
+  const { running: vehicleLoading, data: vehicle } = useApi((_) => _.vehicle, {
+    request: vehicleId,
+  });
 
   const {
     loading: rideControlLoading,

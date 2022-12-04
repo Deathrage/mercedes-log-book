@@ -4,17 +4,18 @@ import { useField } from "react-final-form";
 import { formatKilowattHours, formatLiters } from "../../helpers/formatters";
 import { PointParametersType } from "./types";
 import DateInputField from "../fields/DateInputField";
-import TextInputField from "../fields/TextInputField";
 import NumberInputField from "../fields/NumberInputField";
 import { hasCombustionEngine, hasElectricEngine } from "@shared/helpers";
 import { PropulsionType } from "@shared/model";
+import AutocompleteTextInputField from "../fields/AutocompleteTextInputField";
 
 const PointParameters: FC<{
   disabled?: boolean;
   capacity: { battery?: number; gas?: number };
   propulsion?: PropulsionType;
+  addresses: { name: string; address: string }[] | null;
   type: PointParametersType;
-}> = ({ disabled, type, capacity, propulsion }) => {
+}> = ({ disabled, type, addresses, capacity, propulsion }) => {
   const usesGas = propulsion && hasCombustionEngine(propulsion);
   const usesBattery = propulsion && hasElectricEngine(propulsion);
 
@@ -77,8 +78,14 @@ const PointParameters: FC<{
         <Grid item xs={3} />
         <Grid item xs={2} />
         <Grid item xs={7}>
-          <TextInputField
+          <AutocompleteTextInputField
             name={isStart ? "startAddress" : "endAddress"}
+            options={
+              addresses?.map(({ name, address }) => ({
+                label: name,
+                value: address,
+              })) ?? []
+            }
             label="Address"
             disabled={disabled}
           />

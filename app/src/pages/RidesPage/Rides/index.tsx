@@ -20,7 +20,7 @@ import {
 } from "src/helpers/formatters";
 import { DoubleTableCell } from "../../../components/DoubleTableCell";
 import RideDialog from "../../../components/RideDialog";
-import { useLazyApi } from "../../../api";
+import { useApi, useLazyApi } from "../../../api";
 import { useVehicleId } from "../../../hooks/vehicle";
 import {
   RideDialogMode,
@@ -29,7 +29,6 @@ import {
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import { RideActions } from "./RideActions";
 import { hasCombustionEngine, hasElectricEngine } from "@shared/helpers";
-import useOnMount from "../../../hooks/useOnMount";
 
 const FromTo: FC<{
   from: string | null | undefined;
@@ -47,10 +46,9 @@ const pageSize = 10;
 const Rides: FC = () => {
   const vehicleId = useVehicleId();
 
-  const { data: vehicle, invoke } = useLazyApi((_) => _.vehicle, {
-    defaultRunning: true,
+  const { data: vehicle } = useApi((_) => _.vehicle, {
+    request: vehicleId,
   });
-  useOnMount(() => void invoke(vehicleId));
   const gasCapacity = vehicle?.capacity.gas;
   const batteryCapacity = vehicle?.capacity.battery;
 
