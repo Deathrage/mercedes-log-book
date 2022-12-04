@@ -2,9 +2,9 @@ import { useCallback, useMemo } from "react";
 import { useLazyApi } from "../../api";
 import { mapToReturnValues, mapToValues } from "./helpers";
 import { RideDialogMode, RideDialogModeType } from "./types";
-import { mapToCreatePayload, mapToUpdatePayload } from "./helpers";
 import { useVehicleId } from "../../hooks/vehicle";
 import { RideFormValues } from "../RideForm/types";
+import { mapToCreatePayload, mapToUpdatePayload } from "../RideForm/helpers";
 
 export const useInitialValues = ({ type }: RideDialogMode) => {
   const { data, running, invoke, reset } = useLazyApi((_) => _.ride);

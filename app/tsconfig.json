@@ -12,6 +12,6 @@
       "@shared/helpers": ["../api/shared/helpers"]
     }
   },
-  "include": ["src", "../api"],
+  "include": ["src", "../api/shared"],
   "extends": "../tsconfig.json"
 }

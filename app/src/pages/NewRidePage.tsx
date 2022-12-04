@@ -1,14 +1,14 @@
 import { Button, Fab, Grid, Paper, Stack, Typography } from "@mui/material";
 import React, { FC, useCallback, useRef, useState } from "react";
-import VehicleStatus from "../../components/VehicleStatus";
-import RideForm from "../../components/RideForm";
+import VehicleStatus from "../components/VehicleStatus";
+import RideForm from "../components/RideForm";
 import CloseIcon from "@mui/icons-material/Close";
-import AddFab from "../../components/AddFab";
-import { useLazyApi } from "src/api";
-import { mapToCreatePayload } from "src/components/RideDialog/helpers";
-import { useVehicleId } from "src/hooks/vehicle";
+import AddFab from "../components/AddFab";
+import { useLazyApi } from "../api";
+import { useVehicleId } from "../hooks/vehicle";
 import { useNavigate } from "react-router-dom";
-import Routes from "../../consts/Routes";
+import Routes from "../consts/Routes";
+import { mapToCreatePayload } from "../components/RideForm/helpers";
 
 const NewRidePage: FC = () => {
   const vehicleId = useVehicleId();
