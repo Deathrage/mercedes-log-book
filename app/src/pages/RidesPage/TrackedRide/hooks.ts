@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useVehicleId } from "../../../hooks/vehicle";
 import useGeolocation from "../../../hooks/useGeolocation";
 import { useErrorsContext } from "../../../components/errors/hooks";
 import { useLazyApi } from "../../../api";
