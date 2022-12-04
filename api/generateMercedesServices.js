@@ -4,10 +4,10 @@ const OpenApi = require("openapi-typescript-codegen");
 const { merge, isErrorResult } = require("openapi-merge");
 const { load } = require("js-yaml");
 
-const spec = path.resolve(__dirname, "spec");
+const spec = path.resolve(__dirname, "src/services/mercedes/spec");
 const mercedesServices = path.resolve(
   __dirname,
-  "services-mercedes/__generated__"
+  "src/services/mercedes/__generated__"
 );
 
 const work = async () => {

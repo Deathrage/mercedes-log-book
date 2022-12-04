@@ -1,14 +1,14 @@
 import React, { FC, PropsWithChildren, useMemo } from "react";
-import { useApi } from "../../api";
+import { useLazyApi } from "../../api";
 import useOnMount from "../../hooks/useOnMount";
 import context, { CurrentUserContext } from "./context";
 
 const Provider = context.Provider;
 
 const CurrentUserProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
-  const { data, invoke } = useApi((_) => _.getCurrentUser);
+  const { data, invoke } = useLazyApi((_) => _.currentUser);
   useOnMount(() => {
-    invoke(null);
+    invoke(undefined);
   });
 
   const ctx = useMemo<CurrentUserContext | null>(

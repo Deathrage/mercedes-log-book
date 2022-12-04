@@ -11,13 +11,29 @@ import {
   formatBatteryLevel,
   formatGasLevel,
 } from "src/helpers/formatters";
-import { useVehicle } from "src/hooks/vehicle";
+import { useVehicleId } from "src/hooks/vehicle";
+import { useLazyApi } from "src/api";
+import useOnMount from "src/hooks/useOnMount";
 
 const TrackedRide: FC<{ onFinished?: () => void }> = ({ onFinished }) => {
+  const vehicleId = useVehicleId();
+
   const {
-    capacity: { battery, gas },
-  } = useVehicle();
-  const { loading, current, begin, finish, cancel } = useRideControl();
+    running: vehicleLoading,
+    data: vehicle,
+    invoke,
+  } = useLazyApi((_) => _.vehicle, { defaultRunning: true });
+  useOnMount(() => void invoke(vehicleId));
+
+  const {
+    loading: rideControlLoading,
+    current,
+    begin,
+    finish,
+    cancel,
+  } = useRideControl(vehicleId);
+
+  const loading = vehicleLoading || rideControlLoading;
 
   return (
     <Grid container spacing={3} alignItems="stretch">
@@ -74,13 +90,18 @@ const TrackedRide: FC<{ onFinished?: () => void }> = ({ onFinished }) => {
           </Grid>
           <Grid item xs={4}>
             <InfoField label="Gas level" loading={loading}>
-              {current ? formatGasLevel(current.gas.start, gas) : null}
+              {current && vehicle
+                ? formatGasLevel(current.gas.start, vehicle.capacity.gas)
+                : null}
             </InfoField>
           </Grid>
           <Grid item xs={4}>
             <InfoField label="Battery level" loading={loading}>
-              {current
-                ? formatBatteryLevel(current.battery.start, battery)
+              {current && vehicle
+                ? formatBatteryLevel(
+                    current.battery.start,
+                    vehicle.capacity.battery
+                  )
                 : null}
             </InfoField>
           </Grid>

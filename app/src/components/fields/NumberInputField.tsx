@@ -1,7 +1,6 @@
-import { TextField } from "@mui/material";
+import { Skeleton, SxProps, TextField } from "@mui/material";
 import React, { FC } from "react";
 import { Field } from "react-final-form";
-import { isNumber } from "../../../../api/helpers-shared/predicate";
 
 const NumberInputField: FC<{
   name: string;
@@ -13,6 +12,8 @@ const NumberInputField: FC<{
   helperText?: string;
   disabled?: boolean;
   decimals?: number;
+  loading?: boolean;
+  sx?: SxProps;
 }> = ({
   name,
   label,
@@ -23,6 +24,8 @@ const NumberInputField: FC<{
   helperText,
   step,
   decimals = 2,
+  loading,
+  sx,
 }) => (
   <Field<number> name={name}>
     {({ input: { value, onChange, ...input }, meta: { error } }) => (
@@ -31,12 +34,24 @@ const NumberInputField: FC<{
         required={required}
         variant="filled"
         type="number"
-        InputProps={{ endAdornment: suffix }}
+        sx={sx}
+        InputProps={{
+          endAdornment: suffix,
+          slots: {
+            input: loading
+              ? () => (
+                  <Skeleton sx={{ margin: "25px 12px 8px", width: "100%" }} />
+                )
+              : undefined,
+          },
+        }}
         inputProps={{ step }}
         fullWidth
         disabled={disabled}
         value={
-          isNumber(value) ? Number((value * (rate ?? 1)).toFixed(decimals)) : ""
+          typeof value === "number"
+            ? Number((value * (rate ?? 1)).toFixed(decimals))
+            : ""
         }
         onChange={(e) =>
           onChange(

@@ -14,21 +14,26 @@ import {
 import React, { FC, useRef, useState } from "react";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { WithConfirm } from "../../../components/WithConfirm";
+import WithConfirm from "../../../components/WithConfirm";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import RideData from "../../../../../api/model-shared/RideData";
 import { formatCoordinates } from "src/helpers/formatters";
 
 export const RideActions: FC<{
-  ride: RideData;
+  ride: {
+    id: string;
+    address?: { start?: string; end?: string };
+    coordinates?: {
+      start?: { lat: number; lon: number };
+      end?: { lat: number; lon: number };
+    };
+  };
   onReturn: () => void;
   onCopy: () => void;
   onEdit: () => void;
   onDelete: () => void;
   loading: boolean;
-  onlyEditOrDelete?: boolean;
 }> = ({
   ride: { id, address, coordinates },
   onReturn,
@@ -36,7 +41,6 @@ export const RideActions: FC<{
   onEdit,
   onDelete,
   loading,
-  onlyEditOrDelete,
 }) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
@@ -48,49 +52,28 @@ export const RideActions: FC<{
       <br />
       Id:{id}
       <br />
-      From: {address.start ?? formatCoordinates(coordinates.start) ?? "-"}
+      From: {address?.start ?? formatCoordinates(coordinates?.start) ?? "-"}
       <br />
-      To: {address.end ?? formatCoordinates(coordinates.end) ?? "-"}
+      To: {address?.end ?? formatCoordinates(coordinates?.end) ?? "-"}
     </>
   );
 
   return (
     <>
       <ButtonGroup variant="text" color="inherit" ref={anchorRef}>
-        {onlyEditOrDelete ? (
-          <>
-            <Tooltip title="Edit" placement="top">
-              <Button onClick={onEdit} disabled={loading}>
-                <EditIcon />
-              </Button>
-            </Tooltip>
-            <WithConfirm text={deleteConfirmText} onConfirmed={onDelete}>
-              {(ask) => (
-                <Tooltip title="Delete" placement="top">
-                  <Button onClick={ask} disabled={loading}>
-                    <DeleteIcon color="error" />
-                  </Button>
-                </Tooltip>
-              )}
-            </WithConfirm>
-          </>
-        ) : (
-          <>
-            <Tooltip title="Return ride" placement="top">
-              <Button onClick={onReturn} disabled={loading}>
-                <KeyboardReturnIcon />
-              </Button>
-            </Tooltip>
-            <Button
-              size="small"
-              aria-label="select merge strategy"
-              aria-haspopup="menu"
-              onClick={() => setOpen(true)}
-            >
-              <ArrowDropDownIcon />
-            </Button>
-          </>
-        )}
+        <Tooltip title="Return ride" placement="top">
+          <Button onClick={onReturn} disabled={loading}>
+            <KeyboardReturnIcon />
+          </Button>
+        </Tooltip>
+        <Button
+          size="small"
+          aria-label="select merge strategy"
+          aria-haspopup="menu"
+          onClick={() => setOpen(true)}
+        >
+          <ArrowDropDownIcon />
+        </Button>
       </ButtonGroup>
       <Popper
         sx={{

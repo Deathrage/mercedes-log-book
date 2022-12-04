@@ -1,7 +1,6 @@
 import { Grid } from "@mui/material";
 import React, { FC } from "react";
-import useOnMount from "../../../hooks/useOnMount";
-import { useVehicle } from "src/hooks/vehicle";
+import { useVehicleId } from "src/hooks/vehicle";
 import { useApi } from "../../../api";
 import {
   formatBatteryLevel,
@@ -11,23 +10,27 @@ import {
 import InfoFieldWithDate from "../../../components/InfoFieldWithDate";
 
 const VehicleStatus: FC = () => {
-  const {
-    id: vehicleId,
-    capacity: { gas, battery },
-  } = useVehicle();
+  const vehicleId = useVehicleId();
 
-  const { data, running, invoke } = useApi((_) => _.getVehicleStatus);
-
-  useOnMount(() => {
-    invoke({ vehicleId });
+  const { data: vehicle, running: vehicleLoading } = useApi((_) => _.vehicle, {
+    request: vehicleId,
   });
+
+  const { data: status, running: statusLoading } = useApi(
+    (_) => _.vehicleStatus,
+    {
+      request: vehicleId,
+    }
+  );
+
+  const running = statusLoading || vehicleLoading;
 
   return (
     <Grid container spacing={3}>
       <Grid item xs={4}>
         <InfoFieldWithDate
           label="Odometer"
-          data={data?.odometer}
+          data={status?.odometer}
           loading={running}
           format={formatKilometers}
         />
@@ -35,24 +38,24 @@ const VehicleStatus: FC = () => {
       <Grid item xs={4}>
         <InfoFieldWithDate
           label="Gas level"
-          data={data?.gas?.level}
+          data={status?.gas?.level}
           loading={running}
-          format={(val) => formatGasLevel(val, gas)}
+          format={(val) => formatGasLevel(val, vehicle!.capacity.gas)}
         />
       </Grid>
       <Grid item xs={4}>
         <InfoFieldWithDate
           label="Battery level"
-          data={data?.battery?.level}
+          data={status?.battery?.level}
           loading={running}
-          format={(val) => formatBatteryLevel(val, battery)}
+          format={(val) => formatBatteryLevel(val, vehicle!.capacity.battery)}
         />
       </Grid>
       <Grid item xs={4} />
       <Grid item xs={4}>
         <InfoFieldWithDate
           label="Gas range"
-          data={data?.gas?.range}
+          data={status?.gas?.range}
           loading={running}
           format={formatKilometers}
         />
@@ -60,7 +63,7 @@ const VehicleStatus: FC = () => {
       <Grid item xs={4}>
         <InfoFieldWithDate
           label="Battery range"
-          data={data?.battery?.range}
+          data={status?.battery?.range}
           loading={running}
           format={formatKilometers}
         />

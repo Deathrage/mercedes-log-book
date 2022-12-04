@@ -22,7 +22,6 @@ import {
 import Routes from "../consts/Routes";
 import { useLocation, useNavigate } from "react-router-dom";
 import VehicleSelect from "./VehicleSelect";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Copyright from "./Copyright";
@@ -102,16 +101,6 @@ const Menu: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
             <RouteIcon />
           </ListItemIcon>
           <ListItemText primary="Rides" />
-        </ListItemButton>
-        <ListItemButton
-          selected={pathname === Routes.ADDRESSES}
-          onClick={() => navigate(Routes.ADDRESSES)}
-          disabled
-        >
-          <ListItemIcon>
-            <LocationOnIcon />
-          </ListItemIcon>
-          <ListItemText primary="Address book" />
         </ListItemButton>
         <ListItemButton
           selected={pathname === Routes.SETTINGS}

@@ -1,6 +1,6 @@
 import { Grid, Typography } from "@mui/material";
 import React, { FC } from "react";
-import { useApi } from "src/api";
+import { useLazyApi } from "src/api";
 import { formatKilometers, formatPercentage } from "src/helpers/formatters";
 import useOnMount from "src/hooks/useOnMount";
 import { useVehicleId } from "src/hooks/vehicle";
@@ -14,15 +14,15 @@ const RideSummaryPanel: FC = () => {
     data: sum,
     running: sumLoading,
     invoke: invokeSum,
-  } = useApi((_) => _.getRidesSum);
+  } = useLazyApi((_) => _.ridesSum);
   const {
     data: odometer,
     running: odometerLoading,
     invoke: invokeOdometer,
-  } = useApi((_) => _.getVehicleStatusOdometer);
+  } = useLazyApi((_) => _.vehicleOdometer);
   useOnMount(() => {
-    invokeSum({ vehicleId });
-    invokeOdometer({ vehicleId });
+    invokeSum(vehicleId);
+    invokeOdometer(vehicleId);
   });
 
   return (

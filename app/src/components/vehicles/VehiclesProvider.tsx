@@ -6,95 +6,65 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import VehicleData from "../../../../api/model-shared/VehicleData";
-import { useApi } from "../../api";
+import { useLazyApi } from "../../api";
 import useOnMount from "../../hooks/useOnMount";
-import context, { VehiclesContext } from "./context";
+import context from "./context";
+import { Vehicle, VehiclesContext } from "./types";
 
 const Provider = context.Provider;
 
 const VehiclesProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
-  const [loading, setLoading] = useState(true);
+  const {
+    data: apiVehicles,
+    running: loading,
+    invoke: invokeVehicles,
+  } = useLazyApi((_) => _.currentUserVehicles, { defaultRunning: true });
+  useOnMount(() => void invokeVehicles(undefined));
 
-  const { data: vehicles, invoke: invokeVehicles } = useApi(
-    (_) => _.getVehicles
-  );
-  useOnMount(() => {
-    invokeVehicles(null);
-  });
-
-  const [activeVehicle, setActiveVehicle] = useState<VehicleData | null>(null);
-
-  const activateVehicle = useCallback(
-    (id: string) => {
-      const vehicle = vehicles?.find((v) => v.id === id);
-      if (!vehicle) throw new Error(`Unknown vehicle ${id}`);
-
-      setActiveVehicle(vehicle);
-    },
-    [vehicles]
-  );
+  const [activeVehicleId, setActiveVehicleId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!vehicles) return;
+    if (!Array.isArray(apiVehicles)) return;
+    // If there is already active vehicle
+    if (activeVehicleId) {
+      // Check if it is still available otherwise unset it
+      if (!apiVehicles.some((v) => v.id === activeVehicleId))
+        setActiveVehicleId(null);
+      // Return as otherwise first vehicle will be set
+      return;
+    }
+    // If there is no active vehicle and we have any vehicles set first
+    if (apiVehicles.length === 0) return;
+    setActiveVehicleId(apiVehicles[0].id);
+  }, [activeVehicleId, apiVehicles]);
 
-    setLoading(false);
+  const vehicles = useMemo<Vehicle[]>(() => {
+    if (!Array.isArray(apiVehicles)) return [];
+    return apiVehicles.map((v) => ({
+      id: v.id,
+      license: v.license,
+      model: v.model,
+    }));
+  }, [apiVehicles]);
 
-    const toActivate = vehicles[0];
-    if (!toActivate) return;
+  const activeVehicle = useMemo<Vehicle | null>(() => {
+    const vehicle = vehicles.find((v) => v.id === activeVehicleId);
+    return vehicle ?? null;
+  }, [activeVehicleId, vehicles]);
 
-    setActiveVehicle(toActivate);
-  }, [activeVehicle, vehicles]);
-
-  const { invoke: invokePostVehicle } = useApi((_) => _.postVehicle);
-
-  const createVehicle = useCallback(
-    async (vehicle: VehicleData) => {
-      if (!vehicles) return;
-
-      const newVehicle = await invokePostVehicle(vehicle);
-
-      vehicles.push(newVehicle);
-      setActiveVehicle(newVehicle);
-    },
-    [invokePostVehicle, vehicles]
-  );
-
-  const updateVehicle = useCallback(
-    async (vehicleData: VehicleData) => {
-      if (!vehicles) return;
-      const vehicleIndex = vehicles.findIndex((v) => v.id === vehicleData.id);
-      if (vehicleIndex < 0)
-        throw new Error(`Unknown vehicle ${vehicleData.id}`);
-
-      const savedVehicle = await invokePostVehicle(vehicleData);
-
-      vehicles[vehicleIndex] = savedVehicle;
-      setActiveVehicle(savedVehicle);
-    },
-    [invokePostVehicle, vehicles]
-  );
+  const reload = useCallback(async () => {
+    await invokeVehicles(undefined);
+  }, [invokeVehicles]);
 
   const ctx = useMemo<VehiclesContext>(
-    () =>
-      !loading
-        ? {
-            loading: false,
-            vehicles: [],
-            activeVehicle: activeVehicle,
-            setActiveVehicle: activateVehicle,
-            createVehicle,
-            updateVehicle,
-          }
-        : {
-            loading: true,
-            vehicles: [],
-            activeVehicle: null,
-            setActiveVehicle: () => void 0,
-            createVehicle: () => Promise.resolve(),
-            updateVehicle: () => Promise.resolve(),
-          },
-    [loading, activeVehicle, activateVehicle, createVehicle, updateVehicle]
+    () => ({
+      loading,
+      vehicles,
+      activeVehicle: activeVehicle,
+      setActiveVehicle: setActiveVehicleId,
+      reload,
+    }),
+    [loading, vehicles, activeVehicle, reload]
   );
 
   return <Provider value={ctx}>{children}</Provider>;

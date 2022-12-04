@@ -1,5 +1,4 @@
 import moment from "moment";
-import { isNumber } from "../../../api/helpers-shared/predicate";
 import formatcoords from "formatcoords";
 
 export const formatDate = (date: Date | string | number | undefined | null) =>
@@ -13,27 +12,29 @@ const percentageInt = new Intl.NumberFormat("en-US", {
   style: "percent",
 });
 export const formatPercentage = (value: number | undefined | null) =>
-  isNumber(value) ? percentageInt.format(value) : undefined;
+  typeof value === "number" ? percentageInt.format(value) : undefined;
 
 const kmInt = new Intl.NumberFormat("en-US", {
   style: "unit",
   unit: "kilometer",
 });
 export const formatKilometers = (value: number | undefined | null) =>
-  isNumber(value) ? kmInt.format(value) : undefined;
+  typeof value === "number" ? kmInt.format(value) : undefined;
 
 const literInt = new Intl.NumberFormat("en-US", {
   style: "unit",
   unit: "liter",
 });
 export const formatLiters = (value: number | undefined | null) =>
-  isNumber(value) ? literInt.format(value) : undefined;
+  typeof value === "number" ? literInt.format(value) : undefined;
 
 const kilowattHoursIntl = new Intl.NumberFormat("en-US", {
   style: "decimal",
 });
 export const formatKilowattHours = (value: number | undefined | null) =>
-  isNumber(value) ? `${kilowattHoursIntl.format(value)} kWh` : undefined;
+  typeof value === "number"
+    ? `${kilowattHoursIntl.format(value)} kWh`
+    : undefined;
 
 export const formatCoordinates = (
   value: { lat: number; lon: number } | undefined | null
@@ -44,7 +45,7 @@ export const formatBatteryLevel = (
   capacity: number | null | undefined
 ) =>
   `${formatPercentage(level) ?? "-"} approx. ${
-    isNumber(capacity) && isNumber(level)
+    typeof capacity === "number" && typeof level === "number"
       ? formatKilowattHours(capacity * level)
       : "-"
   }`;
@@ -54,5 +55,7 @@ export const formatGasLevel = (
   capacity: number | null | undefined
 ) =>
   `${formatPercentage(level) ?? "-"} approx. ${
-    isNumber(capacity) && isNumber(level) ? formatLiters(capacity * level) : "-"
+    typeof capacity === "number" && typeof level === "number"
+      ? formatLiters(capacity * level)
+      : "-"
   }`;

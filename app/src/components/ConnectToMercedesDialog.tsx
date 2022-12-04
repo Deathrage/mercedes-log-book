@@ -6,8 +6,9 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import { AuthorizeMb } from "@shared/contracts";
 import React, { FC } from "react";
-import api from "../consts/api";
+import { toApiEndpoint } from "src/helpers/api";
 import { useCurrentUserContext } from "./currentUser/hooks";
 
 const ConnectToMercedesDialog: FC = () => {
@@ -24,7 +25,9 @@ const ConnectToMercedesDialog: FC = () => {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button href={api.mercedesAuth}>Authorize</Button>
+        <Button href={toApiEndpoint(AuthorizeMb.GET_INIT.path)}>
+          Authorize
+        </Button>
       </DialogActions>
     </Dialog>
   );

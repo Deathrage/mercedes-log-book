@@ -1,10 +1,17 @@
-import { FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  Skeleton,
+} from "@mui/material";
+import { PropulsionType } from "@shared/model";
 import { FormState, FormApi, ValidationErrors } from "final-form";
 import React, { ReactNode, useCallback } from "react";
 import { FC } from "react";
 import { Field, Form } from "react-final-form";
 import { numberIsGreater, numberIsMultiple } from "src/helpers/form";
-import PropulsionType from "../../../api/model-shared/PropulsionType";
 import NumberInputField from "./fields/NumberInputField";
 import TextInputField from "./fields/TextInputField";
 
@@ -30,10 +37,11 @@ const validate = (values: VehicleFormValues): ValidationErrors => {
 };
 
 const VehicleForm: FC<{
+  loading?: boolean;
   initialValues?: VehicleFormValues;
   onSubmit: (values: VehicleFormValues) => Promise<void>;
   wrap: (content: ReactNode, state: FormState<VehicleFormValues>) => ReactNode;
-}> = ({ initialValues, onSubmit, wrap }) => {
+}> = ({ initialValues, loading, onSubmit, wrap }) => {
   const submit = useCallback(
     async (values: VehicleFormValues, formApi: FormApi<VehicleFormValues>) => {
       await onSubmit(values);
@@ -69,13 +77,22 @@ const VehicleForm: FC<{
                     required
                     label="VIN code"
                     disabled={!!initialValues}
+                    loading={loading}
                   />
                 </Grid>
                 <Grid item xs={4}>
-                  <TextInputField name="license" label="License plate" />
+                  <TextInputField
+                    name="license"
+                    label="License plate"
+                    loading={loading}
+                  />
                 </Grid>
                 <Grid item xs={4}>
-                  <TextInputField name="model" label="Model" />
+                  <TextInputField
+                    name="model"
+                    label="Model"
+                    loading={loading}
+                  />
                 </Grid>
                 <Grid item xs={4}>
                   <Field<PropulsionType> name="propulsion">
@@ -92,6 +109,18 @@ const VehicleForm: FC<{
                           labelId="propulsion-label"
                           label="Propulsion"
                           required
+                          slots={{
+                            input: loading
+                              ? () => (
+                                  <Skeleton
+                                    sx={{
+                                      margin: "25px 12px 8px",
+                                      width: "100%",
+                                    }}
+                                  />
+                                )
+                              : undefined,
+                          }}
                           {...input}
                         >
                           <MenuItem value={PropulsionType.COMBUSTION}>
@@ -116,6 +145,7 @@ const VehicleForm: FC<{
                     disabled={!requireGas}
                     step={1}
                     suffix="L"
+                    loading={loading}
                   />
                 </Grid>
                 <Grid item xs={4}>
@@ -126,6 +156,7 @@ const VehicleForm: FC<{
                     disabled={!requireBattery}
                     step={0.1}
                     suffix="kWh"
+                    loading={loading}
                   />
                 </Grid>
               </Grid>,

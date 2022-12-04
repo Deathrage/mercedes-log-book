@@ -1,7 +1,11 @@
-import RideData from "../../../../api/model-shared/RideData";
+import endpoints from "../../api/endpoints";
 import { RideFormValues } from "../RideForm/types";
 
-export const mapToValues = (data: RideData): RideFormValues => ({
+type CreatePayload = Parameters<typeof endpoints.createRide>[0];
+type UpdatePayload = Parameters<typeof endpoints.updateRide>[0];
+type GetPayload = Awaited<ReturnType<typeof endpoints.ride>>;
+
+export const mapToValues = (data: GetPayload): RideFormValues => ({
   departed: data.departed,
   arrived: data.arrived,
   startAddress: data.address.start,
@@ -20,7 +24,7 @@ export const mapToValues = (data: RideData): RideFormValues => ({
   note: data.note,
 });
 
-export const mapToReturnValues = (data: RideData): RideFormValues => ({
+export const mapToReturnValues = (data: GetPayload): RideFormValues => ({
   departed: data.arrived,
   startAddress: data.address.end,
   endAddress: data.address.start,
@@ -31,12 +35,10 @@ export const mapToReturnValues = (data: RideData): RideFormValues => ({
   startBattery: data.battery.end,
 });
 
-export const mapToRideData = (
-  id: string | undefined,
+export const mapToCreatePayload = (
   vehicleId: string,
   state: RideFormValues
-): RideData => ({
-  id,
+): CreatePayload => ({
   vehicleId,
   departed: state.departed!,
   arrived: state.arrived,
@@ -68,4 +70,13 @@ export const mapToRideData = (
   },
   reason: state.reason,
   note: state.note,
+});
+
+export const mapToUpdatePayload = (
+  id: string,
+  vehicleId: string,
+  state: RideFormValues
+): UpdatePayload => ({
+  id,
+  ...mapToCreatePayload(vehicleId, state),
 });

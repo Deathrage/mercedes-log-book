@@ -3,7 +3,6 @@ import { RideDialogMode, RideDialogModeType } from "./types";
 import { useInitialValues, useOnSubmit } from "./hooks";
 import { useVehicleId } from "../../hooks/vehicle";
 import RideForm from "../RideForm";
-import RideData from "../../../../api/model-shared/RideData";
 import Header from "./Header";
 import { AppBar, Button, Dialog, IconButton, Toolbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -21,7 +20,7 @@ const getTitle = (mode: RideDialogMode) => {
 
 const RideDialog: FC<{
   mode: RideDialogMode;
-  onSaved: (ride: RideData) => void;
+  onSaved: () => void;
   onClose: () => void;
 }> = ({ mode, onClose, onSaved }) => {
   const vehicleId = useVehicleId();
@@ -29,13 +28,10 @@ const RideDialog: FC<{
   const { initialValues, loading, load, reset } = useInitialValues(mode);
   const onSubmit = useOnSubmit(
     mode,
-    useCallback(
-      (ride: RideData) => {
-        onSaved(ride);
-        reset();
-      },
-      [onSaved, reset]
-    )
+    useCallback(() => {
+      onSaved();
+      reset();
+    }, [onSaved, reset])
   );
 
   const open = mode.type !== RideDialogModeType.CLOSED;

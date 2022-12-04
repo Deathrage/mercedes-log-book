@@ -1,15 +1,13 @@
 import { useCallback, useMemo } from "react";
-import { useApi } from "../../api";
+import { useLazyApi } from "../../api";
 import { mapToReturnValues, mapToValues } from "./helpers";
 import { RideDialogMode, RideDialogModeType } from "./types";
-import { mapToRideData } from "./helpers";
-import { turnEmptyValuesToUndefined } from "../../helpers/form";
+import { mapToCreatePayload, mapToUpdatePayload } from "./helpers";
 import { useVehicleId } from "../../hooks/vehicle";
 import { RideFormValues } from "../RideForm/types";
-import RideData from "../../../../api/model-shared/RideData";
 
 export const useInitialValues = ({ type }: RideDialogMode) => {
-  const { data, running, invoke, reset } = useApi((_) => _.getRide);
+  const { data, running, invoke, reset } = useLazyApi((_) => _.ride);
 
   const initialValues = useMemo<RideFormValues | undefined>(() => {
     if (type === RideDialogModeType.CLOSED) return undefined;
@@ -28,28 +26,22 @@ export const useInitialValues = ({ type }: RideDialogMode) => {
   };
 };
 
-export const useOnSubmit = (
-  mode: RideDialogMode,
-  onSaved: (ride: RideData) => void
-) => {
+export const useOnSubmit = (mode: RideDialogMode, onSaved: () => void) => {
   const vehicleId = useVehicleId();
 
   const id = mode.type === RideDialogModeType.EDIT ? mode.id : undefined;
 
-  const { invoke: invokePost } = useApi((_) => _.postRide);
+  const { invoke: create } = useLazyApi((_) => _.createRide);
+  const { invoke: update } = useLazyApi((_) => _.updateRide);
+
   const onSubmit = useCallback(
     async (state: RideFormValues) => {
-      const request = mapToRideData(
-        id,
-        vehicleId,
-        turnEmptyValuesToUndefined(state)
-      );
+      if (id) await update(mapToUpdatePayload(id, vehicleId, state));
+      else await create(mapToCreatePayload(vehicleId, state));
 
-      const rideData = await invokePost(request);
-
-      onSaved(rideData);
+      onSaved();
     },
-    [id, vehicleId, invokePost, onSaved]
+    [id, vehicleId, update, create, onSaved]
   );
 
   return onSubmit;

@@ -1,4 +1,4 @@
-import { TextField } from "@mui/material";
+import { SxProps, TextField } from "@mui/material";
 import moment from "moment";
 import React, { FC } from "react";
 import { Field } from "react-final-form";
@@ -7,7 +7,8 @@ const DateInputField: FC<{
   name: string;
   label: string;
   required?: boolean;
-}> = ({ name, label, required }) => (
+  sx?: SxProps;
+}> = ({ name, label, required, sx }) => (
   <Field<Date> name={name}>
     {({ input: { value, onChange, ...input }, meta: { error } }) => (
       <TextField
@@ -25,6 +26,7 @@ const DateInputField: FC<{
         }
         error={error}
         helperText={error}
+        sx={sx}
         {...input}
       />
     )}

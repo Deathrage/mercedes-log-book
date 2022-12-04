@@ -24,7 +24,7 @@ const InfoFieldWithDate = <Value extends unknown>({
     label={label}
     underline={formatDateTime(data?.date)}
   >
-    {data && format(data.value)}
+    {!loading && data ? format(data.value) : null}
   </InfoField>
 );
 

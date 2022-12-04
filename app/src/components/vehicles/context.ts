@@ -1,14 +1,5 @@
 import { createContext } from "react";
-import VehicleData from "../../../../api/model-shared/VehicleData";
-
-export interface VehiclesContext {
-  get loading(): boolean;
-  get vehicles(): VehicleData[];
-  get activeVehicle(): VehicleData | null;
-  setActiveVehicle(id: string): void;
-  createVehicle(vehicle: VehicleData): Promise<void>;
-  updateVehicle(vehicle: VehicleData): Promise<void>;
-}
+import { VehiclesContext } from "./types";
 
 export default createContext<VehiclesContext>(
   new Proxy<VehiclesContext>({} as VehiclesContext, {

@@ -6,21 +6,23 @@ import { PointParametersType } from "./types";
 import DateInputField from "../fields/DateInputField";
 import TextInputField from "../fields/TextInputField";
 import NumberInputField from "../fields/NumberInputField";
-import {
-  hasCombustionEngine,
-  hasElectricEngine,
-} from "../../../../api/helpers-shared/propulsion";
-import { useVehicle } from "src/hooks/vehicle";
-import { isNumber } from "../../../../api/helpers-shared/predicate";
+import { useVehicleId } from "src/hooks/vehicle";
+import { hasCombustionEngine, hasElectricEngine } from "@shared/helpers";
+import { useLazyApi } from "../../api";
+import useOnMount from "src/hooks/useOnMount";
 
 const PointParameters: FC<{
   type: PointParametersType;
   infoField?: ReactNode;
 }> = ({ type, infoField }) => {
-  const activeVehicle = useVehicle();
+  const vehicleId = useVehicleId();
+  const { data: vehicle, invoke } = useLazyApi((_) => _.vehicle, {
+    defaultRunning: true,
+  });
+  useOnMount(() => void invoke(vehicleId));
 
-  const usesGas = hasCombustionEngine(activeVehicle.propulsion);
-  const usesBattery = hasElectricEngine(activeVehicle.propulsion);
+  const usesGas = vehicle && hasCombustionEngine(vehicle.propulsion);
+  const usesBattery = vehicle && hasElectricEngine(vehicle.propulsion);
 
   const isStart = type === PointParametersType.START;
 
@@ -121,10 +123,9 @@ const PointParameters: FC<{
                 step={1}
                 disabled={!usesGas}
                 helperText={
-                  isNumber(gas) && isNumber(activeVehicle?.capacity.gas)
-                    ? `Approx. ${formatLiters(
-                        gas * activeVehicle!.capacity.gas
-                      )}.`
+                  typeof gas === "number" &&
+                  typeof vehicle?.capacity.gas === "number"
+                    ? `Approx. ${formatLiters(gas * vehicle.capacity.gas)}.`
                     : undefined
                 }
               />
@@ -138,9 +139,10 @@ const PointParameters: FC<{
                 step={1}
                 disabled={!usesBattery}
                 helperText={
-                  isNumber(battery) && isNumber(activeVehicle?.capacity.battery)
+                  typeof battery === "number" &&
+                  typeof vehicle?.capacity.battery === "number"
                     ? `Approx. ${formatKilowattHours(
-                        battery * activeVehicle!.capacity.battery
+                        battery * vehicle.capacity.battery
                       )}.`
                     : undefined
                 }

@@ -1,81 +1,103 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useVehicleId } from "../../../hooks/vehicle";
-import RideData from "../../../../../api/model-shared/RideData";
 import useGeolocation from "../../../hooks/useGeolocation";
-import Coordinates from "../../../../../api/model-shared/Coordinates";
 import { useErrorsContext } from "../../../components/errors/hooks";
-import { useApi } from "../../../api";
-import useOnMount from "../../../hooks/useOnMount";
+import { useLazyApi } from "../../../api";
+import useOnMount from "src/hooks/useOnMount";
 
-export const useRideControl = () => {
-  const vehicleId = useVehicleId();
-  const { current: currentLocation } = useGeolocation();
-  const { show: showError } = useErrorsContext();
-
-  // Ride that is currently happening
-  const [currentRide, setCurrentRide] = useState<RideData>();
+const useInitialRide = (vehicleId: string) => {
+  // Fetches initial ride during mount of the page
+  // If ride is already ongoing it has to be finished first before beginning new one
+  const {
+    running: rideIdLoading,
+    data: rideId,
+    invoke: loadInitialRide,
+  } = useLazyApi((_) => _.ongoingRide, { defaultRunning: true });
+  useOnMount(() => void loadInitialRide(vehicleId));
 
   // Fetches initial ride during mount of the page
   // If ride is already ongoing it has to be finished first before beginning new one
-  const { running: loadingInitialRide, invoke: getInitialRide } = useApi(
-    (_) => _.getVehicleRide,
-    { defaultRunning: true }
-  );
-  useOnMount(() => {
-    getInitialRide({ vehicleId }).then((maybeRide) => {
-      if (maybeRide) setCurrentRide(maybeRide);
-    });
+  const {
+    running: loadingRide,
+    invoke: loadRide,
+    data: ride,
+  } = useLazyApi((_) => _.ride);
+
+  useEffect(() => {
+    if (rideId) loadRide({ id: rideId, vehicleId });
+  }, [loadRide, rideId, vehicleId]);
+
+  return { loading: rideIdLoading || loadingRide || (rideId && !ride), ride };
+};
+
+const useRideApi = (vehicleId: string) => {
+  const { show: showError } = useErrorsContext();
+  const { current: currentLocation } = useGeolocation();
+
+  const { running: loadingRide, invoke: loadRide } = useLazyApi((_) => _.ride, {
+    silent: true,
   });
 
-  const postWithCoordinates = useCallback(
-    async (
-      func: (req: { vehicleId: string; body: Coordinates }) => Promise<RideData>
-    ) => {
-      try {
-        const { latitude, longitude } = await currentLocation();
-        const ride = await func({
-          vehicleId,
-          body: { lat: latitude, lon: longitude },
-        });
-        return ride;
-      } catch (err) {
-        showError(err);
-        throw err;
-      }
-    },
-    [currentLocation, showError, vehicleId]
+  const { running: loadingStartStop, invoke: invokeStartStop } = useLazyApi(
+    (_) => _.startStopOngoingRide,
+    { silent: true }
+  );
+  const { running: loadingCancel, invoke: cancel } = useLazyApi(
+    (_) => _.cancelOngoingRide
   );
 
-  const { running: loadingBeginRide, invoke: postBeginRide } = useApi(
-    (_) => _.postVehicleRideBegin,
-    { silent: true }
-  );
-  const { running: loadingFinishRide, invoke: postFinishRide } = useApi(
-    (_) => _.postVehicleRideFinish,
-    { silent: true }
-  );
-  const { running: loadingCancelRide, invoke: postCancelRide } = useApi(
-    (_) => _.postVehicleRideCancel
-  );
+  const startStop = useCallback(async () => {
+    try {
+      const { latitude, longitude } = await currentLocation();
+
+      const rideId = await invokeStartStop({
+        vehicleId,
+        coordinates: { lat: latitude, lon: longitude },
+      });
+      const ride = await loadRide({ id: rideId, vehicleId });
+
+      return ride;
+    } catch (err) {
+      showError(err);
+      throw err;
+    }
+  }, [currentLocation, invokeStartStop, loadRide, showError, vehicleId]);
+
+  return {
+    loading: loadingCancel || loadingStartStop || loadingRide,
+    startStop,
+    cancel,
+  };
+};
+
+export const useRideControl = (vehicleId: string) => {
+  // Fetches initial ride during mount of the page
+  // If ride is already ongoing it has to be finished first before beginning new one
+  const { loading: initialRideLoading, ride: initialRide } =
+    useInitialRide(vehicleId);
+
+  // Ride that is currently happening
+  const [currentRide, setCurrentRide] = useState<typeof initialRide>();
+  useEffect(() => {
+    if (initialRide) setCurrentRide(initialRide);
+  }, [initialRide]);
+
+  const { loading: rideApiLoading, startStop, cancel } = useRideApi(vehicleId);
 
   return {
     begin: useCallback(async () => {
-      const currentRide = await postWithCoordinates(postBeginRide);
+      const currentRide = await startStop();
       setCurrentRide(currentRide);
-    }, [postBeginRide, postWithCoordinates]),
+    }, [startStop]),
     finish: useCallback(async () => {
-      await postWithCoordinates(postFinishRide);
+      await startStop();
       setCurrentRide(undefined);
-    }, [postFinishRide, postWithCoordinates]),
+    }, [startStop]),
     cancel: useCallback(async () => {
-      await postCancelRide({ vehicleId });
+      await cancel(vehicleId);
       setCurrentRide(undefined);
-    }, [postCancelRide, vehicleId]),
+    }, [cancel, vehicleId]),
     current: currentRide,
-    loading:
-      loadingInitialRide ||
-      loadingBeginRide ||
-      loadingFinishRide ||
-      loadingCancelRide,
+    loading: initialRideLoading || rideApiLoading,
   };
 };

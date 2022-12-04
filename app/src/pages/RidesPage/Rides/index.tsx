@@ -1,5 +1,4 @@
 import {
-  Fab,
   Skeleton,
   Stack,
   Table,
@@ -21,20 +20,17 @@ import {
 } from "src/helpers/formatters";
 import { DoubleTableCell } from "../../../components/DoubleTableCell";
 import RideDialog from "../../../components/RideDialog";
-import { useApi } from "../../../api";
-import { useVehicle } from "../../../hooks/vehicle";
-import { isNumber } from "../../../../../api/helpers-shared/predicate";
-import {
-  hasCombustionEngine,
-  hasElectricEngine,
-} from "../../../../../api/helpers-shared/propulsion";
+import { useLazyApi } from "../../../api";
+import { useVehicleId } from "../../../hooks/vehicle";
 import {
   RideDialogMode,
   RideDialogModeType,
 } from "../../../components/RideDialog/types";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import { RideActions } from "./RideActions";
-import AddIcon from "@mui/icons-material/Add";
+import { hasCombustionEngine, hasElectricEngine } from "@shared/helpers";
+import useOnMount from "../../../hooks/useOnMount";
+import AddFab from "../../../components/AddFab";
 
 const FromTo: FC<{
   from: string | null | undefined;
@@ -50,11 +46,14 @@ const FromTo: FC<{
 const pageSize = 10;
 
 const Rides: FC = () => {
-  const {
-    id: vehicleId,
-    propulsion,
-    capacity: { gas: gasCapacity, battery: batteryCapacity },
-  } = useVehicle();
+  const vehicleId = useVehicleId();
+
+  const { data: vehicle, invoke } = useLazyApi((_) => _.vehicle, {
+    defaultRunning: true,
+  });
+  useOnMount(() => void invoke(vehicleId));
+  const gasCapacity = vehicle?.capacity.gas;
+  const batteryCapacity = vehicle?.capacity.battery;
 
   const [mode, setMode] = useState<RideDialogMode>({
     type: RideDialogModeType.CLOSED,
@@ -62,11 +61,7 @@ const Rides: FC = () => {
 
   const [page, setPage] = useState(0);
 
-  const {
-    data,
-    running: loadingGet,
-    invoke: invokeGet,
-  } = useApi((_) => _.getRides);
+  const { data, invoke: invokeGet } = useLazyApi((_) => _.rides);
   const fetch = useCallback(
     () => invokeGet({ vehicleId, page, pageSize }),
     [invokeGet, page, vehicleId]
@@ -75,23 +70,17 @@ const Rides: FC = () => {
     fetch();
   }, [fetch]);
 
-  const { running: loadingDelete, invoke: invokeDelete } = useApi(
+  const { running: loadingDelete, invoke: invokeDelete } = useLazyApi(
     (_) => _.deleteRide
   );
 
-  const showGas = hasCombustionEngine(propulsion);
-  const showBattery = hasElectricEngine(propulsion);
+  const showGas = vehicle && hasCombustionEngine(vehicle.propulsion);
+  const showBattery = vehicle && hasElectricEngine(vehicle.propulsion);
 
   return (
     <TableContainer>
-      <Fab
-        aria-label="add"
-        sx={{ position: "fixed", bottom: "2rem", right: "2rem" }}
-        onClick={() => setMode({ type: RideDialogModeType.CREATE })}
-      >
-        <AddIcon />
-      </Fab>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+      <AddFab onClick={() => setMode({ type: RideDialogModeType.CREATE })} />
+      <Table>
         <TableHead>
           <TableRow>
             <TableCell>Started</TableCell>
@@ -99,23 +88,27 @@ const Rides: FC = () => {
             <TableCell>Odometer</TableCell>
             {showGas && <TableCell>Gas</TableCell>}
             {showBattery && <TableCell>Battery</TableCell>}
-            <TableCell />
+            <TableCell sx={{ width: "8rem" }} />
           </TableRow>
         </TableHead>
         <TableBody>
-          {loadingGet || !data ? (
+          {!data ? (
             <TableRow>
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
               <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
-              <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
-              <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
+              {showGas && (
+                <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
+              )}
+              {showBattery && (
+                <DoubleTableCell first={<Skeleton />} second={<Skeleton />} />
+              )}
               <TableCell>
                 <Skeleton />
               </TableCell>
             </TableRow>
           ) : (
-            data?.rides?.map(
+            data.rides.map(
               ({
                 id,
                 departed,
@@ -125,7 +118,6 @@ const Rides: FC = () => {
                 odometer,
                 gas,
                 battery,
-                ...rest
               }) => (
                 <TableRow key={id}>
                   <DoubleTableCell
@@ -150,7 +142,8 @@ const Rides: FC = () => {
                       />
                     }
                     second={
-                      isNumber(odometer.start) && isNumber(odometer.end)
+                      typeof odometer.start === "number" &&
+                      typeof odometer.end === "number"
                         ? formatKilometers(odometer.end - odometer.start)
                         : "-"
                     }
@@ -164,9 +157,9 @@ const Rides: FC = () => {
                         />
                       }
                       second={`Approx. ${
-                        isNumber(gasCapacity) &&
-                        isNumber(gas.start) &&
-                        isNumber(gas.end)
+                        typeof gasCapacity === "number" &&
+                        typeof gas.start === "number" &&
+                        typeof gas.end === "number"
                           ? formatLiters(
                               gas.start * gasCapacity - gas.end * gasCapacity
                             )
@@ -183,9 +176,9 @@ const Rides: FC = () => {
                         />
                       }
                       second={`Approx. ${
-                        isNumber(batteryCapacity) &&
-                        isNumber(battery.start) &&
-                        isNumber(battery.end)
+                        typeof batteryCapacity === "number" &&
+                        typeof battery.start === "number" &&
+                        typeof battery.end === "number"
                           ? formatKilowattHours(
                               battery.start * batteryCapacity -
                                 battery.end * batteryCapacity
@@ -199,14 +192,8 @@ const Rides: FC = () => {
                       loading={loadingDelete}
                       ride={{
                         id,
-                        departed,
-                        arrived,
                         address,
                         coordinates,
-                        odometer,
-                        gas,
-                        battery,
-                        ...rest,
                       }}
                       onReturn={() =>
                         setMode({

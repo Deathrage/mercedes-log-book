@@ -1,13 +1,26 @@
 import { Button, Grid, Typography } from "@mui/material";
 import React, { FC } from "react";
 import VehicleStatus from "./VehicleStatus";
-import { useVehiclesContext } from "../../../components/vehicles/hooks";
 import VehicleForm from "../../../components/VehicleForm";
 import { turnEmptyValuesToUndefined } from "../../../helpers/form";
+import { useVehicleId } from "src/hooks/vehicle";
+import { useLazyApi } from "src/api";
+import useOnMount from "src/hooks/useOnMount";
 
 const VehicleTab: FC = () => {
-  const { activeVehicle, updateVehicle } = useVehiclesContext();
-  if (!activeVehicle) throw new Error("There is no active vehicle!");
+  const vehicleId = useVehicleId();
+
+  const {
+    data: vehicle,
+    running: vehicleLoading,
+    invoke,
+  } = useLazyApi((_) => _.vehicle, {
+    defaultRunning: true,
+  });
+
+  useOnMount(() => void invoke(vehicleId));
+
+  const { invoke: update } = useLazyApi((_) => _.updateVehicle);
 
   return (
     <Grid container spacing={3}>
@@ -20,7 +33,7 @@ const VehicleTab: FC = () => {
       <Grid item xs={3}>
         <img
           src="https://images.freeimages.com/images/large-previews/e07/car-1568850.jpg"
-          alt={activeVehicle?.id ?? "vehicle"}
+          alt={vehicleId}
           style={{ maxWidth: "100%" }}
         />
       </Grid>
@@ -29,9 +42,10 @@ const VehicleTab: FC = () => {
       </Grid>
       <Grid item xs={12}>
         <VehicleForm
-          onSubmit={(state) => {
+          loading={vehicleLoading}
+          onSubmit={async (state) => {
             state = turnEmptyValuesToUndefined(state);
-            return updateVehicle({
+            await update({
               id: state.vin,
               license: state.license,
               model: state.model,
@@ -41,15 +55,20 @@ const VehicleTab: FC = () => {
                 battery: state.batteryCapacity,
               },
             });
+            await invoke(vehicleId);
           }}
-          initialValues={{
-            vin: activeVehicle.id,
-            license: activeVehicle.license,
-            model: activeVehicle.model,
-            propulsion: activeVehicle.propulsion,
-            gasCapacity: activeVehicle.capacity.gas,
-            batteryCapacity: activeVehicle.capacity.battery,
-          }}
+          initialValues={
+            vehicle
+              ? {
+                  vin: vehicle.id,
+                  license: vehicle.license,
+                  model: vehicle.model,
+                  propulsion: vehicle.propulsion,
+                  gasCapacity: vehicle.capacity.gas,
+                  batteryCapacity: vehicle.capacity.battery,
+                }
+              : undefined
+          }
           wrap={(children, { submitting, pristine }) => (
             <>
               {children}
@@ -58,7 +77,7 @@ const VehicleTab: FC = () => {
                 sx={{ ml: "auto", display: "block", marginTop: "1rem" }}
                 type="submit"
                 variant="contained"
-                disabled={submitting || pristine}
+                disabled={submitting || pristine || !vehicle}
               >
                 Save
               </Button>

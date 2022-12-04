@@ -1,6 +1,5 @@
 enum Routes {
   RIDES = "/",
-  ADDRESSES = "/addresses",
   SETTINGS = "/settings",
 }
 

@@ -6,9 +6,12 @@
     "baseUrl": ".",
     "jsx": "react",
     "paths": {
-      "zod": ["node_modules/zod"]
+      "zod": ["node_modules/zod"],
+      "@shared/model": ["../api/shared/model"],
+      "@shared/contracts": ["../api/shared/contracts"],
+      "@shared/helpers": ["../api/shared/helpers"]
     }
   },
-  "include": ["src", "../api/mode-shared"],
+  "include": ["src", "../api"],
   "extends": "../tsconfig.json"
 }

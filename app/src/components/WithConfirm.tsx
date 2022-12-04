@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import React, { ReactNode, useCallback, useState } from "react";
 
-export const WithConfirm = ({
+const WithConfirm = ({
   text,
   onConfirmed,
   children,
@@ -39,3 +39,5 @@ export const WithConfirm = ({
     </>
   );
 };
+
+export default WithConfirm;

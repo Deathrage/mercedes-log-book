@@ -14,11 +14,14 @@ import VehicleForm from "./VehicleForm";
 import { useVehiclesContext } from "./vehicles/hooks";
 import CloseIcon from "@mui/icons-material/Close";
 import { turnEmptyValuesToUndefined } from "src/helpers/form";
+import { useLazyApi } from "../api";
 
 const AddVehicleDialog: FC = () => {
-  const { activeVehicle, loading, createVehicle } = useVehiclesContext();
+  const { activeVehicle, loading, reload } = useVehiclesContext();
 
   const [creating, setCreating] = useState(false);
+
+  const { running, invoke } = useLazyApi((a) => a.updateVehicle);
 
   return (
     <>
@@ -40,7 +43,7 @@ const AddVehicleDialog: FC = () => {
           <VehicleForm
             onSubmit={async (state) => {
               state = turnEmptyValuesToUndefined(state);
-              await createVehicle({
+              await invoke({
                 id: state.vin,
                 license: state.license,
                 model: state.model,
@@ -51,6 +54,7 @@ const AddVehicleDialog: FC = () => {
                 },
               });
               setCreating(false);
+              await reload();
             }}
             wrap={(children, { submitting, pristine }) => (
               <>
@@ -65,7 +69,7 @@ const AddVehicleDialog: FC = () => {
                       color="inherit"
                       sx={{ ml: "auto" }}
                       type="submit"
-                      disabled={submitting || pristine}
+                      disabled={submitting || pristine || running}
                     >
                       Save
                     </Button>
