@@ -40,8 +40,8 @@ const VehicleForm: FC<{
   loading?: boolean;
   initialValues?: VehicleFormValues;
   onSubmit: (values: VehicleFormValues) => Promise<void>;
-  wrap: (content: ReactNode, state: FormState<VehicleFormValues>) => ReactNode;
-}> = ({ initialValues, loading, onSubmit, wrap }) => {
+  wrap?: (content: ReactNode, state: FormState<VehicleFormValues>) => ReactNode;
+}> = ({ initialValues, loading, onSubmit, wrap = (content) => content }) => {
   const submit = useCallback(
     async (values: VehicleFormValues, formApi: FormApi<VehicleFormValues>) => {
       await onSubmit(values);

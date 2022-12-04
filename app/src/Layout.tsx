@@ -11,6 +11,7 @@ import ConnectToMercedesDialog from "./components/ConnectToMercedesDialog";
 import AddVehicleDialog from "./components/AddVehicleDialog";
 import { useVehiclesContext } from "./components/vehicles/hooks";
 import SettingsPage from "./pages/SettingsPage";
+import NewRidePage from "./pages/NewRidePage";
 
 const Layout = () => {
   const [open, setOpen] = useState(true);
@@ -41,6 +42,7 @@ const Layout = () => {
           {mercedesBenzPaired && activeVehicle && (
             <Switch>
               <Route path={Routes.RIDES} element={<RidesPage />} />
+              <Route path={Routes.NEW_RIDE} element={<NewRidePage />} />
               <Route path={Routes.SETTINGS} element={<SettingsPage />} />
             </Switch>
           )}

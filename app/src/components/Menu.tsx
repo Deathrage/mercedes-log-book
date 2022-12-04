@@ -86,7 +86,10 @@ const Menu: FC<{ open?: boolean; onToggleDrawer?: () => void }> = ({
       </Toolbar>
       <Divider />
       <List component="nav">
-        <ListItemButton disabled>
+        <ListItemButton
+          selected={pathname === Routes.NEW_RIDE}
+          onClick={() => navigate(Routes.NEW_RIDE)}
+        >
           <ListItemIcon>
             <AddBoxIcon />
           </ListItemIcon>

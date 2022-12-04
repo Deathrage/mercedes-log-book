@@ -3,7 +3,6 @@ import { RideDialogMode, RideDialogModeType } from "./types";
 import { useInitialValues, useOnSubmit } from "./hooks";
 import { useVehicleId } from "../../hooks/vehicle";
 import RideForm from "../RideForm";
-import Header from "./Header";
 import { AppBar, Button, Dialog, IconButton, Toolbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -45,7 +44,9 @@ const RideDialog: FC<{
       : undefined;
 
   useEffect(() => {
-    if (open && rideToLoadId) {
+    if (open) {
+      if (!rideToLoadId) throw new Error("Id of ride to load is undefined!");
+
       load({ id: rideToLoadId, vehicleId });
     }
   }, [load, open, rideToLoadId, vehicleId]);
@@ -53,29 +54,29 @@ const RideDialog: FC<{
   return (
     <Dialog open={open} onClose={onClose} fullScreen>
       <RideForm
-        leftInfoField={
-          mode.type === RideDialogModeType.CREATE ? <Header /> : null
-        }
         initialValues={initialValues}
         onSubmit={onSubmit}
-        header={({ submitting, pristine }) => (
-          <AppBar sx={{ position: "relative" }}>
-            <Toolbar>
-              <IconButton edge="start" onClick={onClose}>
-                <CloseIcon />
-              </IconButton>
-              {getTitle(mode)}
-              <Button
-                autoFocus
-                color="inherit"
-                sx={{ ml: "auto" }}
-                type="submit"
-                disabled={loading || submitting || pristine}
-              >
-                Save
-              </Button>
-            </Toolbar>
-          </AppBar>
+        wrap={(children, { submitting, pristine }) => (
+          <>
+            <AppBar sx={{ position: "relative" }}>
+              <Toolbar>
+                <IconButton edge="start" onClick={onClose}>
+                  <CloseIcon />
+                </IconButton>
+                {getTitle(mode)}
+                <Button
+                  autoFocus
+                  color="inherit"
+                  sx={{ ml: "auto" }}
+                  type="submit"
+                  disabled={loading || submitting || pristine}
+                >
+                  Save
+                </Button>
+              </Toolbar>
+            </AppBar>
+            {children}
+          </>
         )}
       />
     </Dialog>

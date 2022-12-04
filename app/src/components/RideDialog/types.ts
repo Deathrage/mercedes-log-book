@@ -11,7 +11,7 @@ export type RideDialogMode =
     }
   | {
       type: RideDialogModeType.CREATE;
-      templateId?: string;
+      templateId: string;
     }
   | {
       type: RideDialogModeType.RETURN;

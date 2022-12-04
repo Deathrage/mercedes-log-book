@@ -7,8 +7,9 @@ const DateInputField: FC<{
   name: string;
   label: string;
   required?: boolean;
+  disabled?: boolean;
   sx?: SxProps;
-}> = ({ name, label, required, sx }) => (
+}> = ({ name, label, required, disabled, sx }) => (
   <Field<Date> name={name}>
     {({ input: { value, onChange, ...input }, meta: { error } }) => (
       <TextField
@@ -27,6 +28,7 @@ const DateInputField: FC<{
         error={error}
         helperText={error}
         sx={sx}
+        disabled={disabled}
         {...input}
       />
     )}

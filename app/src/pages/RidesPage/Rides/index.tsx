@@ -30,7 +30,6 @@ import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import { RideActions } from "./RideActions";
 import { hasCombustionEngine, hasElectricEngine } from "@shared/helpers";
 import useOnMount from "../../../hooks/useOnMount";
-import AddFab from "../../../components/AddFab";
 
 const FromTo: FC<{
   from: string | null | undefined;
@@ -79,7 +78,6 @@ const Rides: FC = () => {
 
   return (
     <TableContainer>
-      <AddFab onClick={() => setMode({ type: RideDialogModeType.CREATE })} />
       <Table>
         <TableHead>
           <TableRow>

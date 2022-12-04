@@ -21,3 +21,7 @@ export type RideFormValues = Partial<{
   reason: string;
   note: string;
 }>;
+
+export interface RideFormHandle {
+  submit: () => void;
+}

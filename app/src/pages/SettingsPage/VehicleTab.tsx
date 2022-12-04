@@ -1,8 +1,8 @@
 import { Button, Grid, Typography } from "@mui/material";
 import React, { FC } from "react";
-import VehicleStatus from "./VehicleStatus";
-import VehicleForm from "../../../components/VehicleForm";
-import { turnEmptyValuesToUndefined } from "../../../helpers/form";
+import VehicleStatus from "../../components/VehicleStatus";
+import VehicleForm from "../../components/VehicleForm";
+import { turnEmptyValuesToUndefined } from "../../helpers/form";
 import { useVehicleId } from "src/hooks/vehicle";
 import { useLazyApi } from "src/api";
 import useOnMount from "src/hooks/useOnMount";

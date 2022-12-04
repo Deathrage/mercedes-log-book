@@ -1,15 +1,15 @@
 import { Grid } from "@mui/material";
 import React, { FC } from "react";
 import { useVehicleId } from "src/hooks/vehicle";
-import { useApi } from "../../../api";
+import { useApi } from "../api";
 import {
   formatBatteryLevel,
   formatGasLevel,
   formatKilometers,
-} from "../../../helpers/formatters";
-import InfoFieldWithDate from "../../../components/InfoFieldWithDate";
+} from "../helpers/formatters";
+import InfoFieldWithDate from "./InfoFieldWithDate";
 
-const VehicleStatus: FC = () => {
+const VehicleStatus: FC<{ hideRanges?: boolean }> = ({ hideRanges }) => {
   const vehicleId = useVehicleId();
 
   const { data: vehicle, running: vehicleLoading } = useApi((_) => _.vehicle, {
@@ -51,23 +51,27 @@ const VehicleStatus: FC = () => {
           format={(val) => formatBatteryLevel(val, vehicle!.capacity.battery)}
         />
       </Grid>
-      <Grid item xs={4} />
-      <Grid item xs={4}>
-        <InfoFieldWithDate
-          label="Gas range"
-          data={status?.gas?.range}
-          loading={running}
-          format={formatKilometers}
-        />
-      </Grid>
-      <Grid item xs={4}>
-        <InfoFieldWithDate
-          label="Battery range"
-          data={status?.battery?.range}
-          loading={running}
-          format={formatKilometers}
-        />
-      </Grid>
+      {!hideRanges && (
+        <>
+          <Grid item xs={4} />
+          <Grid item xs={4}>
+            <InfoFieldWithDate
+              label="Gas range"
+              data={status?.gas?.range}
+              loading={running}
+              format={formatKilometers}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <InfoFieldWithDate
+              label="Battery range"
+              data={status?.battery?.range}
+              loading={running}
+              format={formatKilometers}
+            />
+          </Grid>
+        </>
+      )}
     </Grid>
   );
 };

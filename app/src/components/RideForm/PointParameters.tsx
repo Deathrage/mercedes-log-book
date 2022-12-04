@@ -1,28 +1,22 @@
 import { Button, Grid, Typography } from "@mui/material";
-import React, { FC, ReactNode } from "react";
+import React, { FC } from "react";
 import { useField } from "react-final-form";
 import { formatKilowattHours, formatLiters } from "../../helpers/formatters";
 import { PointParametersType } from "./types";
 import DateInputField from "../fields/DateInputField";
 import TextInputField from "../fields/TextInputField";
 import NumberInputField from "../fields/NumberInputField";
-import { useVehicleId } from "src/hooks/vehicle";
 import { hasCombustionEngine, hasElectricEngine } from "@shared/helpers";
-import { useLazyApi } from "../../api";
-import useOnMount from "src/hooks/useOnMount";
+import { PropulsionType } from "@shared/model";
 
 const PointParameters: FC<{
+  disabled?: boolean;
+  capacity: { battery?: number; gas?: number };
+  propulsion?: PropulsionType;
   type: PointParametersType;
-  infoField?: ReactNode;
-}> = ({ type, infoField }) => {
-  const vehicleId = useVehicleId();
-  const { data: vehicle, invoke } = useLazyApi((_) => _.vehicle, {
-    defaultRunning: true,
-  });
-  useOnMount(() => void invoke(vehicleId));
-
-  const usesGas = vehicle && hasCombustionEngine(vehicle.propulsion);
-  const usesBattery = vehicle && hasElectricEngine(vehicle.propulsion);
+}> = ({ disabled, type, capacity, propulsion }) => {
+  const usesGas = propulsion && hasCombustionEngine(propulsion);
+  const usesBattery = propulsion && hasElectricEngine(propulsion);
 
   const isStart = type === PointParametersType.START;
 
@@ -56,9 +50,14 @@ const PointParameters: FC<{
             name={isStart ? "departed" : "arrived"}
             label={isStart ? "Departed" : "Arrived"}
             required={isStart}
+            disabled={disabled}
           />
           {isStart && (
-            <Button size="small" onClick={() => onChangeDeparted(new Date())}>
+            <Button
+              size="small"
+              onClick={() => onChangeDeparted(new Date())}
+              disabled={disabled}
+            >
               Now
             </Button>
           )}
@@ -68,20 +67,20 @@ const PointParameters: FC<{
               onClick={() => {
                 if (departed) onChangeArrived(departed);
               }}
+              disabled={disabled}
             >
               Departed
             </Button>
           )}
         </Grid>
         <Grid item xs={2} />
-        <Grid item xs={3}>
-          {infoField}
-        </Grid>
+        <Grid item xs={3} />
         <Grid item xs={2} />
         <Grid item xs={7}>
           <TextInputField
             name={isStart ? "startAddress" : "endAddress"}
             label="Address"
+            disabled={disabled}
           />
         </Grid>
         <Grid item xs={5}>
@@ -90,6 +89,7 @@ const PointParameters: FC<{
             label="Odometer"
             suffix="km"
             step={1}
+            disabled={disabled}
           />
         </Grid>
         <Grid item xs={7}>
@@ -100,6 +100,7 @@ const PointParameters: FC<{
                 label="Latitude"
                 suffix="°"
                 decimals={7}
+                disabled={disabled}
               />
             </Grid>
             <Grid item xs={6}>
@@ -108,6 +109,7 @@ const PointParameters: FC<{
                 label="Longitude"
                 suffix="°"
                 decimals={7}
+                disabled={disabled}
               />
             </Grid>
           </Grid>
@@ -121,11 +123,10 @@ const PointParameters: FC<{
                 suffix="%"
                 rate={100}
                 step={1}
-                disabled={!usesGas}
+                disabled={disabled || !usesGas}
                 helperText={
-                  typeof gas === "number" &&
-                  typeof vehicle?.capacity.gas === "number"
-                    ? `Approx. ${formatLiters(gas * vehicle.capacity.gas)}.`
+                  typeof gas === "number" && typeof capacity.gas === "number"
+                    ? `Approx. ${formatLiters(gas * capacity.gas)}.`
                     : undefined
                 }
               />
@@ -137,12 +138,12 @@ const PointParameters: FC<{
                 suffix="%"
                 rate={100}
                 step={1}
-                disabled={!usesBattery}
+                disabled={disabled || !usesBattery}
                 helperText={
                   typeof battery === "number" &&
-                  typeof vehicle?.capacity.battery === "number"
+                  typeof capacity.battery === "number"
                     ? `Approx. ${formatKilowattHours(
-                        battery * vehicle.capacity.battery
+                        battery * capacity.battery
                       )}.`
                     : undefined
                 }

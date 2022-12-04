@@ -13,7 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Form } from "react-final-form";
 import TextInputField from "src/components/fields/TextInputField";
 
-interface FormState {
+interface FormValues {
   name: string;
   address: string;
 }
@@ -27,7 +27,7 @@ const CreateOrEditRow: FC<{
   return (
     <TableRow>
       <TableCell colSpan={3} padding="none">
-        <Form<FormState>
+        <Form<FormValues>
           onSubmit={(values, api) => {
             if (api.getState().pristine) {
               onCancel();
