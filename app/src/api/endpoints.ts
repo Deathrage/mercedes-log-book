@@ -7,9 +7,15 @@ import {
   Rides,
   RidesSum,
   VehiclesOngoingRide,
+  RideReports,
 } from "@shared/contracts";
 import { z } from "zod";
-import { fetchApiJson, fetchApiString, fetchApiVoid } from "./helpers";
+import {
+  fetchApiBlob,
+  fetchApiJson,
+  fetchApiString,
+  fetchApiVoid,
+} from "./helpers";
 
 const endpoints = {
   currentUser: () =>
@@ -126,6 +132,14 @@ const endpoints = {
     ),
   cancelOngoingRide: (vehicleId: string) =>
     fetchApiVoid(VehiclesOngoingRide.DELETE.path(vehicleId), "DELETE"),
+  rideReport: ({
+    vehicleId,
+    ...dates
+  }: {
+    vehicleId: string;
+    from: Date;
+    to: Date;
+  }) => fetchApiBlob(RideReports.GET.path(vehicleId, dates), "GET"),
 };
 
 export default endpoints;

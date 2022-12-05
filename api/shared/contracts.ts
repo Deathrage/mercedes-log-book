@@ -7,3 +7,4 @@ export * as Vehicles from "../f_Vehicles/schema";
 export * as VehiclesOngoingRide from "../f_Vehicles_OngoingRide/schema";
 export * as VehiclesStatus from "../f_Vehicles_Status/schema";
 export * as VehiclesStatusOdometer from "../f_Vehicles_Status_Odometer/schema";
+export * as RideReports from "../f_RideReports/schema";

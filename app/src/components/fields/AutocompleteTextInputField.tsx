@@ -28,7 +28,7 @@ const AutocompleteTextInputField: FC<{
         fullWidth
         disabled={disabled || loading}
         {...input}
-        onChange={(_, value) => onChange(value)}
+        onInputChange={(_, value) => onChange(value)}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -38,6 +38,7 @@ const AutocompleteTextInputField: FC<{
             helperText={error}
             variant="filled"
             InputProps={{
+              ...params.InputProps,
               slots: {
                 input: loading
                   ? () => (
@@ -45,7 +46,6 @@ const AutocompleteTextInputField: FC<{
                     )
                   : undefined,
               },
-              ...params.InputProps,
             }}
           />
         )}

@@ -36,6 +36,14 @@ export default class RidesRepository {
     return this.#dataSource.upsert(ride);
   }
 
+  betweenDates(vehicleId: string, dates: { from: Date; to: Date }) {
+    return this.#dataSource.query(Ride, {
+      alias: "r",
+      where: `r.vehicleId = '${vehicleId}' AND '${dates.from.toJSON()}' <= r.departed AND r.departed <= '${dates.to.toJSON()}'`,
+      orderby: "r.departed DESC",
+    });
+  }
+
   paginatedFromLatest(vehicleId: string, skip: number, take: number) {
     return this.#dataSource.query(Ride, {
       alias: "r",

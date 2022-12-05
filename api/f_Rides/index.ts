@@ -46,6 +46,8 @@ class RideHandler extends HttpHandler {
     const page = Number(req.query.required.page);
     const pageSize = Number(req.query.required.pageSize);
 
+    if (pageSize > 10) throw new Error("Page size cannot be higher than 10!");
+
     return {
       body: await this.#getMany(vehicleId, page, pageSize),
     };

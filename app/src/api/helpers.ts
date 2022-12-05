@@ -12,6 +12,13 @@ const includeBody = (req: RequestInit, body: object | null | undefined) => {
   return req;
 };
 
+const makeError = (
+  status: number,
+  method: string,
+  path: string,
+  detail: string | null | undefined
+) => new Error(`${status} - ${method} ${path}${detail ? `: ${detail}` : ""}`);
+
 export const fetchApiString = async <Response extends string | null>(
   path: string,
   method: string,
@@ -21,8 +28,7 @@ export const fetchApiString = async <Response extends string | null>(
 
   const text = (await res.text()) || null;
 
-  if (res.status !== 200)
-    throw new Error(`${res.status} - ${method} ${path}: ${text}`);
+  if (res.status !== 200) throw makeError(res.status, method, path, text);
 
   return text as Response;
 };
@@ -54,9 +60,21 @@ export const fetchApiVoid = async (
   );
 
   if (res.status !== 200)
-    throw new Error(
-      `${res.status} - ${method} ${path}: ${(await res.text()) || "No body"}`
-    );
+    throw makeError(res.status, method, path, await res.text());
+};
+
+export const fetchApiBlob = async (
+  path: string,
+  method: string,
+  body?: object | null
+) => {
+  const res = await fetch(toApiEndpoint(path), includeBody({ method }, body));
+
+  if (res.status !== 200)
+    throw makeError(res.status, method, path, await res.text());
+
+  const blob = await res.blob();
+  return blob;
 };
 
 type Result = { success: true; data: object } | { success: false };
