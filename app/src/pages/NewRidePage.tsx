@@ -1,24 +1,43 @@
-import { Button, Fab, Grid, Paper, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  ButtonGroup,
+  Grid,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import React, { FC, useCallback, useRef, useState } from "react";
 import VehicleStatus from "../components/VehicleStatus";
 import RideForm from "../components/RideForm";
-import CloseIcon from "@mui/icons-material/Close";
 import AddFab from "../components/AddFab";
 import { useLazyApi } from "../api";
 import { useVehicleId } from "../hooks/vehicle";
 import { useNavigate } from "react-router-dom";
 import Routes from "../consts/Routes";
-import { mapToCreatePayload } from "../components/RideForm/helpers";
+import {
+  mapToCreatePayload,
+  toReturnValues,
+} from "../components/RideForm/helpers";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import CloseIcon from "@mui/icons-material/Close";
+import { RideFormValues } from "../components/RideForm/types";
+
+interface Ride {
+  id: number;
+  initialValues?: RideFormValues;
+}
 
 const NewRidePage: FC = () => {
   const vehicleId = useVehicleId();
 
   const lastIdRef = useRef(1);
 
-  const [rides, setRides] = useState<number[]>([1]);
-  const addRide = useCallback(() => {
+  const [rides, setRides] = useState<Ride[]>([{ id: lastIdRef.current }]);
+  const addRide = useCallback((initialValues?: RideFormValues) => {
     const nextId = (lastIdRef.current += 1);
-    setRides((prev) => [...prev, nextId]);
+    setRides((prev) => [...prev, { id: nextId, initialValues }]);
   }, []);
 
   const { invoke: createRide } = useLazyApi((_) => _.createRide);
@@ -27,14 +46,14 @@ const NewRidePage: FC = () => {
 
   return (
     <>
-      <AddFab onClick={addRide} />
+      <AddFab onClick={() => addRide()} />
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Paper sx={{ p: 2, pb: 5 }}>
             <VehicleStatus hideRanges />
           </Paper>
         </Grid>
-        {rides.map((id) => (
+        {rides.map(({ id, initialValues }) => (
           <Grid item xs={12} key={id}>
             <Paper>
               <RideForm
@@ -43,10 +62,11 @@ const NewRidePage: FC = () => {
                   await createRide(payload);
                   setRides((prev) => {
                     if (prev.length === 1) navigate(Routes.RIDES);
-                    return prev.filter((id2) => id2 !== id);
+                    return prev.filter(({ id: id2 }) => id2 !== id);
                   });
                 }}
-                wrap={(children, { submitting }) => (
+                initialValues={initialValues}
+                wrap={(children, { submitting, values }) => (
                   <>
                     <Stack
                       direction="row"
@@ -61,23 +81,50 @@ const NewRidePage: FC = () => {
                           color="secondary"
                           type="submit"
                           disabled={submitting}
-                          sx={{ mr: "1rem" }}
+                          sx={{ marginRight: "1rem" }}
                         >
                           Create
                         </Button>
-                        <Fab
+                        <ButtonGroup
+                          variant="text"
+                          sx={{ verticalAlign: "middle", marginRight: "1rem" }}
                           size="small"
-                          onClick={() =>
-                            setRides((prev) => {
-                              if (prev.length === 1) navigate(Routes.RIDES);
-                              return prev.filter((id2) => id2 !== id);
-                            })
-                          }
-                          color="error"
-                          disabled={submitting}
+                          color="inherit"
                         >
-                          <CloseIcon />
-                        </Fab>
+                          <Tooltip title="Return ride" placement="top">
+                            <Button
+                              onClick={() => addRide(toReturnValues(values))}
+                              disabled={submitting}
+                            >
+                              <KeyboardReturnIcon />
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="Duplicate ride" placement="top">
+                            <Button
+                              onClick={() => addRide(values)}
+                              disabled={submitting}
+                            >
+                              <ContentCopyIcon />
+                            </Button>
+                          </Tooltip>
+                        </ButtonGroup>
+                        <Tooltip title="Remove ride" placement="top">
+                          <Button
+                            size="small"
+                            color="error"
+                            variant="contained"
+                            onClick={() =>
+                              setRides((prev) => {
+                                if (prev.length === 1) navigate(Routes.RIDES);
+                                return prev.filter(({ id: id2 }) => id2 !== id);
+                              })
+                            }
+                            disabled={submitting}
+                            sx={{ minWidth: "unset" }}
+                          >
+                            <CloseIcon />
+                          </Button>
+                        </Tooltip>
                       </div>
                     </Stack>
                     {children}

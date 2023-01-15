@@ -49,3 +49,55 @@ export const mapToUpdatePayload = (
   id,
   ...mapToCreatePayload(vehicleId, state),
 });
+
+export const switchSides = ({
+  departed,
+  arrived,
+  startAddress,
+  startLatitude,
+  startLongitude,
+  endAddress,
+  endLatitude,
+  endLongitude,
+  startOdometer,
+  endOdometer,
+  startGas,
+  endGas,
+  startBattery,
+  endBattery,
+  reason,
+  note,
+}: RideFormValues) => ({
+  departed: arrived,
+  arrived: departed,
+  startAddress: endAddress,
+  startLatitude: endLatitude,
+  startLongitude: endLongitude,
+  endAddress: startAddress,
+  endLatitude: startLatitude,
+  endLongitude: startLongitude,
+  startOdometer: endOdometer,
+  endOdometer: startOdometer,
+  startGas: endGas,
+  endGas: startGas,
+  startBattery: endBattery,
+  endBattery: startBattery,
+  reason,
+  note,
+});
+
+export const toReturnValues = (values: RideFormValues) => {
+  const switchedValues = switchSides(values);
+
+  delete switchedValues.arrived;
+  delete switchedValues.endAddress;
+  delete switchedValues.endLatitude;
+  delete switchedValues.endLongitude;
+  delete switchedValues.endOdometer;
+  delete switchedValues.endGas;
+  delete switchedValues.endBattery;
+  delete switchedValues.reason;
+  delete switchedValues.note;
+
+  return switchedValues;
+};

@@ -66,12 +66,7 @@ export const RideActions: FC<{
             <KeyboardReturnIcon />
           </Button>
         </Tooltip>
-        <Button
-          size="small"
-          aria-label="select merge strategy"
-          aria-haspopup="menu"
-          onClick={() => setOpen(true)}
-        >
+        <Button size="small" onClick={() => setOpen(true)}>
           <ArrowDropDownIcon />
         </Button>
       </ButtonGroup>

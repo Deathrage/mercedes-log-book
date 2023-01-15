@@ -1,4 +1,5 @@
 import endpoints from "../../api/endpoints";
+import { toReturnValues } from "../RideForm/helpers";
 import { RideFormValues } from "../RideForm/types";
 
 type GetPayload = Awaited<ReturnType<typeof endpoints.ride>>;
@@ -22,13 +23,7 @@ export const mapToValues = (data: GetPayload): RideFormValues => ({
   note: data.note,
 });
 
-export const mapToReturnValues = (data: GetPayload): RideFormValues => ({
-  departed: data.arrived,
-  startAddress: data.address.end,
-  endAddress: data.address.start,
-  startLatitude: data.coordinates.end?.lat,
-  startLongitude: data.coordinates.end?.lon,
-  startOdometer: data.odometer.end,
-  startGas: data.gas.end,
-  startBattery: data.battery.end,
-});
+export const mapToReturnValues = (data: GetPayload): RideFormValues => {
+  const values = mapToValues(data);
+  return toReturnValues(values);
+};
