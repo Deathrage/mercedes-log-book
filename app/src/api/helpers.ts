@@ -17,7 +17,16 @@ const makeError = (
   method: string,
   path: string,
   detail: string | null | undefined
-) => new Error(`${status} - ${method} ${path}${detail ? `: ${detail}` : ""}`);
+) => {
+  const jsonResult = detail && tryParseJson(detail);
+
+  return new Error(
+    `${status} - ${method} ${path}${detail ? `: ${detail}` : ""}`,
+    {
+      cause: jsonResult && jsonResult.success ? jsonResult.data : undefined,
+    }
+  );
+};
 
 export const fetchApiString = async <Response extends string | null>(
   path: string,

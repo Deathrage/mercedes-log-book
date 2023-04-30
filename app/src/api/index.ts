@@ -1,10 +1,10 @@
 import { AuthorizeMb } from "@shared/contracts";
-import { mercedesBenzError, MercedesBenzErrorType } from "@shared/model";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { mercedesBenzError } from "@shared/model";
+import { createElement, useCallback, useEffect, useRef, useState } from "react";
 import { toApiEndpoint } from "../helpers/api";
 import { useErrorsContext } from "../components/errors/hooks";
 import endpoints from "./endpoints";
-import { tryParseJson } from "./helpers";
+import { Box, Button } from "@mui/material";
 
 export const useLazyApi = <Response, Request = undefined>(
   pick: (list: typeof endpoints) => (request: Request) => Promise<Response>,
@@ -54,19 +54,44 @@ export const useLazyApi = <Response, Request = undefined>(
         } catch (error) {
           setState({ running: false, data: null, error });
 
-          if (error instanceof Error) {
-            const jsonResult = tryParseJson(error.message);
-            if (jsonResult.success) {
-              const result = mercedesBenzError.safeParse(jsonResult.data);
-              if (
-                result.success &&
-                result.data.type === MercedesBenzErrorType.INVALID_GRANT
-              )
-                window.location.href = toApiEndpoint(AuthorizeMb.GET_INIT.path);
+          let isMbError = false;
+
+          if (
+            error instanceof Error &&
+            typeof error.cause === "object" &&
+            // null is treated as object
+            error.cause
+          ) {
+            const result = mercedesBenzError.safeParse(error.cause);
+            debugger;
+            if (result.success) {
+              // At this point we can be sure that this is MB error
+              isMbError = true;
+              if (!silent)
+                show(error, {
+                  title: "Mercedes Benz API Error",
+                  action: createElement(
+                    Box,
+                    { sx: { marginTop: "1rem" } },
+                    createElement(
+                      Button,
+                      {
+                        color: "error",
+                        variant: "outlined",
+                        onClick: () => {
+                          window.location.href = toApiEndpoint(
+                            AuthorizeMb.GET_INIT.path
+                          );
+                        },
+                      },
+                      "Re-authorize Mercedes Me"
+                    )
+                  ),
+                });
             }
           }
 
-          if (!silent) show(error);
+          if (!silent && !isMbError) show(error);
           reject(error);
         }
       }),

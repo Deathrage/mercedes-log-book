@@ -1,7 +1,13 @@
-import { createContext } from "react";
+import { ReactNode, createContext } from "react";
 
 export interface ErrorsContext {
-  show(err: unknown): void;
+  show(
+    err: unknown,
+    opts?: {
+      title?: string;
+      action?: ReactNode;
+    }
+  ): void;
 }
 
 export default createContext<ErrorsContext>(

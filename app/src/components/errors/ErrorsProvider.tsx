@@ -8,13 +8,38 @@ import React, {
 } from "react";
 import context, { ErrorsContext } from "./context";
 
+type Params = Parameters<ErrorsContext["show"]>;
+type QueuedError = {
+  err: Params[0];
+} & Params[1];
+
 const Provider = context.Provider;
 
-const ErrorsProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
-  const [errors, setErrors] = useState<unknown[]>([]);
+const ActiveError: FC<QueuedError & { onClose: () => void }> = ({
+  err,
+  title,
+  action,
+  onClose,
+}) => (
+  <Alert severity="error" onClose={onClose}>
+    <AlertTitle>{title ?? "Error"}</AlertTitle>
+    {Array.isArray(err) ? JSON.stringify(err, null, 2) : String(err)}
+    {action}
+  </Alert>
+);
 
-  const show = useCallback(
-    (err: unknown) => setErrors((prev) => [err, ...prev]),
+const ErrorsProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
+  const [errors, setErrors] = useState<QueuedError[]>([]);
+
+  const show = useCallback<ErrorsContext["show"]>(
+    (err, opts) =>
+      setErrors((prev) => [
+        {
+          err,
+          ...opts,
+        },
+        ...prev,
+      ]),
     []
   );
 
@@ -26,16 +51,12 @@ const ErrorsProvider: FC<PropsWithChildren<{}>> = ({ children }) => {
   );
   const close = useCallback(() => setErrors((prev) => prev.slice(1)), []);
 
+  const activeError = errors[0];
   return (
     <Provider value={ctx}>
       {children}
-      <Dialog open={!!errors.length} onClose={close} fullWidth>
-        <Alert severity="error">
-          <AlertTitle>Error</AlertTitle>
-          {Array.isArray(errors[0])
-            ? JSON.stringify(errors[0], null, 2)
-            : String(errors[0])}
-        </Alert>
+      <Dialog open={!!activeError} onClose={close} fullWidth>
+        <ActiveError {...activeError} onClose={close} />
       </Dialog>
     </Provider>
   );

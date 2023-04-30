@@ -2,14 +2,13 @@
   "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
   "configurations": {
     "mercedes-log-book": {
+      "host": "127.0.0.1",
       "appLocation": "app",
       "apiLocation": "api",
-      "outputLocation": "dist",
-      "appBuildCommand": "npm run build",
-      "apiBuildCommand": "npm run build",
+      "apiPort": 7071,
       "port": 4280,
       "run": "npm start",
-      "appDevserverUrl": "http://localhost:4281",
+      "appDevserverUrl": "http://127.0.0.1:4281",
       "devserverTimeout": 9000
     }
   }
