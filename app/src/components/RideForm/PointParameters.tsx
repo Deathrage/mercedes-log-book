@@ -3,7 +3,7 @@ import React, { FC } from "react";
 import { useField } from "react-final-form";
 import { formatKilowattHours, formatLiters } from "../../helpers/formatters";
 import { PointParametersType } from "./types";
-import DateInputField from "../fields/DateInputField";
+import DatetimeInputField from "../fields/DatetimeInputField";
 import NumberInputField from "../fields/NumberInputField";
 import { hasCombustionEngine, hasElectricEngine } from "@shared/helpers";
 import { PropulsionType } from "@shared/model";
@@ -47,7 +47,7 @@ const PointParameters: FC<{
           </Typography>
         </Grid>
         <Grid item xs={5}>
-          <DateInputField
+          <DatetimeInputField
             name={isStart ? "departed" : "arrived"}
             label={isStart ? "Departed" : "Arrived"}
             required={isStart}

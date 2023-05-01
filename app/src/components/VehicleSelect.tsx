@@ -18,22 +18,19 @@ const VehicleSelect: FC = () => {
       renderInput={(params) => <TextField {...params} />}
       getOptionLabel={(o) => o.label}
       options={options}
-      value={
-        options.find((o) => o.value === activeVehicle?.id) ?? {
-          label: "temp",
-          value: "temp",
-        }
-      }
+      value={options.find((o) => o.value === activeVehicle?.id) ?? null}
       onChange={(_, option) => option && setActiveVehicle(option.value)}
       fullWidth
-      componentsProps={{
+      slotProps={{
         popper: {
           sx: {
             whiteSpace: "nowrap",
           },
         },
+        clearIndicator: {
+          sx: { display: "none" },
+        },
       }}
-      disableClearable
     />
   );
 };

@@ -4,7 +4,7 @@ import React, { FC, ReactNode, useCallback } from "react";
 import { Form } from "react-final-form";
 import { useLazyApi } from "src/api";
 import { useVehicleId } from "../../hooks/vehicle";
-import DateInputField from "../fields/DateInputField";
+import DatetimeInputField from "../fields/DatetimeInputField";
 import { getInitialValue, getTitle } from "./helpers";
 import { RideReportFormValues, RideReportType } from "./types";
 import { saveAs } from "file-saver";
@@ -57,7 +57,7 @@ const RideReportForm: FC<{
             getTitle(type),
             <Grid spacing={3} container>
               <Grid item xs={6}>
-                <DateInputField
+                <DatetimeInputField
                   name="from"
                   label="From"
                   disabled={disabled || type !== RideReportType.CUSTOM}
@@ -65,7 +65,7 @@ const RideReportForm: FC<{
                 />
               </Grid>
               <Grid item xs={6}>
-                <DateInputField
+                <DatetimeInputField
                   name="to"
                   label="To"
                   disabled={disabled || type !== RideReportType.CUSTOM}

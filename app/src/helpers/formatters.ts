@@ -1,12 +1,11 @@
-import moment from "moment";
+import { format } from "date-fns";
 import formatcoords from "formatcoords";
 
-export const formatDate = (date: Date | string | number | undefined | null) =>
-  date ? moment(date).format("DD. MM. yyyy") : undefined;
+export const formatDate = (date: Date | number | undefined | null) =>
+  date ? format(date, "dd. MM. yyyy") : undefined;
 
-export const formatDateTime = (
-  date: Date | string | number | undefined | null
-) => (date ? moment(date).format("DD. MM. yyyy HH:mm:ss") : undefined);
+export const formatDateTime = (date: Date | number | undefined | null) =>
+  date ? format(date, "dd. MM. yyyy HH:mm:ss") : undefined;
 
 const percentageInt = new Intl.NumberFormat("en-US", {
   style: "percent",

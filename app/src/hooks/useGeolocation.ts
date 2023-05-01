@@ -1,4 +1,4 @@
-import moment from "moment";
+import { isBefore, subMinutes } from "date-fns";
 import { useCallback } from "react";
 
 const useGeolocation = () => {
@@ -13,9 +13,7 @@ const useGeolocation = () => {
 
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            if (
-              moment(pos.timestamp).isBefore(moment().subtract(5, "minutes"))
-            ) {
+            if (isBefore(pos.timestamp, subMinutes(new Date(), 5))) {
               const error = new Error("Location is older than 5 minutes");
               reject(error);
               return;
