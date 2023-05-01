@@ -1,13 +1,19 @@
+import { Vehicle } from "../components/vehicles/types";
 import { useVehiclesContext } from "../components/vehicles/hooks";
 
-export const useVehicle = () => {
+export function useVehicle(throwIfNotSelected?: true): Vehicle;
+export function useVehicle(throwIfNotSelected: false): Vehicle | null;
+export function useVehicle(throwIfNotSelected = true): Vehicle | null {
   const { activeVehicle } = useVehiclesContext();
-  if (!activeVehicle) throw new Error("Vehicle is not selected!");
+  if (!activeVehicle && throwIfNotSelected)
+    throw new Error("Vehicle is not selected!");
 
   return activeVehicle;
-};
+}
 
-export const useVehicleId = () => {
-  const vehicle = useVehicle();
-  return vehicle.id;
-};
+export function useVehicleId(throwIfNotSelected?: true): string;
+export function useVehicleId(throwIfNotSelected: false): string | null;
+export function useVehicleId(throwIfNotSelected = true): string | null {
+  const vehicle = useVehicle(throwIfNotSelected as any);
+  return vehicle?.id || null;
+}

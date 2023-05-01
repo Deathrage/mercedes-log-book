@@ -8,7 +8,6 @@ import {
   Typography,
 } from "@mui/material";
 import React, { FC, useCallback, useRef, useState } from "react";
-import VehicleStatus from "../components/VehicleStatus";
 import RideForm from "../components/RideForm";
 import AddFab from "../components/AddFab";
 import { useLazyApi } from "../api";
@@ -48,11 +47,6 @@ const NewRidePage: FC = () => {
     <>
       <AddFab onClick={() => addRide()} />
       <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2, pb: 5 }}>
-            <VehicleStatus hideRanges />
-          </Paper>
-        </Grid>
         {rides.map(({ id, initialValues }) => (
           <Grid item xs={12} key={id}>
             <Paper>

@@ -1,6 +1,5 @@
 import { Button, Grid, Typography } from "@mui/material";
 import React, { FC } from "react";
-import VehicleStatus from "../../components/VehicleStatus";
 import VehicleForm from "../../components/VehicleForm";
 import { turnEmptyValuesToUndefined } from "../../helpers/form";
 import { useVehicleId } from "src/hooks/vehicle";
@@ -24,19 +23,6 @@ const VehicleTab: FC = () => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12}>
-        <Typography variant="h6">Vehicle status</Typography>
-      </Grid>
-      <Grid item xs={9}>
-        <VehicleStatus />
-      </Grid>
-      <Grid item xs={3}>
-        <img
-          src="https://images.freeimages.com/images/large-previews/e07/car-1568850.jpg"
-          alt={vehicleId}
-          style={{ maxWidth: "100%" }}
-        />
-      </Grid>
       <Grid item xs={12}>
         <Typography variant="h6">Vehicle settings</Typography>
       </Grid>

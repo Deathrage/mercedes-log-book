@@ -12,9 +12,9 @@ const Settings: FC = () => {
   const [tab, setTab] = useState("1");
 
   return (
-    <Paper sx={{ pt: 2 }}>
+    <Paper>
       <TabContext value={tab}>
-        <Grid container spacing={3}>
+        <Grid container spacing={3} marginTop={0}>
           <Grid item xs={12} sx={{ pt: "0 !important" }}>
             <AppBar position="relative">
               <TabList

@@ -1,17 +1,13 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 import { Container } from "@mui/material";
 import Menu from "./components/Menu";
-import { BrowserRouter, Routes as Switch, Route } from "react-router-dom";
-import Routes from "./consts/Routes";
-import RidesPage from "./pages/RidesPage";
+import { Outlet } from "react-router-dom";
 import { useCurrentUserContext } from "./components/currentUser/hooks";
 import ConnectToMercedesDialog from "./components/ConnectToMercedesDialog";
 import AddVehicleDialog from "./components/AddVehicleDialog";
 import { useVehiclesContext } from "./components/vehicles/hooks";
-import SettingsPage from "./pages/SettingsPage";
-import NewRidePage from "./pages/NewRidePage";
+import VehicleBar from "./components/VehicleBar";
 
 const Layout = () => {
   const [open, setOpen] = useState(true);
@@ -23,7 +19,7 @@ const Layout = () => {
   const { activeVehicle } = useVehiclesContext();
 
   return (
-    <BrowserRouter>
+    <Box sx={{ display: "flex" }}>
       <Menu open={open} onToggleDrawer={toggleDrawer} />
       <Box
         component="main"
@@ -37,20 +33,15 @@ const Layout = () => {
           overflow: "auto",
         }}
       >
-        <Toolbar />
-        <Container maxWidth="xl">
-          {mercedesBenzPaired && activeVehicle && (
-            <Switch>
-              <Route path={Routes.RIDES} element={<RidesPage />} />
-              <Route path={Routes.NEW_RIDE} element={<NewRidePage />} />
-              <Route path={Routes.SETTINGS} element={<SettingsPage />} />
-            </Switch>
-          )}
+        <VehicleBar sx={{ mb: "2rem" }} />
+
+        <Container maxWidth={false}>
+          {mercedesBenzPaired && activeVehicle && <Outlet />}
           <ConnectToMercedesDialog />
           <AddVehicleDialog />
         </Container>
       </Box>
-    </BrowserRouter>
+    </Box>
   );
 };
 
